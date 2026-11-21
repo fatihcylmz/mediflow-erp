@@ -1,0 +1,35 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MediFlow.Application.Contracts/MediFlow.Application.Contracts.csproj" />
+    <Project Path="src/MediFlow.Application/MediFlow.Application.csproj" />
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <Project Path="src/MediFlow.DbMigrator/MediFlow.DbMigrator.csproj" />
+    <Project Path="src/MediFlow.Domain.Shared/MediFlow.Domain.Shared.csproj" />
+    <Project Path="src/MediFlow.Domain/MediFlow.Domain.csproj" />
+    <Project Path="src/MediFlow.EntityFrameworkCore/MediFlow.EntityFrameworkCore.csproj" />
+    <Project Path="src/MediFlow.HttpApi.Client/MediFlow.HttpApi.Client.csproj" />
+    
+    <Project Path="src/MediFlow.HttpApi.Host/MediFlow.HttpApi.Host.csproj" />
+    <Project Path="src/MediFlow.HttpApi/MediFlow.HttpApi.csproj" />
+    
+    
+    
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/MediFlow.Application.Tests/MediFlow.Application.Tests.csproj" />
+    <Project Path="test/MediFlow.Domain.Tests/MediFlow.Domain.Tests.csproj" />
+    <Project Path="test/MediFlow.EntityFrameworkCore.Tests/MediFlow.EntityFrameworkCore.Tests.csproj" />
+    <Project Path="test/MediFlow.HttpApi.Client.ConsoleTestApp/MediFlow.HttpApi.Client.ConsoleTestApp.csproj" />
+    
+    <Project Path="test/MediFlow.TestBase/MediFlow.TestBase.csproj" />
+    
+  </Folder>
+</Solution>

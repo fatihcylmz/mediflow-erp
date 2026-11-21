@@ -1,0 +1,75 @@
+# Docker Compose for MediFlow Healthcare ERP
+version: '3.8'
+
+x-common-db-config: &db-config
+  image: postgres:15-alpine
+  environment:
+    POSTGRES_DB: PharmaERP
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: ${DB_PASSWORD:-346134}
+  volumes:
+    - postgres_data:/var/lib/postgresql/data
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U postgres"]
+    interval: 5s
+    timeout: 5s
+    retries: 10
+
+x-common-backend-config: &backend-config
+  build:
+    context: ./src/MediFlow.HttpApi.Host
+    dockerfile: Dockerfile
+  ports:
+    - "44396:80"
+  environment:
+    - ASPNETCORE_ENVIRONMENT=Production
+    - DB_CONNECTION_STRING=Host=mediflow-db;Port=5432;Database=PharmaERP;User Id=postgres;Password=${DB_PASSWORD:-346134};
+  depends_on:
+    mediflow-db:
+      condition: service_healthy
+  restart: unless-stopped
+
+x-common-frontend-config: &frontend-config
+  build:
+    context: ./mediflow-frontend
+    dockerfile: Dockerfile
+  ports:
+    - "3000:80"
+  environment:
+    - NEXT_PUBLIC_API_URL=https://localhost:44396/api/app
+    - NEXT_PUBLIC_AUTH_URL=https://localhost:44396/api/account
+  depends_on:
+    - mediflow-backend
+  restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+services:
+  mediflow-db:
+    <<: *db-config
+
+  mediflow-backend:
+    <<: *backend-config
+
+  mediflow-frontend:
+    <<: *frontend-config
+
+# Build the application Dockerfiles
+# Backend Dockerfile (src/MediFlow.HttpApi.Host/Dockerfile):
+# FROM mcr.microsoft.com/dotnet/aspnet:10.0
+# WORKDIR /app
+# COPY . .
+# RUN dotnet publish -c Release -o out
+# EXPOSE 80
+# CMD ["dotnet", "MediFlow.HttpApi.Host.dll"]
+
+# Frontend Dockerfile (mediflow-frontend/Dockerfile):
+# FROM node:18-alpine
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm ci --only=production
+# COPY . .
+# EXPOSE 3000
+# CMD ["npx", "next", "start", "-p", "3000"]

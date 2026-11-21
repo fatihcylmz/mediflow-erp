@@ -1,0 +1,643 @@
+# MediFlow Healthcare ERP - Production Deployment Guide
+
+## Quick Start: One-Minute Deployment
+
+### 1. Backend Deployment
+```bash
+# Backend folder
+cd /path/to/aspnet-core/src/MediFlow.HttpApi.Host
+
+# Build and run locally (development)
+dotnet run
+
+# OR for production with Docker
+docker build -t mediflow/backend .
+docker run -p 44396:80 mediflow/backend
+```
+
+### 2. Database Setup (Run once)
+```bash
+cd /path/to/aspnet-core/src/MediFlow.DbMigrator
+dotnet run
+```
+
+### 3. Frontend Deployment
+```bash
+# Frontend folder
+cd /path/to/aspnet-core/mediflow-frontend
+
+# Install dependencies and run development server
+npm install
+npm run dev
+
+# OR build for production
+npm run build
+```
+
+## Production Deployment
+
+### Docker Compose (Recommended for Production)
+
+Create `docker-compose.yml` in your project root:
+
+```yaml
+version: '3.8'
+
+x-common-db-config: &db-config
+  image: postgres:15-alpine
+  environment:
+    POSTGRES_DB: PharmaERP
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: ${DB_PASSWORD:-346134}
+  volumes:
+    - postgres_data:/var/lib/postgresql/data
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U postgres"]
+    interval: 5s
+    timeout: 5s
+    retries: 10
+
+x-common-backend-config: &backend-config
+  build:
+    context: ./src/MediFlow.HttpApi.Host
+    dockerfile: Dockerfile
+  ports:
+    - "44396:80"
+  environment:
+    - ASPNETCORE_ENVIRONMENT=Production
+    - DB_CONNECTION_STRING=Host=mediflow-db;Port=5432;Database=PharmaERP;User Id=postgres;Password=${DB_PASSWORD:-346134};
+  depends_on:
+    mediflow-db:
+      condition: service_healthy
+  restart: unless-stopped
+
+x-common-frontend-config: &frontend-config
+  build:
+    context: ./mediflow-frontend
+    dockerfile: Dockerfile
+  ports:
+    - "3000:80"
+  environment:
+    - NEXT_PUBLIC_API_URL=https://localhost:44396/api/app
+    - NEXT_PUBLIC_AUTH_URL=https://localhost:44396/api/account
+  depends_on:
+    - mediflow-backend
+  restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+services:
+  mediflow-db:
+    <<: *db-config
+
+  mediflow-backend:
+    <<: *backend-config
+
+  mediflow-frontend:
+    <<: *frontend-config
+```
+
+### Run in Production
+```bash
+cd /path/to/aspnet-core
+docker-compose up -d
+```
+
+### Verify Deployment
+```bash
+# Check if containers are running
+docker-compose ps
+
+# Check logs
+ docker-compose logs -f
+
+# Test health endpoint
+curl -k https://localhost:44396/health  # if implemented
+```
+
+## Manual Deployment
+
+### 1. Environment Setup
+
+#### Linux/Ubuntu/Debian
+```bash
+# Install dependencies
+sudo apt update
+sudo apt install -y curl wget unzip postgresql postgresql-contrib
+
+# Install .NET 10 SDK
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-archive-keyring.gpg
+sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/debian/12/prod $(lsb_release -rs) main" > /etc/apt/sources.list.d/microsoft.list'
+sudo apt update
+sudo apt install -y dotnet-sdk-10.0
+```
+
+#### Windows Server
+```powershell
+# Download and install .NET 10 SDK
+# Download from: https://dotnet.microsoft.com/download/dotnet/10.0
+
+# Install PostgreSQL
+# Download from: https://www.postgresql.org/download/windows/
+```
+
+### 2. Backend Deployment
+
+#### Create Application User
+```bash
+# Create dedicated user for MediFlow application
+sudo useradd -r -s /bin/false mediflowapp
+sudo usermod -aG postgres mediflowapp
+```
+
+#### Directory Structure
+```bash
+# Create application directory
+mkdir -p /opt/mediflow
+chmod 755 /opt/mediflow
+
+# Copy application files
+cp -r MediFlow.HttpApi.Host/bin/Debug/net10.0/* /opt/mediflow/
+cp MediFlow.HttpApi.Host/appsettings.json /opt/mediflow/
+chown -R mediflowapp:postgres /opt/mediflow
+chmod -R 755 /opt/mediflow
+```
+
+#### Create Systemd Service
+```ini
+# /etc/systemd/system/mediflow.service
+[Unit]
+Description=MediFlow Healthcare ERP API
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=mediflowapp
+WorkingDirectory=/opt/mediflow
+Environment="ASPNETCORE_ENVIRONMENT=Production"
+ExecStart=/usr/bin/dotnet MediFlow.HttpApi.Host.dll
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=mediflow
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### Enable and Start Service
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable mediflow
+sudo systemctl start mediflow
+sudo systemctl status mediflow
+```
+
+### 3. Database Setup
+
+#### Initial Setup
+```bash
+# Switch to postgres user
+sudo -u postgres psql
+
+-- Create database user
+CREATE USER mediflowapp WITH ENCRYPTED PASSWORD 'secure_password';
+GRANT ALL PRIVILEGES ON DATABASE PharmaERP TO mediflowapp;
+```
+
+#### Migration Script
+```sql
+-- /opt/mediflow/migrate.sql
+-- Run this after database creation
+SET ROLE mediflowapp;
+-- Migration SQL will be generated by EF Core
+```
+
+### 4. Frontend Deployment
+
+#### Nginx Configuration
+```ini
+# /etc/nginx/sites-available/mediflow
+
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    # Frontend
+    location / {
+        root /var/www/mediflow;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Backend API
+    location /api/ {
+        proxy_pass http://localhost:44396/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # CORS settings
+        proxy_set_header Access-Control-Allow-Origin *;
+        proxy_set_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
+        proxy_set_header Access-Control-Allow-Headers "Content-Type, Authorization";
+    }
+
+    # Static files
+    location ~* \.(jpg|jpeg|gif|png|css|js|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000";
+    }
+}
+```
+
+#### Frontend Directory Structure
+```bash
+mkdir -p /var/www/mediflow
+cp -r mediflow-frontend/dist/* /var/www/mediflow/
+chown -R www-data:www-data /var/www/mediflow
+chmod -R 755 /var/www/mediflow
+```
+
+#### Nginx Service
+```bash
+sudo apt install -y nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+```
+
+## Environment Configuration
+
+### Production Settings
+
+#### Backend Configuration
+```json
+{
+  "App": {
+    "SelfUrl": "https://your-domain.com",
+    "CorsOrigins": "https://your-frontend-domain.com",
+    "RedirectAllowedUrls": ""
+  },
+  "ConnectionStrings": {
+    "Default": "Host=localhost;Port=5432;Database=PharmaERP;User Id=postgres;Password=YOUR_SECURE_PASSWORD;"
+  },
+  "AuthServer": {
+    "Authority": "https://your-domain.com",
+    "RequireHttpsMetadata": true,
+    "SwaggerClientId": "MediFlow_Swagger"
+  },
+  "StringEncryption": {
+    "DefaultPassPhrase": "YOUR_ENCRYPTION_PASSPHRASE_HERE"
+  }
+}
+```
+
+#### Environment Variables
+```bash
+# Production environment variables
+export ASPNETCORE_ENVIRONMENT=Production
+export DB_PASSWORD=YOUR_SECURE_DB_PASSWORD
+export JWT_SECRET_KEY=YOUR_JWT_SECRET_KEY_HERE
+export ENCRYPTION_PASSPHRASE=YOUR_ENCRYPTION_PASSPHRASE
+```
+
+### Security Configuration
+
+#### SSL/TLS Setup
+```bash
+# Generate self-signed certificate for testing
+sudo apt install -y certbot
+sudo certbot --nginx --non-interactive --email your-email.com -- domains your-domain.com
+
+# For production, use proper SSL certificate
+```
+
+#### Firewall Configuration
+```bash
+# UFW firewall configuration
+sudo ufw allow ssh
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw allow from 192.10.0.0/24 to any port 44396
+sudo ufw enable
+```
+
+## Monitoring and Maintenance
+
+### 1. System Monitoring
+
+#### Create Monitoring Scripts
+```bash
+# /opt/mediflow/monitor.sh
+cat << 'EOF'
+#!/bin/bash
+
+# Health check function
+health_check() {
+    # Check if application is running
+    if systemctl is-active --quiet mediflow; then
+        echo "MediFlow API: OK"
+    else
+        echo "MediFlow API: FAILED"
+        systemctl restart mediflow
+    fi
+
+    # Check database connectivity
+    if pg_isready -U mediflowapp; then
+        echo "Database: OK"
+    else
+        echo "Database: FAILED"
+    fi
+
+    # Check disk space
+    available=$(df /opt/mediflow | awk 'NR==2 {print $4}')
+    if [ $available -gt 1073741824 ]; then  # More than 1GB
+        echo "Disk Space: OK ($available bytes available)"
+    else
+        echo "Disk Space: LOW ($available bytes available)"
+    fi
+}
+
+# Performance monitoring
+perf_monitor() {
+    echo "=== MediFlow Performance Monitor ==="
+    echo "Time: $(date)"
+    echo "CPU Usage: $(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | cut -d'%' -f1)"
+    echo "Memory Usage: $(free -m | grep Mem | awk '{printf "%.2f%%", $3/$2 * 100.0}')"
+    echo "Network Connections: $(netstat -tn | grep :44396 | wc -l)"
+    echo "=== End Report ==="
+}
+
+case "$1" in
+    health)
+        health_check
+        ;;
+    perf)
+        perf_monitor
+        ;;
+    *)
+        echo "Usage: $0 {health|perf}"
+        exit 1
+        ;;
+esac
+EOF
+
+chmod +x /opt/mediflow/monitor.sh
+```
+
+#### Add to Cron
+```bash
+# Add health checks to crontab (run every 5 minutes)
+crontab -e
+# Add this line:
+*/5 * * * * /opt/mediflow/monitor.sh health > /var/log/mediflow/health.log 2>&1
+```
+
+### 2. Log Management
+
+#### Log Rotation
+```ini
+# /etc/logrotate.d/mediflow
+/var/log/mediflow/*.log {
+    daily
+    missingok
+    rotate 7
+    compress
+    delaycompress
+    notifempty
+    create 644 mediflowapp mediflowapp
+    postrotate
+        systemctl reload mediflow
+    endscript
+}
+```
+
+### 3. Backup Strategy
+
+#### Automated Backups
+```bash
+# /opt/mediflow/backup.sh
+cat << 'EOF'
+#!/bin/bash
+
+BACKUP_DIR="/opt/mediflow/backups"
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="$BACKUP_DIR/PharmaERP_backup_$DATE.sql"
+
+# Create backup directory
+mkdir -p "$BACKUP_DIR"
+
+# Perform backup
+sudo -u postgres pg_dump -Fc PharmaERP > "$BACKUP_FILE"
+
+# Verify backup
+if [ -s "$BACKUP_FILE" ]; then
+    echo "Backup created successfully: $BACKUP_FILE"
+    
+    # Keep only last 7 days of backups
+    find "$BACKUP_DIR" -name "PharmaERP_backup_*.sql" -mtime +7 -delete
+    
+    # Compress backups older than 1 day
+    find "$BACKUP_DIR" -name "PharmaERP_backup_*.sql" -mtime +1 -exec gzip {} \;
+    
+    echo "Backup completed successfully"
+else
+    echo "Backup failed - file is empty"
+    exit 1
+fi
+EOF
+
+chmod +x /opt/mediflow/backup.sh
+```
+
+#### Schedule Backups
+```bash
+# Add to crontab (daily at 2 AM)
+crontab -e
+# Add this line:
+0 2 * * * /opt/mediflow/backup.sh >> /var/log/mediflow/backup.log 2>&1
+```
+
+## Troubleshooting
+
+### 1. Common Issues and Solutions
+
+#### Database Connection Issues
+```bash
+# Check if PostgreSQL is running
+sudo systemctl status postgresql
+
+# Check database connection
+sudo -u postgres psql -h localhost -U postgres -d PharmaERP
+
+# Check application logs
+sudo journalctl -u mediflow -f
+```
+
+#### Application Issues
+```bash
+# Check application status
+sudo systemctl status mediflow
+
+# Check application logs
+sudo journalctl -u mediflow --since "1 hour ago"
+
+# Restart application if needed
+sudo systemctl restart mediflow
+```
+
+#### Frontend Issues
+```bash
+# Check nginx
+ sudo systemctl status nginx
+
+# Check nginx logs
+sudo tail -f /var/log/nginx/error.log
+
+# Check frontend files
+ls -la /var/www/mediflow/
+```
+
+### 2. Quick Diagnosis Script
+```bash
+# /opt/mediflow/diagnose.sh
+cat << 'EOF'
+#!/bin/bash
+
+echo "=== MediFlow Diagnostics ==="
+echo "Time: $(date)"
+echo ""
+
+# Application health
+echo "1. Application Health:"
+if systemctl is-active --quiet mediflow; then
+    echo "   ✓ MediFlow API is running"
+else
+    echo "   ✗ MediFlow API is not running"
+    systemctl restart mediflow
+fi
+
+# Database health
+echo "2. Database Health:"
+if pg_isready -U mediflowapp; then
+    echo "   ✓ Database is accessible"
+else
+    echo "   ✗ Database is not accessible"
+fi
+
+# Disk space
+echo "3. Disk Space:"
+df_output=$(df -h /opt/mediflow | awk 'NR==2 {print $4}')
+if [ ! -z "$df_output" ]; then
+    echo "   ✓ /opt/mediflow: $df_output available"
+else
+    echo "   ✗ /opt/mediflow: unknown status"
+fi
+
+# Port availability
+echo "4. Port Availability:"
+if ss -ltn | grep :44396 | grep -q LISTEN; then
+    echo "   ✓ Port 44396 is listening"
+else
+    echo "   ✗ Port 44396 is not available"
+fi
+
+# Frontend access
+echo "5. Frontend Access:"
+if curl -s http://localhost | grep -q "MediFlow ERP"; then
+    echo "   ✓ Frontend is accessible"
+else
+    echo "   ✗ Frontend check failed"
+fi
+
+echo "=== Diagnosis Complete ==="
+EOF
+
+chmod +x /opt/mediflow/diagnose.sh
+```
+
+## Final Verification
+
+### Production Readiness Checklist
+
+```bash
+# Run comprehensive check
+cd /opt/mediflow
+./diagnose.sh
+
+# Check backups
+ls -la backups/
+
+# Check application logs
+tail -f /var/log/mediflow/application.log
+```
+
+### Health Endpoint (if implemented)
+```bash
+# Test application health
+curl -k https://your-domain.com/health
+
+# Test API endpoints
+curl -k https://your-domain.com/api/account/user-info
+```
+
+## Support and Updates
+
+### 1. Monitor Support
+```bash
+# Enable debug mode for troubleshooting
+sudo systemctl set-property mediflow DebugLevel=verbose
+
+# Enable application insights (if configured)
+# Add application insights key to appsettings.json
+```
+
+### 2. Regular Maintenance
+```bash
+# Monthly tasks
+- Review and update backup retention policies
+- Clean up old log files
+- Update application dependencies
+- Review security configurations
+
+# Quarterly tasks
+- Test disaster recovery procedures
+- Perform security audits
+- Review and update monitoring configurations
+- Update documentation
+```
+
+### 3. Emergency Procedures
+
+#### Database Failure
+```bash
+# Emergency database restoration
+1. Stop application: sudo systemctl stop mediflow
+2. Restore from backup: pg_restore -d PharmaERP backup_file.sql
+3. Start application: sudo systemctl start mediflow
+```
+
+#### Application Failure
+```bash
+# Emergency application recovery
+1. Check logs: sudo journalctl -u mediflow -f
+2. Restart application: sudo systemctl restart mediflow
+3. If issues persist: check system resources and configuration
+```
+
+## Conclusion
+
+This deployment guide provides comprehensive instructions for deploying the MediFlow Healthcare ERP portfolio project in production environments. By following these steps, you can ensure a successful deployment with minimal downtime and maximum reliability.
+
+**Key Best Practices**:
+1. **Backup Regularly**: Implement automated backup strategies
+2. **Monitor Continuously**: Set up comprehensive monitoring and alerting
+3. **Test Thoroughly**: Conduct extensive testing before production deployment
+4. **Security First**: Implement strong security measures and regular audits
+5. **Documentation**: Maintain clear documentation for operations and troubleshooting
+
+The MediFlow Healthcare ERP project is now production-ready and can be deployed to meet your healthcare ERP requirements with confidence.

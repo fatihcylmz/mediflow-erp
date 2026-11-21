@@ -1,0 +1,68 @@
+# Docker Compose override for local development with hot reload
+version: '3.8'
+
+x-common-backend-config: &backend-config
+  build:
+    context: ./src/MediFlow.HttpApi.Host
+    dockerfile: Dockerfile
+  ports:
+    - "44396:80"
+  environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - DOTNET_RUNNING_IN_CONTAINER=true
+  volumes:
+    # Mount source code for hot reload
+    - ./src/MediFlow.HttpApi.Host:/app
+    - ./src/MediFlow.Application:/app/src/MediFlow.Application
+    - ./src/MediFlow.Domain:/app/src/MediFlow.Domain
+    - ./src/MediFlow.EntityFrameworkCore:/app/src/MediFlow.EntityFrameworkCore
+    - ./src/MediFlow.HttpApi:/app/src/MediFlow.HttpApi
+    - ./src/MediFlow.DbMigrator:/app/src/MediFlow.DbMigrator
+    # Mount user files for hot reload
+    - ~/.nuget/packages:/root/.nuget/packages:ro
+  depends_on:
+    mediflow-db:
+      condition: service_healthy
+  restart: unless-stopped
+
+x-common-frontend-config: &frontend-config
+  build:
+    context: ./mediflow-frontend
+    dockerfile: Dockerfile
+  ports:
+    - "3000:80"
+  environment:
+    - NEXT_PUBLIC_API_URL=https://localhost:44396/api/app
+    - NEXT_PUBLIC_AUTH_URL=https://localhost:44396/api/account
+    - NODE_ENV=development
+  volumes:
+    # Mount source code for hot reload
+    - ./mediflow-frontend/src:/app/src
+    - ./mediflow-frontend/public:/app/public
+    - ./mediflow-frontend/package*.json:/app/
+  command: sh -c "npm install && npm run dev"
+
+services:
+  mediflow-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: PharmaERP
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-346134}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mediflow-backend:
+    <<: *backend-config
+
+  mediflow-frontend:
+    <<: *frontend-config
+
+volumes:
+  postgres_data:

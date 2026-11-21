@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* ─── Medikal Tipografi & Global Reset ─── */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F1F5F9;
+}
+
+* {
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+.ant-input:focus,
+.ant-input-password input:focus,
+.ant-select-selector {
+  box-shadow: none !important;
+  border-color: #1D4ED8 !important;
+}
+
+.ant-form-item-required::before { color: #DC2626 !important; }
+
+.ant-table-wrapper .ant-table-container {
+  border-radius: 12px !important;
+  overflow: hidden;
+  border: 1px solid #E2E8F0 !important;
+}
+
+.ant-card {
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+}
+
+.ant-menu-light .ant-menu-item-selected {
+  background: rgba(255, 122, 0, 0.12) !important;
+  border-right: 3px solid #FF7A00 !important;
+  border-radius: 0 8px 8px 0 !important;
+}
+
+.ant-menu-light .ant-menu-item:hover {
+  background: rgba(255, 122, 0, 0.06) !important;
+}

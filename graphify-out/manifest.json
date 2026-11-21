@@ -1,0 +1,1808 @@
+{
+  "MediFlow.slnx": {
+    "mtime": 1794912517.0581648,
+    "seen": 1795083119.318906,
+    "ast_hash": "04c38bb4e416ea98fc2d1dea4c8c1dbb",
+    "semantic_hash": "04c38bb4e416ea98fc2d1dea4c8c1dbb"
+  },
+  "docker-compose.override.yml": {
+    "mtime": 1794985552.4844027,
+    "seen": 1795083119.3190897,
+    "ast_hash": "891fa21ee4ea152d08b822faee92471f",
+    "semantic_hash": "891fa21ee4ea152d08b822faee92471f"
+  },
+  "docker-compose.yml": {
+    "mtime": 1794985534.6101108,
+    "seen": 1795083119.3191857,
+    "ast_hash": "f9b8c49046d7268c67cd7ac76065847e",
+    "semantic_hash": "f9b8c49046d7268c67cd7ac76065847e"
+  },
+  "mediflow-frontend/.oxlintrc.json": {
+    "mtime": 1791718385.5996277,
+    "seen": 1795083119.3192635,
+    "ast_hash": "029f4905006c1fffd96bc863e2d98d3e",
+    "semantic_hash": "029f4905006c1fffd96bc863e2d98d3e"
+  },
+  "mediflow-frontend/package.json": {
+    "mtime": 1794914255.459819,
+    "seen": 1795083119.319354,
+    "ast_hash": "7202c4a12d4941f243e46d526b2ad9c7",
+    "semantic_hash": "7202c4a12d4941f243e46d526b2ad9c7"
+  },
+  "mediflow-frontend/src/App.tsx": {
+    "mtime": 1795034735.2472632,
+    "seen": 1795083119.3194344,
+    "ast_hash": "3e99acd5e50b7e05bf1dc63cfe1ae259",
+    "semantic_hash": "3e99acd5e50b7e05bf1dc63cfe1ae259"
+  },
+  "mediflow-frontend/src/components/AuthLayout.tsx": {
+    "mtime": 1794957406.9943347,
+    "seen": 1795083119.31951,
+    "ast_hash": "50e2983a0f14f3da3aa3b76612fd6bcc",
+    "semantic_hash": "50e2983a0f14f3da3aa3b76612fd6bcc"
+  },
+  "mediflow-frontend/src/components/UserManagement/CreateUserModal.tsx": {
+    "mtime": 1795032962.8459585,
+    "seen": 1795083119.3195872,
+    "ast_hash": "08232453fe09bd855f588d46071a4ef6",
+    "semantic_hash": "08232453fe09bd855f588d46071a4ef6"
+  },
+  "mediflow-frontend/src/components/UserManagement/UserManagementPage.tsx": {
+    "mtime": 1795037346.506967,
+    "seen": 1795083119.3196752,
+    "ast_hash": "4e1c79b97314b380ba282162f87d796f",
+    "semantic_hash": "4e1c79b97314b380ba282162f87d796f"
+  },
+  "mediflow-frontend/src/components/hooks/useAppService.tsx": {
+    "mtime": 1795032904.1953065,
+    "seen": 1795083119.3197596,
+    "ast_hash": "d88e829d5fc79add1883123d39e13729",
+    "semantic_hash": "d88e829d5fc79add1883123d39e13729"
+  },
+  "mediflow-frontend/src/layouts/AdminLayout.tsx": {
+    "mtime": 1795032967.5580473,
+    "seen": 1795083119.3198416,
+    "ast_hash": "fbd23dbefdd59f174d1627d3d4d90432",
+    "semantic_hash": "fbd23dbefdd59f174d1627d3d4d90432"
+  },
+  "mediflow-frontend/src/layouts/PharmacyLayout.tsx": {
+    "mtime": 1795032967.452492,
+    "seen": 1795083119.3199186,
+    "ast_hash": "908d4f2f4081402a9cd5d066e7df2839",
+    "semantic_hash": "908d4f2f4081402a9cd5d066e7df2839"
+  },
+  "mediflow-frontend/src/layouts/SupplierLayout.tsx": {
+    "mtime": 1795032967.4096417,
+    "seen": 1795083119.31999,
+    "ast_hash": "a2d8e48a2ad29760f0336a3b5d6c7727",
+    "semantic_hash": "a2d8e48a2ad29760f0336a3b5d6c7727"
+  },
+  "mediflow-frontend/src/layouts/WarehouseLayout.tsx": {
+    "mtime": 1795032967.5033727,
+    "seen": 1795083119.3200607,
+    "ast_hash": "38a823213903e97750605804daad739f",
+    "semantic_hash": "38a823213903e97750605804daad739f"
+  },
+  "mediflow-frontend/src/main.tsx": {
+    "mtime": 1791718385.6246736,
+    "seen": 1795083119.3201303,
+    "ast_hash": "787e5a07efeb2bf6209d5937195f2f68",
+    "semantic_hash": "787e5a07efeb2bf6209d5937195f2f68"
+  },
+  "mediflow-frontend/src/pages/DrugList.tsx": {
+    "mtime": 1792747409.6996708,
+    "seen": 1795083119.320206,
+    "ast_hash": "6f0640d2889a5da17d63f01d1aec85ef",
+    "semantic_hash": "6f0640d2889a5da17d63f01d1aec85ef"
+  },
+  "mediflow-frontend/src/pages/DrugPriceHistoryList.tsx": {
+    "mtime": 1791809235.1881838,
+    "seen": 1795083119.3202798,
+    "ast_hash": "c160b8c8ad92666ef18b74cb1717ae5f",
+    "semantic_hash": "c160b8c8ad92666ef18b74cb1717ae5f"
+  },
+  "mediflow-frontend/src/pages/IngredientList.tsx": {
+    "mtime": 1791805566.8097885,
+    "seen": 1795083119.3203523,
+    "ast_hash": "75b8f719606c5a90ea6a59fc9c853597",
+    "semantic_hash": "75b8f719606c5a90ea6a59fc9c853597"
+  },
+  "mediflow-frontend/src/pages/InventoryList.tsx": {
+    "mtime": 1792751407.660895,
+    "seen": 1795083119.3204434,
+    "ast_hash": "78fe500b4acb2cc2f25aa7831ba8a43a",
+    "semantic_hash": "78fe500b4acb2cc2f25aa7831ba8a43a"
+  },
+  "mediflow-frontend/src/pages/InvoiceList.tsx": {
+    "mtime": 1793637048.688091,
+    "seen": 1795083119.320526,
+    "ast_hash": "dfcc4736fc842e971291381cd4aa0107",
+    "semantic_hash": "dfcc4736fc842e971291381cd4aa0107"
+  },
+  "mediflow-frontend/src/pages/LoginPage.tsx": {
+    "mtime": 1795032946.5946434,
+    "seen": 1795083119.3206072,
+    "ast_hash": "b1b1e9e107da0c7955146b4641f2b8e5",
+    "semantic_hash": "b1b1e9e107da0c7955146b4641f2b8e5"
+  },
+  "mediflow-frontend/src/pages/OrderList.tsx": {
+    "mtime": 1793469090.8038733,
+    "seen": 1795083119.3206966,
+    "ast_hash": "452f3cd3e4f7dba35436cc46881bd4b8",
+    "semantic_hash": "452f3cd3e4f7dba35436cc46881bd4b8"
+  },
+  "mediflow-frontend/src/pages/PharmacyDashboard.tsx": {
+    "mtime": 1794913929.4614644,
+    "seen": 1795083119.3207843,
+    "ast_hash": "40b0f468e0dceaaff875ac63a79fe38f",
+    "semantic_hash": "40b0f468e0dceaaff875ac63a79fe38f"
+  },
+  "mediflow-frontend/src/pages/PharmacyList.tsx": {
+    "mtime": 1791982188.7366946,
+    "seen": 1795083119.3210013,
+    "ast_hash": "df5e0ba4bd2105c27593adaca3d74755",
+    "semantic_hash": "df5e0ba4bd2105c27593adaca3d74755"
+  },
+  "mediflow-frontend/src/pages/PrescriptionList.tsx": {
+    "mtime": 1791805162.7696395,
+    "seen": 1795083119.321547,
+    "ast_hash": "943eba3a965b1c64ab40ac2a92627e25",
+    "semantic_hash": "943eba3a965b1c64ab40ac2a92627e25"
+  },
+  "mediflow-frontend/src/pages/ReturnList.tsx": {
+    "mtime": 1793705777.6397321,
+    "seen": 1795083119.322001,
+    "ast_hash": "cb5ba0a3503be0e8b57e7db7672c0138",
+    "semantic_hash": "cb5ba0a3503be0e8b57e7db7672c0138"
+  },
+  "mediflow-frontend/src/pages/SaleList.tsx": {
+    "mtime": 1791810739.9779365,
+    "seen": 1795083119.322452,
+    "ast_hash": "8f8ba6c4c2ac0d6d240f4300d0bbdb72",
+    "semantic_hash": "8f8ba6c4c2ac0d6d240f4300d0bbdb72"
+  },
+  "mediflow-frontend/src/pages/ShipmentList.tsx": {
+    "mtime": 1793469621.7352493,
+    "seen": 1795083119.3229303,
+    "ast_hash": "a48b4499dd41df60b87f1a25b00c1a73",
+    "semantic_hash": "a48b4499dd41df60b87f1a25b00c1a73"
+  },
+  "mediflow-frontend/src/pages/SupplierDashboard.tsx": {
+    "mtime": 1794913929.499299,
+    "seen": 1795083119.3233178,
+    "ast_hash": "295e2854decd7171178e893dfc0b501a",
+    "semantic_hash": "295e2854decd7171178e893dfc0b501a"
+  },
+  "mediflow-frontend/src/pages/SupplierList.tsx": {
+    "mtime": 1791728978.0441594,
+    "seen": 1795083119.3233967,
+    "ast_hash": "47f47f269ca0cdbfb8188bf6f810683d",
+    "semantic_hash": "47f47f269ca0cdbfb8188bf6f810683d"
+  },
+  "mediflow-frontend/src/pages/WarehouseDashboard.tsx": {
+    "mtime": 1794913929.626992,
+    "seen": 1795083119.323468,
+    "ast_hash": "c5d5c4827aee1df5d0f57cc94b6483bd",
+    "semantic_hash": "c5d5c4827aee1df5d0f57cc94b6483bd"
+  },
+  "mediflow-frontend/src/pages/WarehouseList.tsx": {
+    "mtime": 1791801611.2367668,
+    "seen": 1795083119.323539,
+    "ast_hash": "e0dda471a7fd18c10f592bc684a9041e",
+    "semantic_hash": "e0dda471a7fd18c10f592bc684a9041e"
+  },
+  "mediflow-frontend/src/services/api.ts": {
+    "mtime": 1795032864.2388587,
+    "seen": 1795083119.3236208,
+    "ast_hash": "c81544c32dedf8c292fda15a8e27a498",
+    "semantic_hash": "c81544c32dedf8c292fda15a8e27a498"
+  },
+  "mediflow-frontend/tsconfig.app.json": {
+    "mtime": 1795032955.5481195,
+    "seen": 1795083119.3237114,
+    "ast_hash": "6efb87b3146adb91fe14d980f66fea5d",
+    "semantic_hash": "6efb87b3146adb91fe14d980f66fea5d"
+  },
+  "mediflow-frontend/tsconfig.json": {
+    "mtime": 1791718385.6287377,
+    "seen": 1795083119.3238018,
+    "ast_hash": "a3d39fa780ebff65444de257f291ce6c",
+    "semantic_hash": "a3d39fa780ebff65444de257f291ce6c"
+  },
+  "mediflow-frontend/tsconfig.node.json": {
+    "mtime": 1791718385.6306365,
+    "seen": 1795083119.3238885,
+    "ast_hash": "f9cb81ddcea69ffdab672fc8c48dca66",
+    "semantic_hash": "f9cb81ddcea69ffdab672fc8c48dca66"
+  },
+  "mediflow-frontend/vite.config.ts": {
+    "mtime": 1791718385.631637,
+    "seen": 1795083119.323975,
+    "ast_hash": "5d54447744c19ccd28638a5c668d15ea",
+    "semantic_hash": "5d54447744c19ccd28638a5c668d15ea"
+  },
+  "src/MediFlow.Application.Contracts/Customers/CreateUpdateCustomerDto.cs": {
+    "mtime": 1794912971.1681516,
+    "seen": 1795083119.3240607,
+    "ast_hash": "fe3bbd968932f8a11175d4ac2d710d4b",
+    "semantic_hash": "fe3bbd968932f8a11175d4ac2d710d4b"
+  },
+  "src/MediFlow.Application.Contracts/Customers/CustomerDto.cs": {
+    "mtime": 1794912971.1916783,
+    "seen": 1795083119.3241637,
+    "ast_hash": "a5b7871ecf8326ab3159ff5db0eccfed",
+    "semantic_hash": "a5b7871ecf8326ab3159ff5db0eccfed"
+  },
+  "src/MediFlow.Application.Contracts/Customers/ICustomerAppService.cs": {
+    "mtime": 1794912971.2124758,
+    "seen": 1795083119.3242545,
+    "ast_hash": "ef66697855b5e04b11c1c6b201038f2c",
+    "semantic_hash": "ef66697855b5e04b11c1c6b201038f2c"
+  },
+  "src/MediFlow.Application.Contracts/DrugIngredient/CreateUpdateDrugIngredientDto.cs": {
+    "mtime": 1794912971.2272506,
+    "seen": 1795083119.3243465,
+    "ast_hash": "55b66543ce8e8e261b860b101d1bcc8f",
+    "semantic_hash": "55b66543ce8e8e261b860b101d1bcc8f"
+  },
+  "src/MediFlow.Application.Contracts/DrugIngredient/DrugIngredientDto.cs": {
+    "mtime": 1794912971.2344856,
+    "seen": 1795083119.3244414,
+    "ast_hash": "8222dc5f82ddca28b7eac8248c278db6",
+    "semantic_hash": "8222dc5f82ddca28b7eac8248c278db6"
+  },
+  "src/MediFlow.Application.Contracts/DrugIngredient/IDrugIngredientAppService.cs": {
+    "mtime": 1794912971.2480936,
+    "seen": 1795083119.3245323,
+    "ast_hash": "10e81c4f37e6530365f32717852d040e",
+    "semantic_hash": "10e81c4f37e6530365f32717852d040e"
+  },
+  "src/MediFlow.Application.Contracts/Drugs/CreateUpdateDrugDto.cs": {
+    "mtime": 1794912971.2705145,
+    "seen": 1795083119.3246248,
+    "ast_hash": "ccb5954d07786dc8fe47e4f90b1c5245",
+    "semantic_hash": "ccb5954d07786dc8fe47e4f90b1c5245"
+  },
+  "src/MediFlow.Application.Contracts/Drugs/DrugDto.cs": {
+    "mtime": 1794912971.301149,
+    "seen": 1795083119.3247173,
+    "ast_hash": "3864310a4f1ad60c932ac5e558f667be",
+    "semantic_hash": "3864310a4f1ad60c932ac5e558f667be"
+  },
+  "src/MediFlow.Application.Contracts/Drugs/IDrugAppService.cs": {
+    "mtime": 1794912971.3272803,
+    "seen": 1795083119.324812,
+    "ast_hash": "cba9250e1bb97385ab5ab927229bf7e3",
+    "semantic_hash": "cba9250e1bb97385ab5ab927229bf7e3"
+  },
+  "src/MediFlow.Application.Contracts/Ingredients/CreateUpdateIngredientDto.cs": {
+    "mtime": 1794912971.3488028,
+    "seen": 1795083119.3249316,
+    "ast_hash": "cb87221e7d74e9fabf266b74703eba56",
+    "semantic_hash": "cb87221e7d74e9fabf266b74703eba56"
+  },
+  "src/MediFlow.Application.Contracts/Ingredients/IIngredientAppService.cs": {
+    "mtime": 1794912971.3680208,
+    "seen": 1795083119.3250244,
+    "ast_hash": "544b9300d884fe25e6a38b1454e55835",
+    "semantic_hash": "544b9300d884fe25e6a38b1454e55835"
+  },
+  "src/MediFlow.Application.Contracts/Ingredients/IngredientDto.cs": {
+    "mtime": 1794912971.3829494,
+    "seen": 1795083119.3251119,
+    "ast_hash": "4f5ef26afa7e802cf47995e771d69600",
+    "semantic_hash": "4f5ef26afa7e802cf47995e771d69600"
+  },
+  "src/MediFlow.Application.Contracts/Inventories/CreateUpdateStockBatchDto.cs": {
+    "mtime": 1794912971.401616,
+    "seen": 1795083119.3252254,
+    "ast_hash": "fb18eb7b21ecaa41eed62fe2ae862a93",
+    "semantic_hash": "fb18eb7b21ecaa41eed62fe2ae862a93"
+  },
+  "src/MediFlow.Application.Contracts/Inventories/CreateUpdateStockMovementLogDto.cs": {
+    "mtime": 1794912971.425591,
+    "seen": 1795083119.3253222,
+    "ast_hash": "e14f326637ff4c293fd36ad3caa2525a",
+    "semantic_hash": "e14f326637ff4c293fd36ad3caa2525a"
+  },
+  "src/MediFlow.Application.Contracts/Inventories/IStockBatchAppService.cs": {
+    "mtime": 1794912971.4491272,
+    "seen": 1795083119.325418,
+    "ast_hash": "72e86e41293272f32a48678de37eb3fc",
+    "semantic_hash": "72e86e41293272f32a48678de37eb3fc"
+  },
+  "src/MediFlow.Application.Contracts/Inventories/IStockMovementLogAppService.cs": {
+    "mtime": 1794912971.473822,
+    "seen": 1795083119.3255198,
+    "ast_hash": "7baf18c3c9ce00fff7f885c360a6d2d1",
+    "semantic_hash": "7baf18c3c9ce00fff7f885c360a6d2d1"
+  },
+  "src/MediFlow.Application.Contracts/Inventories/StockBatchDto.cs": {
+    "mtime": 1794912971.4900634,
+    "seen": 1795083119.3256075,
+    "ast_hash": "6fe0fae2a1867837bcb865f28db361fa",
+    "semantic_hash": "6fe0fae2a1867837bcb865f28db361fa"
+  },
+  "src/MediFlow.Application.Contracts/Inventories/StockMovementLogDto.cs": {
+    "mtime": 1794912971.5125246,
+    "seen": 1795083119.325695,
+    "ast_hash": "4868233396d92afb75212098ced41c65",
+    "semantic_hash": "4868233396d92afb75212098ced41c65"
+  },
+  "src/MediFlow.Application.Contracts/Invoices/CreateUpdateInvoiceDto.cs": {
+    "mtime": 1794912971.532616,
+    "seen": 1795083119.325787,
+    "ast_hash": "f773f398486a795c5ad6adb9b8f2f052",
+    "semantic_hash": "f773f398486a795c5ad6adb9b8f2f052"
+  },
+  "src/MediFlow.Application.Contracts/Invoices/IInvoiceAppService.cs": {
+    "mtime": 1794912971.5704134,
+    "seen": 1795083119.3258796,
+    "ast_hash": "daca5cf0de2b0b9300514ca8538bf7a9",
+    "semantic_hash": "daca5cf0de2b0b9300514ca8538bf7a9"
+  },
+  "src/MediFlow.Application.Contracts/Invoices/InvoiceDto.cs": {
+    "mtime": 1794912971.5909188,
+    "seen": 1795083119.3259673,
+    "ast_hash": "6c4dbaaf10edcb27960444ca87162e31",
+    "semantic_hash": "6c4dbaaf10edcb27960444ca87162e31"
+  },
+  "src/MediFlow.Application.Contracts/Invoices/InvoiceItemDto.cs": {
+    "mtime": 1794912971.6097853,
+    "seen": 1795083119.3260548,
+    "ast_hash": "2a208db61b8adbd4a1167f9e0a5d0d14",
+    "semantic_hash": "2a208db61b8adbd4a1167f9e0a5d0d14"
+  },
+  "src/MediFlow.Application.Contracts/MediFlow.Application.Contracts.csproj": {
+    "mtime": 1794913121.6796513,
+    "seen": 1795083119.3261433,
+    "ast_hash": "b629a34d63b60563fcdeaf06a82317ae",
+    "semantic_hash": "b629a34d63b60563fcdeaf06a82317ae"
+  },
+  "src/MediFlow.Application.Contracts/MediFlowApplicationContractsModule.cs": {
+    "mtime": 1794912971.6310985,
+    "seen": 1795083119.3262308,
+    "ast_hash": "ce5cc3eb80279aef1a5555d9b2e85b7c",
+    "semantic_hash": "ce5cc3eb80279aef1a5555d9b2e85b7c"
+  },
+  "src/MediFlow.Application.Contracts/MediFlowDtoExtensions.cs": {
+    "mtime": 1794912971.6670408,
+    "seen": 1795083119.3263206,
+    "ast_hash": "23cf5bd59637ef7c5ffea24591288857",
+    "semantic_hash": "23cf5bd59637ef7c5ffea24591288857"
+  },
+  "src/MediFlow.Application.Contracts/Orders/CreateUpdateOrderDto.cs": {
+    "mtime": 1794912971.7374966,
+    "seen": 1795083119.326409,
+    "ast_hash": "fd03edb9ee17703c43782126e4847b9d",
+    "semantic_hash": "fd03edb9ee17703c43782126e4847b9d"
+  },
+  "src/MediFlow.Application.Contracts/Orders/CreateUpdateOrderItemDto.cs": {
+    "mtime": 1794912971.7570355,
+    "seen": 1795083119.326499,
+    "ast_hash": "d31bd89e893e2463be1b8f68f12bc00b",
+    "semantic_hash": "d31bd89e893e2463be1b8f68f12bc00b"
+  },
+  "src/MediFlow.Application.Contracts/Orders/IOrderAppService.cs": {
+    "mtime": 1794912971.773691,
+    "seen": 1795083119.3265867,
+    "ast_hash": "ffeaa9a4f7079362b8f39477670a5cf5",
+    "semantic_hash": "ffeaa9a4f7079362b8f39477670a5cf5"
+  },
+  "src/MediFlow.Application.Contracts/Orders/IOrderItemAppService.cs": {
+    "mtime": 1794912971.791971,
+    "seen": 1795083119.326672,
+    "ast_hash": "2899df64100283c56d35b6e1a28d7ff1",
+    "semantic_hash": "2899df64100283c56d35b6e1a28d7ff1"
+  },
+  "src/MediFlow.Application.Contracts/Orders/OrderDto.cs": {
+    "mtime": 1794912971.8073761,
+    "seen": 1795083119.3267581,
+    "ast_hash": "16f6aae5a3f757d4c6b878757481a1c7",
+    "semantic_hash": "16f6aae5a3f757d4c6b878757481a1c7"
+  },
+  "src/MediFlow.Application.Contracts/Orders/OrderItemDto.cs": {
+    "mtime": 1794912971.8271081,
+    "seen": 1795083119.3268442,
+    "ast_hash": "9bb34313788881070fc8514a2705210a",
+    "semantic_hash": "9bb34313788881070fc8514a2705210a"
+  },
+  "src/MediFlow.Application.Contracts/Payment/IPaymentAppService.cs": {
+    "mtime": 1794940936.6491868,
+    "seen": 1795083119.3269432,
+    "ast_hash": "eccf872f675262e075efa61a239ab38c",
+    "semantic_hash": "eccf872f675262e075efa61a239ab38c"
+  },
+  "src/MediFlow.Application.Contracts/Payment/PaymentMethodDto.cs": {
+    "mtime": 1794940929.5263507,
+    "seen": 1795083119.327034,
+    "ast_hash": "439bb5b01a8db963f82c26cd523a0409",
+    "semantic_hash": "439bb5b01a8db963f82c26cd523a0409"
+  },
+  "src/MediFlow.Application.Contracts/Permissions/MediFlowPermissionDefinitionProvider.cs": {
+    "mtime": 1794912971.8529234,
+    "seen": 1795083119.3271232,
+    "ast_hash": "4050f084a9b7e2d925523217b4bafeaa",
+    "semantic_hash": "4050f084a9b7e2d925523217b4bafeaa"
+  },
+  "src/MediFlow.Application.Contracts/Permissions/MediFlowPermissions.cs": {
+    "mtime": 1794912971.8743124,
+    "seen": 1795083119.3272154,
+    "ast_hash": "4a920949bb4a31dad76d0d9fd24f5f38",
+    "semantic_hash": "4a920949bb4a31dad76d0d9fd24f5f38"
+  },
+  "src/MediFlow.Application.Contracts/Pharmacies/CreateUpdatePharmacyDto.cs": {
+    "mtime": 1794912971.9090416,
+    "seen": 1795083119.327303,
+    "ast_hash": "35ccabe2e3245dd88d84d074ddabac2a",
+    "semantic_hash": "35ccabe2e3245dd88d84d074ddabac2a"
+  },
+  "src/MediFlow.Application.Contracts/Pharmacies/CreateUpdatePharmacyStock.cs": {
+    "mtime": 1794912971.928681,
+    "seen": 1795083119.3273926,
+    "ast_hash": "fcbae06911967ae4c5cd7c23553c4216",
+    "semantic_hash": "fcbae06911967ae4c5cd7c23553c4216"
+  },
+  "src/MediFlow.Application.Contracts/Pharmacies/IPharmacyAppService.cs": {
+    "mtime": 1794912971.9470851,
+    "seen": 1795083119.3274794,
+    "ast_hash": "c76eecf6143eaf4b7001420423f3642d",
+    "semantic_hash": "c76eecf6143eaf4b7001420423f3642d"
+  },
+  "src/MediFlow.Application.Contracts/Pharmacies/IPharmacyStockAppService.cs": {
+    "mtime": 1794912971.9650772,
+    "seen": 1795083119.3275657,
+    "ast_hash": "afa2180549450054460ea88399c00142",
+    "semantic_hash": "afa2180549450054460ea88399c00142"
+  },
+  "src/MediFlow.Application.Contracts/Pharmacies/PharmacyDto.cs": {
+    "mtime": 1794912971.9831464,
+    "seen": 1795083119.327651,
+    "ast_hash": "429b806ad81d949eb42827e9f81e673d",
+    "semantic_hash": "429b806ad81d949eb42827e9f81e673d"
+  },
+  "src/MediFlow.Application.Contracts/Pharmacies/PharmacyStockDto.cs": {
+    "mtime": 1794912972.001289,
+    "seen": 1795083119.3277378,
+    "ast_hash": "23e2ab27b0c444634e7e9d0be9a1c8fb",
+    "semantic_hash": "23e2ab27b0c444634e7e9d0be9a1c8fb"
+  },
+  "src/MediFlow.Application.Contracts/Prescriptions/CreateUpdatePrescriptionDto.cs": {
+    "mtime": 1794912972.0261717,
+    "seen": 1795083119.3278263,
+    "ast_hash": "6ce052be5ff5b57f25afb58798af01f9",
+    "semantic_hash": "6ce052be5ff5b57f25afb58798af01f9"
+  },
+  "src/MediFlow.Application.Contracts/Prescriptions/IPrescriptionAppService.cs": {
+    "mtime": 1794912972.0444498,
+    "seen": 1795083119.3279173,
+    "ast_hash": "8ff0d54698d57aa5d9480bb68704c61a",
+    "semantic_hash": "8ff0d54698d57aa5d9480bb68704c61a"
+  },
+  "src/MediFlow.Application.Contracts/Prescriptions/PrescriptionDto.cs": {
+    "mtime": 1794912972.0612855,
+    "seen": 1795083119.3280044,
+    "ast_hash": "969d6aaf3e7a4e6382e6032d53e0afc6",
+    "semantic_hash": "969d6aaf3e7a4e6382e6032d53e0afc6"
+  },
+  "src/MediFlow.Application.Contracts/Pricing/CreateUpdateDrugPriceHistoryDto.cs": {
+    "mtime": 1794912972.0812056,
+    "seen": 1795083119.3280919,
+    "ast_hash": "32c1eeaaa9235cd94bd014c016030958",
+    "semantic_hash": "32c1eeaaa9235cd94bd014c016030958"
+  },
+  "src/MediFlow.Application.Contracts/Pricing/DrugPriceHistoryDto.cs": {
+    "mtime": 1794912972.0879126,
+    "seen": 1795083119.3281865,
+    "ast_hash": "e42e698c21e63c5e9974aec3ec8acc63",
+    "semantic_hash": "e42e698c21e63c5e9974aec3ec8acc63"
+  },
+  "src/MediFlow.Application.Contracts/Pricing/IDrugPriceHistoryAppService.cs": {
+    "mtime": 1794912972.105058,
+    "seen": 1795083119.3282728,
+    "ast_hash": "4ebbd37dc1e6b9700d71e1d52d92cd6e",
+    "semantic_hash": "4ebbd37dc1e6b9700d71e1d52d92cd6e"
+  },
+  "src/MediFlow.Application.Contracts/Returns/CreateUpdateReturnDto.cs": {
+    "mtime": 1794912972.1226845,
+    "seen": 1795083119.32836,
+    "ast_hash": "9caa56e053bf9e9ce2d77347ea608279",
+    "semantic_hash": "9caa56e053bf9e9ce2d77347ea608279"
+  },
+  "src/MediFlow.Application.Contracts/Returns/CreateUpdateReturnItemDto.cs": {
+    "mtime": 1794912972.1428776,
+    "seen": 1795083119.3284516,
+    "ast_hash": "02896e12d389f21022efd9e739af6983",
+    "semantic_hash": "02896e12d389f21022efd9e739af6983"
+  },
+  "src/MediFlow.Application.Contracts/Returns/IReturnAppService.cs": {
+    "mtime": 1794912972.1577675,
+    "seen": 1795083119.3285413,
+    "ast_hash": "16aa3d052a7cafbe8c7eceac02921e31",
+    "semantic_hash": "16aa3d052a7cafbe8c7eceac02921e31"
+  },
+  "src/MediFlow.Application.Contracts/Returns/IReturnItemAppService.cs": {
+    "mtime": 1794912972.1736066,
+    "seen": 1795083119.3286283,
+    "ast_hash": "7196093ea639c24e070e74634c346fc2",
+    "semantic_hash": "7196093ea639c24e070e74634c346fc2"
+  },
+  "src/MediFlow.Application.Contracts/Returns/ReturnDto.cs": {
+    "mtime": 1794912972.1889014,
+    "seen": 1795083119.3287141,
+    "ast_hash": "40b7b941f78970fca7b97c8fc799d025",
+    "semantic_hash": "40b7b941f78970fca7b97c8fc799d025"
+  },
+  "src/MediFlow.Application.Contracts/Returns/ReturnItemDto.cs": {
+    "mtime": 1794912972.2107065,
+    "seen": 1795083119.3288007,
+    "ast_hash": "769b0f55b58e9ae55332a29b2fd61749",
+    "semantic_hash": "769b0f55b58e9ae55332a29b2fd61749"
+  },
+  "src/MediFlow.Application.Contracts/Sales/CreateUpdateSaleDto.cs": {
+    "mtime": 1794912972.2279058,
+    "seen": 1795083119.3288946,
+    "ast_hash": "f4e96ca57e22d4720f6237c21159ff35",
+    "semantic_hash": "f4e96ca57e22d4720f6237c21159ff35"
+  },
+  "src/MediFlow.Application.Contracts/Sales/CreateUpdateSaleItemDto.cs": {
+    "mtime": 1794912972.2475965,
+    "seen": 1795083119.3289983,
+    "ast_hash": "dbeb5045ef13ff7802ea8d3a1dda8b54",
+    "semantic_hash": "dbeb5045ef13ff7802ea8d3a1dda8b54"
+  },
+  "src/MediFlow.Application.Contracts/Sales/ISaleAppService.cs": {
+    "mtime": 1794912972.2686205,
+    "seen": 1795083119.329092,
+    "ast_hash": "2446648f5c31e5f6fee59c0eb7fcf84d",
+    "semantic_hash": "2446648f5c31e5f6fee59c0eb7fcf84d"
+  },
+  "src/MediFlow.Application.Contracts/Sales/ISaleItemAppService.cs": {
+    "mtime": 1794912972.2876196,
+    "seen": 1795083119.3292012,
+    "ast_hash": "09bb6fd231f6ea4e4e3c775f8c9da6c0",
+    "semantic_hash": "09bb6fd231f6ea4e4e3c775f8c9da6c0"
+  },
+  "src/MediFlow.Application.Contracts/Sales/SaleDto.cs": {
+    "mtime": 1794912972.3071926,
+    "seen": 1795083119.3292937,
+    "ast_hash": "d2a0573627dd97b32aefa03f2558ebf6",
+    "semantic_hash": "d2a0573627dd97b32aefa03f2558ebf6"
+  },
+  "src/MediFlow.Application.Contracts/Sales/SaleItemDto.cs": {
+    "mtime": 1794912972.325896,
+    "seen": 1795083119.3293824,
+    "ast_hash": "764a5cb7941126fac2e06b9da355f07b",
+    "semantic_hash": "764a5cb7941126fac2e06b9da355f07b"
+  },
+  "src/MediFlow.Application.Contracts/Shipments/CreateUpdateShipmentDto.cs": {
+    "mtime": 1794912972.3407207,
+    "seen": 1795083119.3294713,
+    "ast_hash": "cc44194b431f7082b77f84d23a1e4841",
+    "semantic_hash": "cc44194b431f7082b77f84d23a1e4841"
+  },
+  "src/MediFlow.Application.Contracts/Shipments/CreateUpdateShipmentItemDto.cs": {
+    "mtime": 1794912972.362545,
+    "seen": 1795083119.3295627,
+    "ast_hash": "8d4e33bd86c2e7b6cbac42c9a64521a9",
+    "semantic_hash": "8d4e33bd86c2e7b6cbac42c9a64521a9"
+  },
+  "src/MediFlow.Application.Contracts/Shipments/IShipmentAppService.cs": {
+    "mtime": 1794912972.3809,
+    "seen": 1795083119.3296502,
+    "ast_hash": "ab58aa13c08a6bdf19b10a86e6a693d0",
+    "semantic_hash": "ab58aa13c08a6bdf19b10a86e6a693d0"
+  },
+  "src/MediFlow.Application.Contracts/Shipments/IShipmentItemAppService.cs": {
+    "mtime": 1794912972.401082,
+    "seen": 1795083119.329759,
+    "ast_hash": "3c58a4efa759073c8b35019c2dc76894",
+    "semantic_hash": "3c58a4efa759073c8b35019c2dc76894"
+  },
+  "src/MediFlow.Application.Contracts/Shipments/ShipmentDto.cs": {
+    "mtime": 1794912972.4137714,
+    "seen": 1795083119.3298628,
+    "ast_hash": "57edb9a3ee5c4b206b217f16e7247a0f",
+    "semantic_hash": "57edb9a3ee5c4b206b217f16e7247a0f"
+  },
+  "src/MediFlow.Application.Contracts/Shipments/ShipmentItemDto.cs": {
+    "mtime": 1794912972.4329789,
+    "seen": 1795083119.3299506,
+    "ast_hash": "501c3efa087d52ae1ff481d57ddb3e9f",
+    "semantic_hash": "501c3efa087d52ae1ff481d57ddb3e9f"
+  },
+  "src/MediFlow.Application.Contracts/Suppliers/CreateUpdateSupplierDto.cs": {
+    "mtime": 1794912972.4476886,
+    "seen": 1795083119.3300352,
+    "ast_hash": "c3b70db5cf6279543146cfe0db864f60",
+    "semantic_hash": "c3b70db5cf6279543146cfe0db864f60"
+  },
+  "src/MediFlow.Application.Contracts/Suppliers/ISupplierAppService.cs": {
+    "mtime": 1794912972.4638183,
+    "seen": 1795083119.3301222,
+    "ast_hash": "d6111b1dad37be50825321318b6a2860",
+    "semantic_hash": "d6111b1dad37be50825321318b6a2860"
+  },
+  "src/MediFlow.Application.Contracts/Suppliers/SupplierDto.cs": {
+    "mtime": 1794912972.4840012,
+    "seen": 1795083119.330208,
+    "ast_hash": "17f86b1387f6a9d717072b21a2b73201",
+    "semantic_hash": "17f86b1387f6a9d717072b21a2b73201"
+  },
+  "src/MediFlow.Application.Contracts/Warehouses/CreateUpdateWarehouseDto.cs": {
+    "mtime": 1794912972.4912832,
+    "seen": 1795083119.3302913,
+    "ast_hash": "a4960aa87ddb145bfe973a398af4a069",
+    "semantic_hash": "a4960aa87ddb145bfe973a398af4a069"
+  },
+  "src/MediFlow.Application.Contracts/Warehouses/IWarehouseAppService.cs": {
+    "mtime": 1794912972.5123954,
+    "seen": 1795083119.3303795,
+    "ast_hash": "11fa0594e47c98bf448ed8e293d73e19",
+    "semantic_hash": "11fa0594e47c98bf448ed8e293d73e19"
+  },
+  "src/MediFlow.Application.Contracts/Warehouses/WarehouseDto.cs": {
+    "mtime": 1794912972.529416,
+    "seen": 1795083119.3304677,
+    "ast_hash": "4b567e1482a2a0ab5f40e9f78b1e5b64",
+    "semantic_hash": "4b567e1482a2a0ab5f40e9f78b1e5b64"
+  },
+  "src/MediFlow.Application/Configuration/MediFlowConfiguration_Configuration.cs": {
+    "mtime": 1794947388.138564,
+    "seen": 1795083119.3305554,
+    "ast_hash": "39f74d3ef3953dd20c5e05b3e54cfc46",
+    "semantic_hash": "39f74d3ef3953dd20c5e05b3e54cfc46"
+  },
+  "src/MediFlow.Application/Customers/CustomerAppService.cs": {
+    "mtime": 1794912970.5868871,
+    "seen": 1795083119.3306582,
+    "ast_hash": "a012cc55b176514c38e1662315b4997a",
+    "semantic_hash": "a012cc55b176514c38e1662315b4997a"
+  },
+  "src/MediFlow.Application/DrugIngredient/DrugIngredientAppService.cs": {
+    "mtime": 1794912970.6050282,
+    "seen": 1795083119.3307674,
+    "ast_hash": "63bd5f869c4e9c3ffcdaf7b815c1c2bf",
+    "semantic_hash": "63bd5f869c4e9c3ffcdaf7b815c1c2bf"
+  },
+  "src/MediFlow.Application/Drugs/DrugAppService.cs": {
+    "mtime": 1794912970.6157298,
+    "seen": 1795083119.3308735,
+    "ast_hash": "82650204ba3aaacda1e0bfcdddb64364",
+    "semantic_hash": "82650204ba3aaacda1e0bfcdddb64364"
+  },
+  "src/MediFlow.Application/Ingredients/IngredientAppService.cs": {
+    "mtime": 1794912970.638565,
+    "seen": 1795083119.3309612,
+    "ast_hash": "00cc3551b84f8503afb369004a42508a",
+    "semantic_hash": "00cc3551b84f8503afb369004a42508a"
+  },
+  "src/MediFlow.Application/Inventories/StockBatchAppService.cs": {
+    "mtime": 1794912970.6504118,
+    "seen": 1795083119.3310516,
+    "ast_hash": "840a7f8960a9e0ddea4312bb800423f5",
+    "semantic_hash": "840a7f8960a9e0ddea4312bb800423f5"
+  },
+  "src/MediFlow.Application/Inventories/StockMovementLogAppService.cs": {
+    "mtime": 1794912970.668425,
+    "seen": 1795083119.3311388,
+    "ast_hash": "ff31b92e918685a2018f6daac6a775b2",
+    "semantic_hash": "ff31b92e918685a2018f6daac6a775b2"
+  },
+  "src/MediFlow.Application/Invoices/InvoiceAppService.cs": {
+    "mtime": 1794912970.6868691,
+    "seen": 1795083119.3312242,
+    "ast_hash": "4ffe9c6d0a278bc2db0a08e0aabc2658",
+    "semantic_hash": "4ffe9c6d0a278bc2db0a08e0aabc2658"
+  },
+  "src/MediFlow.Application/MediFlow.Application.csproj": {
+    "mtime": 1794988367.0135334,
+    "seen": 1795083119.33131,
+    "ast_hash": "ef6742b1008cc4ee456f43d5dccbe6f4",
+    "semantic_hash": "ef6742b1008cc4ee456f43d5dccbe6f4"
+  },
+  "src/MediFlow.Application/MediFlowAppService.cs": {
+    "mtime": 1794912970.7774897,
+    "seen": 1795083119.3313997,
+    "ast_hash": "b172f7e82cc6dd234f7a4aa08368d28d",
+    "semantic_hash": "b172f7e82cc6dd234f7a4aa08368d28d"
+  },
+  "src/MediFlow.Application/MediFlowApplicationMappers.cs": {
+    "mtime": 1794912970.71429,
+    "seen": 1795083119.3314843,
+    "ast_hash": "b6d5bd2282d97745b1018089c1254874",
+    "semantic_hash": "b6d5bd2282d97745b1018089c1254874"
+  },
+  "src/MediFlow.Application/MediFlowApplicationModule.cs": {
+    "mtime": 1794991350.8796792,
+    "seen": 1795083119.3315697,
+    "ast_hash": "aadb5048b4a43af62163591966b69c59",
+    "semantic_hash": "aadb5048b4a43af62163591966b69c59"
+  },
+  "src/MediFlow.Application/Orders/OrderAppService.cs": {
+    "mtime": 1794912970.8757873,
+    "seen": 1795083119.3316538,
+    "ast_hash": "9bb871f468ea31aede760ca9d882a71b",
+    "semantic_hash": "9bb871f468ea31aede760ca9d882a71b"
+  },
+  "src/MediFlow.Application/Orders/OrderItemAppService.cs": {
+    "mtime": 1794912970.889397,
+    "seen": 1795083119.3317432,
+    "ast_hash": "2b7785df0308d62170ee3503b370a8fe",
+    "semantic_hash": "2b7785df0308d62170ee3503b370a8fe"
+  },
+  "src/MediFlow.Application/Payment/PaymentAppService.cs": {
+    "mtime": 1794947962.792315,
+    "seen": 1795083119.3318288,
+    "ast_hash": "6fa34b65b72012eee42f317c51ef683b",
+    "semantic_hash": "6fa34b65b72012eee42f317c51ef683b"
+  },
+  "src/MediFlow.Application/Pharmacies/PharmacyAppService.cs": {
+    "mtime": 1794912970.92038,
+    "seen": 1795083119.331915,
+    "ast_hash": "bbeee08c5d854943e8d3ad66b13ccafc",
+    "semantic_hash": "bbeee08c5d854943e8d3ad66b13ccafc"
+  },
+  "src/MediFlow.Application/Pharmacies/PharmacyStocKAppService.cs": {
+    "mtime": 1794912970.9404728,
+    "seen": 1795083119.3320048,
+    "ast_hash": "14fc3e1532f07efe49da002814216644",
+    "semantic_hash": "14fc3e1532f07efe49da002814216644"
+  },
+  "src/MediFlow.Application/Prescriptions/PrescriptionAppService.cs": {
+    "mtime": 1794912970.960995,
+    "seen": 1795083119.332094,
+    "ast_hash": "b3d626e604724efa60087dcaae96c9ee",
+    "semantic_hash": "b3d626e604724efa60087dcaae96c9ee"
+  },
+  "src/MediFlow.Application/Pricing/DrugPriceHistoryAppService.cs": {
+    "mtime": 1794912970.9784906,
+    "seen": 1795083119.3322318,
+    "ast_hash": "355430818e7c5ecd9c8a2dab507bb4c7",
+    "semantic_hash": "355430818e7c5ecd9c8a2dab507bb4c7"
+  },
+  "src/MediFlow.Application/Properties/AssemblyInfo.cs": {
+    "mtime": 1794912971.0007794,
+    "seen": 1795083119.3323555,
+    "ast_hash": "073d8e3e830fb08afddce07ff85a7ee7",
+    "semantic_hash": "073d8e3e830fb08afddce07ff85a7ee7"
+  },
+  "src/MediFlow.Application/Returns/ReturnAppService.cs": {
+    "mtime": 1794912971.0211709,
+    "seen": 1795083119.3324456,
+    "ast_hash": "a24b4c84c0611f17fbc28dd2a6aa05e6",
+    "semantic_hash": "a24b4c84c0611f17fbc28dd2a6aa05e6"
+  },
+  "src/MediFlow.Application/Returns/ReturnItemAppService.cs": {
+    "mtime": 1794912971.0419579,
+    "seen": 1795083119.3325403,
+    "ast_hash": "615212f680078ead848407782aa95b2f",
+    "semantic_hash": "615212f680078ead848407782aa95b2f"
+  },
+  "src/MediFlow.Application/Sales/SaleAppService.cs": {
+    "mtime": 1794912971.0529547,
+    "seen": 1795083119.3326297,
+    "ast_hash": "f7b4c83963026971c4f43b4bccda135c",
+    "semantic_hash": "f7b4c83963026971c4f43b4bccda135c"
+  },
+  "src/MediFlow.Application/Sales/SaleItemAppService.cs": {
+    "mtime": 1794912971.066934,
+    "seen": 1795083119.332727,
+    "ast_hash": "9266c77cf13fca12879660a54a5446a5",
+    "semantic_hash": "9266c77cf13fca12879660a54a5446a5"
+  },
+  "src/MediFlow.Application/Services/UserInitializationService.cs": {
+    "mtime": 1794992553.7365704,
+    "seen": 1795083119.3328173,
+    "ast_hash": "344c5a064f90559b9c2e7497b3c086b8",
+    "semantic_hash": "344c5a064f90559b9c2e7497b3c086b8"
+  },
+  "src/MediFlow.Application/Shipments/ShipmentAppService.cs": {
+    "mtime": 1794912971.0855925,
+    "seen": 1795083119.3329086,
+    "ast_hash": "3290afa9c980e6f45974758bb3862004",
+    "semantic_hash": "3290afa9c980e6f45974758bb3862004"
+  },
+  "src/MediFlow.Application/Shipments/ShipmentItemAppService.cs": {
+    "mtime": 1794912971.1087284,
+    "seen": 1795083119.332999,
+    "ast_hash": "9ddbca88db46fe57cbf866e4d9dfc895",
+    "semantic_hash": "9ddbca88db46fe57cbf866e4d9dfc895"
+  },
+  "src/MediFlow.Application/Suppliers/SupplierAppService.cs": {
+    "mtime": 1794912971.1292534,
+    "seen": 1795083119.3330855,
+    "ast_hash": "c53e0c46dc8832da61d9bca93ea0704c",
+    "semantic_hash": "c53e0c46dc8832da61d9bca93ea0704c"
+  },
+  "src/MediFlow.Application/Users/IUserManagementAppService.cs": {
+    "mtime": 1795037180.4676995,
+    "seen": 1795083119.333184,
+    "ast_hash": "2b187ca472e7231e404eb93abae98bfa",
+    "semantic_hash": "2b187ca472e7231e404eb93abae98bfa"
+  },
+  "src/MediFlow.Application/Users/UserManagementAppService.cs": {
+    "mtime": 1795037320.9973693,
+    "seen": 1795083119.3332767,
+    "ast_hash": "4c181f9caa41558f7dbd2acff9a3bf26",
+    "semantic_hash": "4c181f9caa41558f7dbd2acff9a3bf26"
+  },
+  "src/MediFlow.Application/Warehouses/WarehouseAppService.cs": {
+    "mtime": 1794912971.1504738,
+    "seen": 1795083119.3333619,
+    "ast_hash": "4312b0fad5d5c224581a28bc165e79ab",
+    "semantic_hash": "4312b0fad5d5c224581a28bc165e79ab"
+  },
+  "src/MediFlow.DbMigrator/DbMigratorHostedService.cs": {
+    "mtime": 1794912972.5469599,
+    "seen": 1795083119.3334486,
+    "ast_hash": "55705dd8a1af7e5009cf83ecbd025654",
+    "semantic_hash": "55705dd8a1af7e5009cf83ecbd025654"
+  },
+  "src/MediFlow.DbMigrator/MediFlow.DbMigrator.csproj": {
+    "mtime": 1794913121.6926038,
+    "seen": 1795083119.3335347,
+    "ast_hash": "30b3644875f3d4c78c94519c55521d79",
+    "semantic_hash": "30b3644875f3d4c78c94519c55521d79"
+  },
+  "src/MediFlow.DbMigrator/MediFlowDbMigratorModule.cs": {
+    "mtime": 1794912972.5787742,
+    "seen": 1795083119.333618,
+    "ast_hash": "5277bf6717405ae19732f9c050c58d15",
+    "semantic_hash": "5277bf6717405ae19732f9c050c58d15"
+  },
+  "src/MediFlow.DbMigrator/Program.cs": {
+    "mtime": 1794912972.6438396,
+    "seen": 1795083119.3337016,
+    "ast_hash": "09052b7cd59d8ab5f1741c2ff10bed79",
+    "semantic_hash": "09052b7cd59d8ab5f1741c2ff10bed79"
+  },
+  "src/MediFlow.DbMigrator/appsettings.json": {
+    "mtime": 1790851819.7610326,
+    "seen": 1795083119.3337858,
+    "ast_hash": "a4ede672d8febf515f232b6e2f3d0a19",
+    "semantic_hash": "a4ede672d8febf515f232b6e2f3d0a19",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Drugs/DrugForm.cs": {
+    "mtime": 1794912973.4315386,
+    "seen": 1795083119.3337886,
+    "ast_hash": "25b1c634a03c8ac3ce8861b1a678cabe",
+    "semantic_hash": "25b1c634a03c8ac3ce8861b1a678cabe"
+  },
+  "src/MediFlow.Domain.Shared/Drugs/PrescriptionType.cs": {
+    "mtime": 1794912973.4469345,
+    "seen": 1795083119.3338776,
+    "ast_hash": "5cc6f6f79f4cae47bdffd187bec3d4af",
+    "semantic_hash": "5cc6f6f79f4cae47bdffd187bec3d4af"
+  },
+  "src/MediFlow.Domain.Shared/Ingredients/IngredientType.cs": {
+    "mtime": 1794912973.46311,
+    "seen": 1795083119.3339636,
+    "ast_hash": "a0ecafe11bf6b6f62cae351a63a370f9",
+    "semantic_hash": "a0ecafe11bf6b6f62cae351a63a370f9"
+  },
+  "src/MediFlow.Domain.Shared/Inventories/StockBatchStatus.cs": {
+    "mtime": 1794939505.731007,
+    "seen": 1795083119.3340507,
+    "ast_hash": "eaf192bcd7715e0f5c946d12f2023a82",
+    "semantic_hash": "eaf192bcd7715e0f5c946d12f2023a82"
+  },
+  "src/MediFlow.Domain.Shared/Inventories/StockMovementType.cs": {
+    "mtime": 1794912973.4767437,
+    "seen": 1795083119.3341882,
+    "ast_hash": "c82a21ab8b7fc23b4bea920ea0cf1ee7",
+    "semantic_hash": "c82a21ab8b7fc23b4bea920ea0cf1ee7"
+  },
+  "src/MediFlow.Domain.Shared/Invoices/InvoiceStatus.cs": {
+    "mtime": 1794912973.4908218,
+    "seen": 1795083119.3342948,
+    "ast_hash": "9ca82028c1136a4f80d25a5ffa840933",
+    "semantic_hash": "9ca82028c1136a4f80d25a5ffa840933"
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlowResource.cs": {
+    "mtime": 1794912973.5082476,
+    "seen": 1795083119.334403,
+    "ast_hash": "6d554fb83fd9a4768b3e8f918d3db816",
+    "semantic_hash": "6d554fb83fd9a4768b3e8f918d3db816"
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/ar.json": {
+    "mtime": 1790750017.771415,
+    "seen": 1795083119.3344927,
+    "ast_hash": "bc2a61383b12be35fcca13ecd8076b9c",
+    "semantic_hash": "bc2a61383b12be35fcca13ecd8076b9c",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/cs.json": {
+    "mtime": 1790750017.7719157,
+    "seen": 1795083119.334495,
+    "ast_hash": "0cda807d35f01244b02c1025d80aa8ff",
+    "semantic_hash": "0cda807d35f01244b02c1025d80aa8ff",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/de.json": {
+    "mtime": 1790750017.7724147,
+    "seen": 1795083119.3344965,
+    "ast_hash": "3510fd71d8ea42b7c68cfbf221084d06",
+    "semantic_hash": "3510fd71d8ea42b7c68cfbf221084d06",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/en-GB.json": {
+    "mtime": 1790750017.7724147,
+    "seen": 1795083119.3344977,
+    "ast_hash": "cdfc8c44ccb61ea4e4fbae307f2c0ac0",
+    "semantic_hash": "cdfc8c44ccb61ea4e4fbae307f2c0ac0",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/en.json": {
+    "mtime": 1790750017.7729154,
+    "seen": 1795083119.3344994,
+    "ast_hash": "820f1ccbe988b55588fc32e0e1846022",
+    "semantic_hash": "820f1ccbe988b55588fc32e0e1846022",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/es.json": {
+    "mtime": 1790750017.7734153,
+    "seen": 1795083119.3345006,
+    "ast_hash": "295ab44cc17448525f2b636cf4a42f1a",
+    "semantic_hash": "295ab44cc17448525f2b636cf4a42f1a",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/fi.json": {
+    "mtime": 1790750017.7739155,
+    "seen": 1795083119.3345017,
+    "ast_hash": "0c8e87efca21ebfa2ed6c9d61f978af9",
+    "semantic_hash": "0c8e87efca21ebfa2ed6c9d61f978af9",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/fr.json": {
+    "mtime": 1790750017.7739155,
+    "seen": 1795083119.334503,
+    "ast_hash": "1d064e544a4419f7f013430e3342779b",
+    "semantic_hash": "1d064e544a4419f7f013430e3342779b",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/hi.json": {
+    "mtime": 1790750017.7739155,
+    "seen": 1795083119.3345041,
+    "ast_hash": "7186887631cc4eb3054650fdec4b2f64",
+    "semantic_hash": "7186887631cc4eb3054650fdec4b2f64",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/hr.json": {
+    "mtime": 1790750017.7749224,
+    "seen": 1795083119.3345053,
+    "ast_hash": "5f36b570d10f0ed6185e84f377994eaa",
+    "semantic_hash": "5f36b570d10f0ed6185e84f377994eaa",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/hu.json": {
+    "mtime": 1790750017.7754295,
+    "seen": 1795083119.3345065,
+    "ast_hash": "48b165b8bb65620f2c67413c699062ee",
+    "semantic_hash": "48b165b8bb65620f2c67413c699062ee",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/is.json": {
+    "mtime": 1790750017.7754295,
+    "seen": 1795083119.3345075,
+    "ast_hash": "2819eadc2500b75356cf86123f66798e",
+    "semantic_hash": "2819eadc2500b75356cf86123f66798e",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/it.json": {
+    "mtime": 1790750017.7754295,
+    "seen": 1795083119.334509,
+    "ast_hash": "956d69f4d503b9528abbcfc4062a9af4",
+    "semantic_hash": "956d69f4d503b9528abbcfc4062a9af4",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/nl.json": {
+    "mtime": 1790750017.7766924,
+    "seen": 1795083119.33451,
+    "ast_hash": "78ee3faa1904fd1a5aa618c033d7fd93",
+    "semantic_hash": "78ee3faa1904fd1a5aa618c033d7fd93",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/pl-PL.json": {
+    "mtime": 1790750017.7766924,
+    "seen": 1795083119.3345115,
+    "ast_hash": "77089ab3a4e4696100a5cd5a8a64eac4",
+    "semantic_hash": "77089ab3a4e4696100a5cd5a8a64eac4",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/pt-BR.json": {
+    "mtime": 1790750017.7771995,
+    "seen": 1795083119.334513,
+    "ast_hash": "e43cb99875984998df399174e54cd746",
+    "semantic_hash": "e43cb99875984998df399174e54cd746",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/ro-RO.json": {
+    "mtime": 1790750017.7782044,
+    "seen": 1795083119.334514,
+    "ast_hash": "8752a815f0934693525782501cedc6e8",
+    "semantic_hash": "8752a815f0934693525782501cedc6e8",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/ru.json": {
+    "mtime": 1790750017.7787054,
+    "seen": 1795083119.334515,
+    "ast_hash": "9c5fb9b92b97161b0cf716c1a8da87f6",
+    "semantic_hash": "9c5fb9b92b97161b0cf716c1a8da87f6",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/sk.json": {
+    "mtime": 1790750017.779216,
+    "seen": 1795083119.334517,
+    "ast_hash": "13a5e24f8e0f57893e330bfdfbfd2cd2",
+    "semantic_hash": "13a5e24f8e0f57893e330bfdfbfd2cd2",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/sl.json": {
+    "mtime": 1790750017.7797055,
+    "seen": 1795083119.334518,
+    "ast_hash": "40c83e5fe7cc1244f10fd7c59ea0b371",
+    "semantic_hash": "40c83e5fe7cc1244f10fd7c59ea0b371",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/sv.json": {
+    "mtime": 1790750017.780205,
+    "seen": 1795083119.3345227,
+    "ast_hash": "a5cfd01a05ce390fde84598fa23dd4cb",
+    "semantic_hash": "a5cfd01a05ce390fde84598fa23dd4cb",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/tr.json": {
+    "mtime": 1790750017.7807043,
+    "seen": 1795083119.334524,
+    "ast_hash": "eeb3eb24eec10e1b9ef43e33b39bbc05",
+    "semantic_hash": "eeb3eb24eec10e1b9ef43e33b39bbc05",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/vi.json": {
+    "mtime": 1790750017.7812042,
+    "seen": 1795083119.3345249,
+    "ast_hash": "e4e89d0449f93f21d3ea6cc99966b736",
+    "semantic_hash": "e4e89d0449f93f21d3ea6cc99966b736",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/zh-Hans.json": {
+    "mtime": 1790750017.7817044,
+    "seen": 1795083119.3345263,
+    "ast_hash": "28cc0d22bf6939e8e62f937309f36cb1",
+    "semantic_hash": "28cc0d22bf6939e8e62f937309f36cb1",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/Localization/MediFlow/zh-Hant.json": {
+    "mtime": 1790750017.7822049,
+    "seen": 1795083119.3345275,
+    "ast_hash": "997e3fd96a7c797ca5171961f0ea29b1",
+    "semantic_hash": "997e3fd96a7c797ca5171961f0ea29b1",
+    "ast_empty": true
+  },
+  "src/MediFlow.Domain.Shared/MediFlow.Domain.Shared.csproj": {
+    "mtime": 1794913121.7113252,
+    "seen": 1795083119.3345287,
+    "ast_hash": "5d55b64ed423f068eecc95f3a232b83c",
+    "semantic_hash": "5d55b64ed423f068eecc95f3a232b83c"
+  },
+  "src/MediFlow.Domain.Shared/MediFlowDomainErrorCodes.cs": {
+    "mtime": 1794912973.536327,
+    "seen": 1795083119.3346224,
+    "ast_hash": "8f6fa228158544b37bfdc276a42fc6b7",
+    "semantic_hash": "8f6fa228158544b37bfdc276a42fc6b7"
+  },
+  "src/MediFlow.Domain.Shared/MediFlowDomainSharedModule.cs": {
+    "mtime": 1794912973.5648458,
+    "seen": 1795083119.3347309,
+    "ast_hash": "e5fcf57354fa70c23444f03e353fbda5",
+    "semantic_hash": "e5fcf57354fa70c23444f03e353fbda5"
+  },
+  "src/MediFlow.Domain.Shared/MediFlowGlobalFeatureConfigurator.cs": {
+    "mtime": 1794912973.585494,
+    "seen": 1795083119.334816,
+    "ast_hash": "d573c665b0b3e3fdc54152138f742ad3",
+    "semantic_hash": "d573c665b0b3e3fdc54152138f742ad3"
+  },
+  "src/MediFlow.Domain.Shared/MediFlowModuleExtensionConfigurator.cs": {
+    "mtime": 1794912973.6144166,
+    "seen": 1795083119.3349025,
+    "ast_hash": "4c180d4237c7a7c55ae2f43e47c2efae",
+    "semantic_hash": "4c180d4237c7a7c55ae2f43e47c2efae"
+  },
+  "src/MediFlow.Domain.Shared/MultiTenancy/MultiTenancyConsts.cs": {
+    "mtime": 1794912973.6553395,
+    "seen": 1795083119.334989,
+    "ast_hash": "ef76b8c06df02bc899cfcc1b3665af31",
+    "semantic_hash": "ef76b8c06df02bc899cfcc1b3665af31"
+  },
+  "src/MediFlow.Domain.Shared/Orders/OrderStatus.cs": {
+    "mtime": 1794912973.7107062,
+    "seen": 1795083119.335076,
+    "ast_hash": "27571ffa5f20eb5a015b04e135d998fe",
+    "semantic_hash": "27571ffa5f20eb5a015b04e135d998fe"
+  },
+  "src/MediFlow.Domain.Shared/Returns/ReturnReason.cs": {
+    "mtime": 1794912973.727234,
+    "seen": 1795083119.3351686,
+    "ast_hash": "374fdc980401b2eab9d1710ca2ba16ef",
+    "semantic_hash": "374fdc980401b2eab9d1710ca2ba16ef"
+  },
+  "src/MediFlow.Domain.Shared/Returns/ReturnStatus.cs": {
+    "mtime": 1794912973.74097,
+    "seen": 1795083119.3352866,
+    "ast_hash": "4fd7355e27ebe83226919ecb6acd458b",
+    "semantic_hash": "4fd7355e27ebe83226919ecb6acd458b"
+  },
+  "src/MediFlow.Domain.Shared/Shipments/ShipmentStatus.cs": {
+    "mtime": 1794912973.7606096,
+    "seen": 1795083119.3353734,
+    "ast_hash": "f842dac42887e36ddf781b52183d911f",
+    "semantic_hash": "f842dac42887e36ddf781b52183d911f"
+  },
+  "src/MediFlow.Domain/Customers/Customers.cs": {
+    "mtime": 1794912972.662088,
+    "seen": 1795083119.3354635,
+    "ast_hash": "eeb5935b0aa3ad4650b2185f2667265a",
+    "semantic_hash": "eeb5935b0aa3ad4650b2185f2667265a"
+  },
+  "src/MediFlow.Domain/Data/IMediFlowDbSchemaMigrator.cs": {
+    "mtime": 1794912972.6713624,
+    "seen": 1795083119.3355548,
+    "ast_hash": "7c3547544c6d383fe9cf5f3d61efd4a7",
+    "semantic_hash": "7c3547544c6d383fe9cf5f3d61efd4a7"
+  },
+  "src/MediFlow.Domain/Data/MediFlowDbMigrationService.cs": {
+    "mtime": 1794912972.7011354,
+    "seen": 1795083119.3356416,
+    "ast_hash": "72b58feb35418f04f2ab4259e9835c20",
+    "semantic_hash": "72b58feb35418f04f2ab4259e9835c20"
+  },
+  "src/MediFlow.Domain/Data/NullMediFlowDbSchemaMigrator.cs": {
+    "mtime": 1794912972.7425032,
+    "seen": 1795083119.3357267,
+    "ast_hash": "019f6ee0146444a7b28f80ce3b4697ca",
+    "semantic_hash": "019f6ee0146444a7b28f80ce3b4697ca"
+  },
+  "src/MediFlow.Domain/Drugs/Drug.cs": {
+    "mtime": 1794912972.7719593,
+    "seen": 1795083119.3358126,
+    "ast_hash": "a319f6214f7e735f87b351a0b6d731bf",
+    "semantic_hash": "a319f6214f7e735f87b351a0b6d731bf"
+  },
+  "src/MediFlow.Domain/Drugs/DrugIngredient.cs": {
+    "mtime": 1794912972.7939644,
+    "seen": 1795083119.3359003,
+    "ast_hash": "e06c26de55f5488047d66f9dadf078ef",
+    "semantic_hash": "e06c26de55f5488047d66f9dadf078ef"
+  },
+  "src/MediFlow.Domain/Ingredients/Ingredient.cs": {
+    "mtime": 1794912972.8119876,
+    "seen": 1795083119.3359869,
+    "ast_hash": "3efb781c8049b636e1855b5cab20085d",
+    "semantic_hash": "3efb781c8049b636e1855b5cab20085d"
+  },
+  "src/MediFlow.Domain/Inventories/StockBatch.cs": {
+    "mtime": 1794912972.8329537,
+    "seen": 1795083119.3360727,
+    "ast_hash": "4c88e5fbfd23949ff8d002c749fdf366",
+    "semantic_hash": "4c88e5fbfd23949ff8d002c749fdf366"
+  },
+  "src/MediFlow.Domain/Inventories/StockMovementLog.cs": {
+    "mtime": 1794912972.852325,
+    "seen": 1795083119.3361626,
+    "ast_hash": "511a0551f5bfe6b43d4fa90317bd7eb7",
+    "semantic_hash": "511a0551f5bfe6b43d4fa90317bd7eb7"
+  },
+  "src/MediFlow.Domain/Invoices/Invoice.cs": {
+    "mtime": 1794912972.8776762,
+    "seen": 1795083119.336258,
+    "ast_hash": "aabedf564bb53c965441dbfd05dbd103",
+    "semantic_hash": "aabedf564bb53c965441dbfd05dbd103"
+  },
+  "src/MediFlow.Domain/Invoices/InvoiceItem.cs": {
+    "mtime": 1794912972.9005542,
+    "seen": 1795083119.3363526,
+    "ast_hash": "176c9e5891bc04ef7cce507f44b42a79",
+    "semantic_hash": "176c9e5891bc04ef7cce507f44b42a79"
+  },
+  "src/MediFlow.Domain/MediFlow.Domain.csproj": {
+    "mtime": 1794913121.7018561,
+    "seen": 1795083119.336437,
+    "ast_hash": "7671a08f318415a35bb4d3ed0064cf4a",
+    "semantic_hash": "7671a08f318415a35bb4d3ed0064cf4a"
+  },
+  "src/MediFlow.Domain/MediFlowConsts.cs": {
+    "mtime": 1794912972.921207,
+    "seen": 1795083119.3365214,
+    "ast_hash": "48b2550e076c420256a036ed61a14016",
+    "semantic_hash": "48b2550e076c420256a036ed61a14016"
+  },
+  "src/MediFlow.Domain/MediFlowDomainModule.cs": {
+    "mtime": 1794912972.9541094,
+    "seen": 1795083119.336608,
+    "ast_hash": "05abd926f24f5edb762216cf3d265fac",
+    "semantic_hash": "05abd926f24f5edb762216cf3d265fac"
+  },
+  "src/MediFlow.Domain/OpenIddict/OpenIddictDataSeedContributor.cs": {
+    "mtime": 1795032791.749597,
+    "seen": 1795083119.3367069,
+    "ast_hash": "b3e4a12ea96a1b73daf4b0e6a2bb6635",
+    "semantic_hash": "b3e4a12ea96a1b73daf4b0e6a2bb6635"
+  },
+  "src/MediFlow.Domain/Orders/Order.cs": {
+    "mtime": 1794912973.0653787,
+    "seen": 1795083119.3367949,
+    "ast_hash": "3799ae7410d37f47d1ca1567719342e5",
+    "semantic_hash": "3799ae7410d37f47d1ca1567719342e5"
+  },
+  "src/MediFlow.Domain/Orders/OrderItem.cs": {
+    "mtime": 1794912973.0823038,
+    "seen": 1795083119.336881,
+    "ast_hash": "a2c315c8b1e73fd22ea951df30edb70f",
+    "semantic_hash": "a2c315c8b1e73fd22ea951df30edb70f"
+  },
+  "src/MediFlow.Domain/Payment/PaymentMethod.cs": {
+    "mtime": 1794940911.4270544,
+    "seen": 1795083119.3369825,
+    "ast_hash": "68ed36a3bd0425d44231aeb5728f073c",
+    "semantic_hash": "68ed36a3bd0425d44231aeb5728f073c"
+  },
+  "src/MediFlow.Domain/Payment/PaymentTransaction.cs": {
+    "mtime": 1794944920.569328,
+    "seen": 1795083119.3370752,
+    "ast_hash": "ac0beaee06c10dfeb4a11116de7be88a",
+    "semantic_hash": "ac0beaee06c10dfeb4a11116de7be88a"
+  },
+  "src/MediFlow.Domain/Pharmacies/Pharmacy.cs": {
+    "mtime": 1794912973.1010654,
+    "seen": 1795083119.3371606,
+    "ast_hash": "a040b88a28f79babebabddcf0f69b7ef",
+    "semantic_hash": "a040b88a28f79babebabddcf0f69b7ef"
+  },
+  "src/MediFlow.Domain/Pharmacies/PharmacyStock.cs": {
+    "mtime": 1794912973.1209917,
+    "seen": 1795083119.3372478,
+    "ast_hash": "27d79cb17a58c62cc49ba125742a4835",
+    "semantic_hash": "27d79cb17a58c62cc49ba125742a4835"
+  },
+  "src/MediFlow.Domain/Prescriptions/Prescription.cs": {
+    "mtime": 1794912973.1460693,
+    "seen": 1795083119.337333,
+    "ast_hash": "5a0b9444ba7917325d980d16f22d141c",
+    "semantic_hash": "5a0b9444ba7917325d980d16f22d141c"
+  },
+  "src/MediFlow.Domain/Pricing/DrugPriceHistory.cs": {
+    "mtime": 1794912973.1618688,
+    "seen": 1795083119.3374188,
+    "ast_hash": "30a91d441d9ec3b8a749db1b3f5481ba",
+    "semantic_hash": "30a91d441d9ec3b8a749db1b3f5481ba"
+  },
+  "src/MediFlow.Domain/Properties/AssemblyInfo.cs": {
+    "mtime": 1794912973.1837282,
+    "seen": 1795083119.33751,
+    "ast_hash": "331a9c94fd759759be1f57d59a66794a",
+    "semantic_hash": "331a9c94fd759759be1f57d59a66794a"
+  },
+  "src/MediFlow.Domain/Returns/Return.cs": {
+    "mtime": 1794912973.212368,
+    "seen": 1795083119.3375952,
+    "ast_hash": "675bd55b64ac1890a840169e9393ab86",
+    "semantic_hash": "675bd55b64ac1890a840169e9393ab86"
+  },
+  "src/MediFlow.Domain/Returns/ReturnItem.cs": {
+    "mtime": 1794912973.2305048,
+    "seen": 1795083119.3376803,
+    "ast_hash": "f5141db280858205771ac2082e3f97f1",
+    "semantic_hash": "f5141db280858205771ac2082e3f97f1"
+  },
+  "src/MediFlow.Domain/Sales/Sale.cs": {
+    "mtime": 1794912973.2521276,
+    "seen": 1795083119.3377645,
+    "ast_hash": "9b454b2f1166830dd7e80d79736329d9",
+    "semantic_hash": "9b454b2f1166830dd7e80d79736329d9"
+  },
+  "src/MediFlow.Domain/Sales/SaleItem.cs": {
+    "mtime": 1794912973.267737,
+    "seen": 1795083119.3378525,
+    "ast_hash": "d78d25687d433eeb0756ee629eadfbf9",
+    "semantic_hash": "d78d25687d433eeb0756ee629eadfbf9"
+  },
+  "src/MediFlow.Domain/Settings/MediFlowSettingDefinitionProvider.cs": {
+    "mtime": 1794912973.295512,
+    "seen": 1795083119.3379364,
+    "ast_hash": "aa5a009e553719b80f87a731d2b70b66",
+    "semantic_hash": "aa5a009e553719b80f87a731d2b70b66"
+  },
+  "src/MediFlow.Domain/Settings/MediFlowSettings.cs": {
+    "mtime": 1794912973.3303883,
+    "seen": 1795083119.3380237,
+    "ast_hash": "61b7a289f2ed874f79b92fe2fcf93110",
+    "semantic_hash": "61b7a289f2ed874f79b92fe2fcf93110"
+  },
+  "src/MediFlow.Domain/Shipments/Shipment.cs": {
+    "mtime": 1794912973.362229,
+    "seen": 1795083119.3381095,
+    "ast_hash": "58eeebae9a1a44a168ce3251a2b99a9a",
+    "semantic_hash": "58eeebae9a1a44a168ce3251a2b99a9a"
+  },
+  "src/MediFlow.Domain/Shipments/ShipmentItem.cs": {
+    "mtime": 1794912973.380892,
+    "seen": 1795083119.338251,
+    "ast_hash": "dfdeabd3f17c0c2270202a65951a7775",
+    "semantic_hash": "dfdeabd3f17c0c2270202a65951a7775"
+  },
+  "src/MediFlow.Domain/Suppliers/Supplier.cs": {
+    "mtime": 1794912973.3992367,
+    "seen": 1795083119.33834,
+    "ast_hash": "8e58de280715ee8c6d19c23a79ec577c",
+    "semantic_hash": "8e58de280715ee8c6d19c23a79ec577c"
+  },
+  "src/MediFlow.Domain/Users/MediFlowUser.cs": {
+    "mtime": 1795030552.1911602,
+    "seen": 1795083119.338429,
+    "ast_hash": "6686e5e5d817159ca5c6e4943bb7e0d2",
+    "semantic_hash": "6686e5e5d817159ca5c6e4943bb7e0d2"
+  },
+  "src/MediFlow.Domain/Warehouses/Warehouse.cs": {
+    "mtime": 1794912973.4145575,
+    "seen": 1795083119.338517,
+    "ast_hash": "a4ae5c27ec6203d6295c167338da7f3a",
+    "semantic_hash": "a4ae5c27ec6203d6295c167338da7f3a"
+  },
+  "src/MediFlow.EntityFrameworkCore/EntityConfigurations/Payment/PaymentConfiguration.cs": {
+    "mtime": 1794944876.293654,
+    "seen": 1795083119.3386033,
+    "ast_hash": "dcf1b9c5320177f5407e32f81c058b2b",
+    "semantic_hash": "dcf1b9c5320177f5407e32f81c058b2b"
+  },
+  "src/MediFlow.EntityFrameworkCore/EntityConfigurations/Payment/PaymentMethodConfiguration.cs": {
+    "mtime": 1794940950.3788996,
+    "seen": 1795083119.3387291,
+    "ast_hash": "09913b3735153234db7b55e3ca5217f7",
+    "semantic_hash": "09913b3735153234db7b55e3ca5217f7"
+  },
+  "src/MediFlow.EntityFrameworkCore/EntityFrameworkCore/EntityFrameworkCoreMediFlowDbSchemaMigrator.cs": {
+    "mtime": 1794912973.7766027,
+    "seen": 1795083119.3388207,
+    "ast_hash": "3db5777e656492e0b66b2ea2b806255a",
+    "semantic_hash": "3db5777e656492e0b66b2ea2b806255a"
+  },
+  "src/MediFlow.EntityFrameworkCore/EntityFrameworkCore/MediFlowDbContext.cs": {
+    "mtime": 1794944594.0136626,
+    "seen": 1795083119.3389134,
+    "ast_hash": "925116f07c6552c971fe5fd90223f391",
+    "semantic_hash": "925116f07c6552c971fe5fd90223f391"
+  },
+  "src/MediFlow.EntityFrameworkCore/EntityFrameworkCore/MediFlowDbContextFactory.cs": {
+    "mtime": 1794912973.8429873,
+    "seen": 1795083119.339001,
+    "ast_hash": "423d6250272aca3c6dd76b6557a3d8ee",
+    "semantic_hash": "423d6250272aca3c6dd76b6557a3d8ee"
+  },
+  "src/MediFlow.EntityFrameworkCore/EntityFrameworkCore/MediFlowEfCoreEntityExtensionMappings.cs": {
+    "mtime": 1794912973.8828073,
+    "seen": 1795083119.339089,
+    "ast_hash": "b4096d3031b2864aa622f795d4db03d7",
+    "semantic_hash": "b4096d3031b2864aa622f795d4db03d7"
+  },
+  "src/MediFlow.EntityFrameworkCore/EntityFrameworkCore/MediFlowEntityFrameworkCoreModule.cs": {
+    "mtime": 1794912973.9222097,
+    "seen": 1795083119.3392017,
+    "ast_hash": "fa42d76f2ce2a92098cca2cb309878c5",
+    "semantic_hash": "fa42d76f2ce2a92098cca2cb309878c5"
+  },
+  "src/MediFlow.EntityFrameworkCore/MediFlow.EntityFrameworkCore.csproj": {
+    "mtime": 1794913121.729312,
+    "seen": 1795083119.3393047,
+    "ast_hash": "50e445d1d121cac43fc783b4689f4007",
+    "semantic_hash": "50e445d1d121cac43fc783b4689f4007"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261001071119_Added_Pharma_Modules.Designer.cs": {
+    "mtime": 1794912974.0171313,
+    "seen": 1795083119.3395348,
+    "ast_hash": "79b79f1e04d2f5596084c8aac2a8ee48",
+    "semantic_hash": "79b79f1e04d2f5596084c8aac2a8ee48"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261001071119_Added_Pharma_Modules.cs": {
+    "mtime": 1794912973.9608822,
+    "seen": 1795083119.3396888,
+    "ast_hash": "5627692007b62fe1ddb8234e9444cb1d",
+    "semantic_hash": "5627692007b62fe1ddb8234e9444cb1d"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261014121930_AddOrderIdToShipment.Designer.cs": {
+    "mtime": 1794912974.0692067,
+    "seen": 1795083119.3397908,
+    "ast_hash": "28e33b412eb8dc237e88c2db9c9ca5d2",
+    "semantic_hash": "28e33b412eb8dc237e88c2db9c9ca5d2"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261014121930_AddOrderIdToShipment.cs": {
+    "mtime": 1794912974.0470998,
+    "seen": 1795083119.3398843,
+    "ast_hash": "1a050c27a43bb756ffe323daf32bda80",
+    "semantic_hash": "1a050c27a43bb756ffe323daf32bda80"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261023092053_Update_Drug_Schema_And_Relations.Designer.cs": {
+    "mtime": 1794912974.1331346,
+    "seen": 1795083119.3399594,
+    "ast_hash": "048f5cf80fa2b4deb03dbbbe51844ed2",
+    "semantic_hash": "048f5cf80fa2b4deb03dbbbe51844ed2"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261023092053_Update_Drug_Schema_And_Relations.cs": {
+    "mtime": 1794912974.1012468,
+    "seen": 1795083119.3400314,
+    "ast_hash": "bd18415f060469ea30a20836a3932727",
+    "semantic_hash": "bd18415f060469ea30a20836a3932727"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261023105541_Add_SupplierId_To_StockBatch.Designer.cs": {
+    "mtime": 1794912974.2081063,
+    "seen": 1795083119.3401203,
+    "ast_hash": "b38f1d7c1d8528ffa93146791fa67940",
+    "semantic_hash": "b38f1d7c1d8528ffa93146791fa67940"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261023105541_Add_SupplierId_To_StockBatch.cs": {
+    "mtime": 1794912974.166001,
+    "seen": 1795083119.3401933,
+    "ast_hash": "708573844ddf8150c250191fd18b4288",
+    "semantic_hash": "708573844ddf8150c250191fd18b4288"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261101164641_AddInvoiceItems.Designer.cs": {
+    "mtime": 1794912974.276824,
+    "seen": 1795083119.3402662,
+    "ast_hash": "cf1764f02d71fdf34bec10ba206103dd",
+    "semantic_hash": "cf1764f02d71fdf34bec10ba206103dd"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261101164641_AddInvoiceItems.cs": {
+    "mtime": 1794912974.2410092,
+    "seen": 1795083119.3403409,
+    "ast_hash": "82802d0e24cd952ca60d5cab2b74029a",
+    "semantic_hash": "82802d0e24cd952ca60d5cab2b74029a"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261102183644_UpdateReturnAndReturnItemSchema.Designer.cs": {
+    "mtime": 1794912974.3404899,
+    "seen": 1795083119.3404148,
+    "ast_hash": "75907d0a8ff459b492cba83e61c0cc71",
+    "semantic_hash": "75907d0a8ff459b492cba83e61c0cc71"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261102183644_UpdateReturnAndReturnItemSchema.cs": {
+    "mtime": 1794912974.3089154,
+    "seen": 1795083119.3405144,
+    "ast_hash": "4d8755897123d7a87652d9b0b9654783",
+    "semantic_hash": "4d8755897123d7a87652d9b0b9654783"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261103080407_Add_InvoiceId_To_Returns.Designer.cs": {
+    "mtime": 1794912974.4074357,
+    "seen": 1795083119.3405914,
+    "ast_hash": "cc214beecab55811b92af5d8046e393f",
+    "semantic_hash": "cc214beecab55811b92af5d8046e393f"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261103080407_Add_InvoiceId_To_Returns.cs": {
+    "mtime": 1794912974.37055,
+    "seen": 1795083119.3406596,
+    "ast_hash": "3d92b86e91ab58296c64d7d576872bd9",
+    "semantic_hash": "3d92b86e91ab58296c64d7d576872bd9"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261117201839_Added_Payment_Methods_And_Transactions.Designer.cs": {
+    "mtime": 1794946719.5916274,
+    "seen": 1795083119.3407283,
+    "ast_hash": "68da88a4e42475e27e162503a4f214c5",
+    "semantic_hash": "68da88a4e42475e27e162503a4f214c5"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/20261117201839_Added_Payment_Methods_And_Transactions.cs": {
+    "mtime": 1794946719.5911124,
+    "seen": 1795083119.3407977,
+    "ast_hash": "c0d554d6d320c5c829862c6340e4c932",
+    "semantic_hash": "c0d554d6d320c5c829862c6340e4c932"
+  },
+  "src/MediFlow.EntityFrameworkCore/Migrations/MediFlowDbContextModelSnapshot.cs": {
+    "mtime": 1794946719.5936608,
+    "seen": 1795083119.340867,
+    "ast_hash": "836d3c4826117a791fe2ea2f8f0dcae5",
+    "semantic_hash": "836d3c4826117a791fe2ea2f8f0dcae5"
+  },
+  "src/MediFlow.EntityFrameworkCore/Properties/AssemblyInfo.cs": {
+    "mtime": 1794912974.4943147,
+    "seen": 1795083119.3409376,
+    "ast_hash": "55465b989651668a3ed902a9637e1ba3",
+    "semantic_hash": "55465b989651668a3ed902a9637e1ba3"
+  },
+  "src/MediFlow.HttpApi.Client/MediFlow.HttpApi.Client.csproj": {
+    "mtime": 1794913121.7640557,
+    "seen": 1795083119.341008,
+    "ast_hash": "59abf1d4e834e656b2abd564f933dacd",
+    "semantic_hash": "59abf1d4e834e656b2abd564f933dacd"
+  },
+  "src/MediFlow.HttpApi.Client/MediFlowHttpApiClientModule.cs": {
+    "mtime": 1794912974.6161604,
+    "seen": 1795083119.341093,
+    "ast_hash": "1b52df45e9a35e82c9d2b97d5f9afae2",
+    "semantic_hash": "1b52df45e9a35e82c9d2b97d5f9afae2"
+  },
+  "src/MediFlow.HttpApi.Host/Controllers/HomeController.cs": {
+    "mtime": 1794912974.667171,
+    "seen": 1795083119.341175,
+    "ast_hash": "1b229e66d744c99a04f8e203d4692049",
+    "semantic_hash": "1b229e66d744c99a04f8e203d4692049"
+  },
+  "src/MediFlow.HttpApi.Host/MediFlow.HttpApi.Host.csproj": {
+    "mtime": 1794913121.7872329,
+    "seen": 1795083119.3412447,
+    "ast_hash": "f6a72c48d7bb32c7f73408ebdb28ccaf",
+    "semantic_hash": "f6a72c48d7bb32c7f73408ebdb28ccaf"
+  },
+  "src/MediFlow.HttpApi.Host/MediFlowBrandingProvider.cs": {
+    "mtime": 1794912974.697874,
+    "seen": 1795083119.3413155,
+    "ast_hash": "d699ad97ac31dac415ec712cedfcaef1",
+    "semantic_hash": "d699ad97ac31dac415ec712cedfcaef1"
+  },
+  "src/MediFlow.HttpApi.Host/MediFlowHttpApiHostModule.cs": {
+    "mtime": 1795033138.1410398,
+    "seen": 1795083119.341385,
+    "ast_hash": "152397f9fab1f418138f41611c5d4816",
+    "semantic_hash": "152397f9fab1f418138f41611c5d4816"
+  },
+  "src/MediFlow.HttpApi.Host/Program.cs": {
+    "mtime": 1794912974.8257937,
+    "seen": 1795083119.341454,
+    "ast_hash": "eb7a8eec27286533130151c6e7b750ee",
+    "semantic_hash": "eb7a8eec27286533130151c6e7b750ee"
+  },
+  "src/MediFlow.HttpApi.Host/Properties/launchSettings.json": {
+    "mtime": 1795032810.819125,
+    "seen": 1795083119.3415248,
+    "ast_hash": "fde9edfbcd6d48c46580aa7d1ec1431b",
+    "semantic_hash": "fde9edfbcd6d48c46580aa7d1ec1431b",
+    "ast_empty": true
+  },
+  "src/MediFlow.HttpApi.Host/abp.resourcemapping.js": {
+    "mtime": 1790750017.8052528,
+    "seen": 1795083119.3415265,
+    "ast_hash": "62bdce0679446faf7f9db590644b5d4a",
+    "semantic_hash": "62bdce0679446faf7f9db590644b5d4a"
+  },
+  "src/MediFlow.HttpApi.Host/appsettings.Development.json": {
+    "mtime": 1790750017.8067834,
+    "seen": 1795083119.3415961,
+    "ast_hash": "5b76b0eef9af8a2300673e0553f609f9",
+    "semantic_hash": "5b76b0eef9af8a2300673e0553f609f9",
+    "ast_empty": true
+  },
+  "src/MediFlow.HttpApi.Host/appsettings.json": {
+    "mtime": 1795032784.0298967,
+    "seen": 1795083119.3415978,
+    "ast_hash": "c672ade7ba36d9bfcb710d15e9f945f6",
+    "semantic_hash": "c672ade7ba36d9bfcb710d15e9f945f6",
+    "ast_empty": true
+  },
+  "src/MediFlow.HttpApi.Host/package.json": {
+    "mtime": 1790750017.8072894,
+    "seen": 1795083119.341599,
+    "ast_hash": "bd3cef3be022ccd790ff2c1279b7116d",
+    "semantic_hash": "bd3cef3be022ccd790ff2c1279b7116d"
+  },
+  "src/MediFlow.HttpApi/Controllers/AuthController.cs": {
+    "mtime": 1795033037.3983762,
+    "seen": 1795083119.3416693,
+    "ast_hash": "1bf1465b6db0bc09a55914d043446b41",
+    "semantic_hash": "1bf1465b6db0bc09a55914d043446b41"
+  },
+  "src/MediFlow.HttpApi/Controllers/MediFlowController.cs": {
+    "mtime": 1794912974.5219102,
+    "seen": 1795083119.3417423,
+    "ast_hash": "e71906f414935b70800ab7dd5361ae7e",
+    "semantic_hash": "e71906f414935b70800ab7dd5361ae7e"
+  },
+  "src/MediFlow.HttpApi/Controllers/UserManagementController.cs": {
+    "mtime": 1795037304.283772,
+    "seen": 1795083119.3418095,
+    "ast_hash": "14a6b13db8171120b586d7935b51ef3a",
+    "semantic_hash": "14a6b13db8171120b586d7935b51ef3a"
+  },
+  "src/MediFlow.HttpApi/MediFlow.HttpApi.csproj": {
+    "mtime": 1795031816.1174216,
+    "seen": 1795083119.3418775,
+    "ast_hash": "84762a7b7f6680402172ed1e02d41051",
+    "semantic_hash": "84762a7b7f6680402172ed1e02d41051"
+  },
+  "src/MediFlow.HttpApi/MediFlowHttpApiModule.cs": {
+    "mtime": 1794912974.5449772,
+    "seen": 1795083119.3419447,
+    "ast_hash": "a94b264aaea933267e8fceae60e2ae8c",
+    "semantic_hash": "a94b264aaea933267e8fceae60e2ae8c"
+  },
+  "src/MediFlow.HttpApi/Models/Test/TestModel.cs": {
+    "mtime": 1794912974.5705812,
+    "seen": 1795083119.3420095,
+    "ast_hash": "50be772d3676b55ce6e32d1ff1dae142",
+    "semantic_hash": "50be772d3676b55ce6e32d1ff1dae142"
+  },
+  "src/MediFlow/HttpApi/Controllers/AdminController.cs": {
+    "mtime": 1795029027.3145118,
+    "seen": 1795083119.3420787,
+    "ast_hash": "953aa15b6d0da3b5451ad8e93bdcc7cc",
+    "semantic_hash": "953aa15b6d0da3b5451ad8e93bdcc7cc"
+  },
+  "src/MediFlow/HttpApi/Controllers/UserManagementController.cs": {
+    "mtime": 1795031582.8571951,
+    "seen": 1795083119.342153,
+    "ast_hash": "6c5ec753fdd017d352e50d6b52a71bfc",
+    "semantic_hash": "6c5ec753fdd017d352e50d6b52a71bfc"
+  },
+  "test/MediFlow.Application.Tests/MediFlow.Application.Tests.csproj": {
+    "mtime": 1794913121.8092084,
+    "seen": 1795083119.342221,
+    "ast_hash": "6a22624954fc32840397444583f7ec82",
+    "semantic_hash": "6a22624954fc32840397444583f7ec82"
+  },
+  "test/MediFlow.Application.Tests/MediFlowApplicationTestBase.cs": {
+    "mtime": 1794912974.8597603,
+    "seen": 1795083119.3422902,
+    "ast_hash": "ac1abf0a1578fe56c6f9616ea2b24eb8",
+    "semantic_hash": "ac1abf0a1578fe56c6f9616ea2b24eb8"
+  },
+  "test/MediFlow.Application.Tests/MediFlowApplicationTestModule.cs": {
+    "mtime": 1794912974.8916988,
+    "seen": 1795083119.342425,
+    "ast_hash": "6aeea06d994e3552a0ee3d0a00b5fcbb",
+    "semantic_hash": "6aeea06d994e3552a0ee3d0a00b5fcbb"
+  },
+  "test/MediFlow.Application.Tests/Samples/SampleAppServiceTests.cs": {
+    "mtime": 1794912974.9537597,
+    "seen": 1795083119.3425841,
+    "ast_hash": "cc17ea0550f566d6401e37284137209b",
+    "semantic_hash": "cc17ea0550f566d6401e37284137209b"
+  },
+  "test/MediFlow.Domain.Tests/MediFlow.Domain.Tests.csproj": {
+    "mtime": 1794913121.8274474,
+    "seen": 1795083119.3427362,
+    "ast_hash": "b3d480dc62ed5bf7df4b682cda029650",
+    "semantic_hash": "b3d480dc62ed5bf7df4b682cda029650"
+  },
+  "test/MediFlow.Domain.Tests/MediFlowDomainTestBase.cs": {
+    "mtime": 1794912974.9806654,
+    "seen": 1795083119.3428824,
+    "ast_hash": "a602573f872d0e69e9238658faa38d5e",
+    "semantic_hash": "a602573f872d0e69e9238658faa38d5e"
+  },
+  "test/MediFlow.Domain.Tests/MediFlowDomainTestModule.cs": {
+    "mtime": 1794912975.0038962,
+    "seen": 1795083119.3430212,
+    "ast_hash": "7a1029c8feb5dfb3ec39b1ca8eedd443",
+    "semantic_hash": "7a1029c8feb5dfb3ec39b1ca8eedd443"
+  },
+  "test/MediFlow.Domain.Tests/Samples/SampleDomainTests.cs": {
+    "mtime": 1794912975.056082,
+    "seen": 1795083119.3431926,
+    "ast_hash": "ea958296f841fab5d8774d9e21744f61",
+    "semantic_hash": "ea958296f841fab5d8774d9e21744f61"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/EntityFrameworkCore/Applications/EfCoreSampleAppServiceTests.cs": {
+    "mtime": 1794912975.0917282,
+    "seen": 1795083119.3433409,
+    "ast_hash": "c628bc63d7cb051dd346c3b276ff8048",
+    "semantic_hash": "c628bc63d7cb051dd346c3b276ff8048"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/EntityFrameworkCore/Domains/EfCoreSampleDomainTests.cs": {
+    "mtime": 1794912975.1160672,
+    "seen": 1795083119.3434942,
+    "ast_hash": "6af6ff287239de99dd126e33ceca7158",
+    "semantic_hash": "6af6ff287239de99dd126e33ceca7158"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/EntityFrameworkCore/MediFlowEntityFrameworkCoreCollection.cs": {
+    "mtime": 1794912975.1380343,
+    "seen": 1795083119.3436325,
+    "ast_hash": "9d5104f0cbb48a2112213d30b0838e3f",
+    "semantic_hash": "9d5104f0cbb48a2112213d30b0838e3f"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/EntityFrameworkCore/MediFlowEntityFrameworkCoreCollectionFixtureBase.cs": {
+    "mtime": 1794912975.1627643,
+    "seen": 1795083119.3437686,
+    "ast_hash": "af3710aa437164b18f9511bd48a6051e",
+    "semantic_hash": "af3710aa437164b18f9511bd48a6051e"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/EntityFrameworkCore/MediFlowEntityFrameworkCoreFixture.cs": {
+    "mtime": 1794912975.1880445,
+    "seen": 1795083119.3439045,
+    "ast_hash": "89e9915ca34cd0201c729fdc3096dbcd",
+    "semantic_hash": "89e9915ca34cd0201c729fdc3096dbcd"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/EntityFrameworkCore/MediFlowEntityFrameworkCoreTestBase.cs": {
+    "mtime": 1794912975.202974,
+    "seen": 1795083119.3440323,
+    "ast_hash": "e65abe6e315ae929d6d8816a68bb259c",
+    "semantic_hash": "e65abe6e315ae929d6d8816a68bb259c"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/EntityFrameworkCore/MediFlowEntityFrameworkCoreTestModule.cs": {
+    "mtime": 1794912975.2275436,
+    "seen": 1795083119.3441553,
+    "ast_hash": "94a5bb65c6bde247b4fd2dfaf0e16836",
+    "semantic_hash": "94a5bb65c6bde247b4fd2dfaf0e16836"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/EntityFrameworkCore/Samples/SampleRepositoryTests.cs": {
+    "mtime": 1794912975.259104,
+    "seen": 1795083119.3442862,
+    "ast_hash": "72c52a6c2c83e0fc03eead09445f6ae7",
+    "semantic_hash": "72c52a6c2c83e0fc03eead09445f6ae7"
+  },
+  "test/MediFlow.EntityFrameworkCore.Tests/MediFlow.EntityFrameworkCore.Tests.csproj": {
+    "mtime": 1794913121.841197,
+    "seen": 1795083119.3444188,
+    "ast_hash": "23e068f5ee3714c5f8b8f2258f48dbf2",
+    "semantic_hash": "23e068f5ee3714c5f8b8f2258f48dbf2"
+  },
+  "test/MediFlow.HttpApi.Client.ConsoleTestApp/ClientDemoService.cs": {
+    "mtime": 1794912975.3128588,
+    "seen": 1795083119.344542,
+    "ast_hash": "976527c5f85163b023af464caeb7823f",
+    "semantic_hash": "976527c5f85163b023af464caeb7823f"
+  },
+  "test/MediFlow.HttpApi.Client.ConsoleTestApp/ConsoleTestAppHostedService.cs": {
+    "mtime": 1794912975.332553,
+    "seen": 1795083119.3446724,
+    "ast_hash": "82feabe2532a6b7c7ab48800f71cb664",
+    "semantic_hash": "82feabe2532a6b7c7ab48800f71cb664"
+  },
+  "test/MediFlow.HttpApi.Client.ConsoleTestApp/MediFlow.HttpApi.Client.ConsoleTestApp.csproj": {
+    "mtime": 1794913121.851945,
+    "seen": 1795083119.344813,
+    "ast_hash": "ad846d83690913c199a653a96f007f65",
+    "semantic_hash": "ad846d83690913c199a653a96f007f65"
+  },
+  "test/MediFlow.HttpApi.Client.ConsoleTestApp/MediFlowConsoleApiClientModule.cs": {
+    "mtime": 1794912975.359772,
+    "seen": 1795083119.3449314,
+    "ast_hash": "b842c0c16275f70266f7ba32edb414ae",
+    "semantic_hash": "b842c0c16275f70266f7ba32edb414ae"
+  },
+  "test/MediFlow.HttpApi.Client.ConsoleTestApp/Program.cs": {
+    "mtime": 1794912975.4069502,
+    "seen": 1795083119.345064,
+    "ast_hash": "d6b81579fc2ef7e2eab326c471f3321c",
+    "semantic_hash": "d6b81579fc2ef7e2eab326c471f3321c"
+  },
+  "test/MediFlow.HttpApi.Client.ConsoleTestApp/appsettings.json": {
+    "mtime": 1790750017.8343728,
+    "seen": 1795083119.345191,
+    "ast_hash": "9557ad889f9c3fe240c47861096b0f20",
+    "semantic_hash": "9557ad889f9c3fe240c47861096b0f20",
+    "ast_empty": true
+  },
+  "test/MediFlow.TestBase/MediFlow.TestBase.csproj": {
+    "mtime": 1794913121.8672755,
+    "seen": 1795083119.3451934,
+    "ast_hash": "8fff8168cf956b78b647839268d1f4bf",
+    "semantic_hash": "8fff8168cf956b78b647839268d1f4bf"
+  },
+  "test/MediFlow.TestBase/MediFlowTestBase.cs": {
+    "mtime": 1794912975.430489,
+    "seen": 1795083119.345307,
+    "ast_hash": "85c6a0a9d3d87efce153b4241a5ff2ee",
+    "semantic_hash": "85c6a0a9d3d87efce153b4241a5ff2ee"
+  },
+  "test/MediFlow.TestBase/MediFlowTestBaseModule.cs": {
+    "mtime": 1794912975.460683,
+    "seen": 1795083119.345419,
+    "ast_hash": "7f963dc0771380fb7adf928a9c925909",
+    "semantic_hash": "7f963dc0771380fb7adf928a9c925909"
+  },
+  "test/MediFlow.TestBase/MediFlowTestConsts.cs": {
+    "mtime": 1794912975.4875107,
+    "seen": 1795083119.345531,
+    "ast_hash": "6627a3911403ad86cda65fda741f936d",
+    "semantic_hash": "6627a3911403ad86cda65fda741f936d"
+  },
+  "test/MediFlow.TestBase/MediFlowTestDataSeedContributor.cs": {
+    "mtime": 1794912975.5070918,
+    "seen": 1795083119.3456523,
+    "ast_hash": "b72cb4fd0e4435e5fa2811f66634fd39",
+    "semantic_hash": "b72cb4fd0e4435e5fa2811f66634fd39"
+  },
+  "test/MediFlow.TestBase/Security/FakeCurrentPrincipalAccessor.cs": {
+    "mtime": 1794912975.560572,
+    "seen": 1795083119.345784,
+    "ast_hash": "7e68e61363a96685e870476e053cfedd",
+    "semantic_hash": "7e68e61363a96685e870476e053cfedd"
+  }
+}
