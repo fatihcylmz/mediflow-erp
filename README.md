@@ -96,7 +96,7 @@ npm run dev
 
 ## Demo Accounts
 
-**Admin**: `mehmutzortmaz` / `Admin123!`
+**Admin**: `admin_mehmet` / `Admin123!`
 **Pharmacy**: `eczane_ahmet` / `Pharmacy123!`
 **Supplier**: `tedarikci_mustafa` / `Supplier123!`
 **Warehouse**: `depo_ayse` / `Warehouse123!`

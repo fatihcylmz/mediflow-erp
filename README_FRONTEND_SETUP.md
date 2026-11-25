@@ -260,10 +260,10 @@ Edit `vite.config.ts` to customize:
 1. **Test Backend**: Ensure the API server is running on port 44396
 2. **Test Frontend**: Navigate to `http://localhost:3000`
 3. **Login**: Test with demo credentials:
-   - **Admin**: `mehmutzortmaz` / `Admin123!`
+   - **Admin**: `admin_mehmet` / `Admin123!`
    - **Pharmacy**: `eczane_ahmet` / `Pharmacy123!`
    - **Supplier**: `tedarikci_mustafa` / `Supplier123!`
-   - **Warehouse**: `depo_ bê` / `Warehouse123!`
+   - **Warehouse**: `depo_ayse` / `Warehouse123!`
    - **Sales**: `sales_cemal` / `Sales123!`
 4. **Explore**: Navigate through different role-specific dashboards
 

@@ -206,7 +206,7 @@ export default function LoginPage() {
               >
                 <Input
                   prefix={<UserOutlined style={{ color: '#94A3B8' }} />}
-                  placeholder="Orn: mehmutzortmaz veya admin@mediflow.local"
+                  placeholder="Orn: admin_mehmet veya admin@mediflow.local"
                   size="large"
                   autoComplete="username"
                   style={{ borderRadius: 10, height: 46, fontSize: 14 }}
