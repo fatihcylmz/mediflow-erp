@@ -511,20 +511,20 @@ export default function ReturnList() {
         extra={<Button type="primary" icon={<PlusOutlined />} onClick={showAddReturnModal} size="large" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderColor: 'transparent', borderRadius: 10 }}>Yeni İade Kaydı</Button>}
       >
       {/* KPI Cards - Modern White Surface */}
-      <Row gutter={[16, 16]} className="mb-6">
-        <Col xs={24} sm={12} lg={6}>
-          <KPICard title="Toplam İade" value={returns.length} subtitle="iade kaydı" color="#FF7A00" icon={<RollbackOutlined />} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <KPICard title="İncelemede" value={returns.filter(r => getEffectiveStatus(r) === 0).length} subtitle="bekliyor" color="#FAAD14" icon={<SyncOutlined />} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <KPICard title="Onaylanan" value={returns.filter(r => getEffectiveStatus(r) === 1).length} subtitle="kabul edildi" color="#059669" icon={<CheckCircleOutlined />} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <KPICard title="Karantina / Diğer" value={returns.filter(r => getEffectiveStatus(r) >= 2).length} subtitle="reddedildi / askıda" color="#DC2626" icon={<CloseCircleOutlined />} />
-        </Col>
-      </Row>
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam İade" value={returns.length} subtitle="iade kaydı" color="#FF7A00" icon={<RollbackOutlined />} />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="İncelemede" value={returns.filter(r => getEffectiveStatus(r) === 0).length} subtitle="bekliyor" color="#FAAD14" icon={<SyncOutlined />} />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Onaylanan" value={returns.filter(r => getEffectiveStatus(r) === 1).length} subtitle="kabul edildi" color="#059669" icon={<CheckCircleOutlined />} />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Karantina / Diğer" value={returns.filter(r => getEffectiveStatus(r) >= 2).length} subtitle="reddedildi / askıda" color="#DC2626" icon={<CloseCircleOutlined />} />
+          </Col>
+        </Row>
 
         <Table dataSource={returns} columns={returnColumns} rowKey="id" loading={loading} bordered={false} size="middle" className="border border-slate-200 rounded-xl" />
       </Card>

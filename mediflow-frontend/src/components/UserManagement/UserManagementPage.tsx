@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Card, Typography, Table, Tag, Button, Space, Select, message, Popconfirm, Input, Row, Col, Spin, Alert, Modal, Form, Divider } from 'antd';
 import { LockOutlined, UserOutlined, MailOutlined } from '@ant-design/icons';
 import { UserAddOutlined, TeamOutlined, ReloadOutlined, DeleteOutlined, SearchOutlined, ShopOutlined, DatabaseOutlined, TruckOutlined, SafetyCertificateOutlined, EditOutlined } from '@ant-design/icons';
 import CreateUserModal from './CreateUserModal';
 import api from '../../services/api';
+import { KPICard } from '../../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -239,81 +240,106 @@ export default function UserManagementPage() {
     },
   ];
 
+  const roleStats = [
+    { key: 'Admin', label: 'Admin', color: 'volcano', icon: <SafetyCertificateOutlined /> },
+    { key: 'PharmacyAdmin', label: 'Eczacı', color: 'green', icon: <ShopOutlined /> },
+    { key: 'WarehouseAdmin', label: 'Depocu', color: 'blue', icon: <DatabaseOutlined /> },
+    { key: 'Supplier', label: 'Tedarikçi', color: 'orange', icon: <TruckOutlined /> },
+  ];
+
   return (
-    <Card>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-        <div>
-          <Title level={3} style={{ margin: 0, color: '#ff7a00' }}>
-            <TeamOutlined /> Kullanıcı Yönetimi
-          </Title>
-          <Text type="secondary">
-            Eczacı, depocu, tedarikçi ve admin hesapları tek ekrandan yönetilir.
-          </Text>
+    <div className="space-y-4">
+      {/* Header Section - Modern Cards */}
+      <Card
+        className="rounded-xl shadow-sm border-0 bg-white"
+        bodyStyle={{ padding: 0 }}
+      >
+        <div style={{ padding: 24, borderBottom: '1px solid #f1f5f9' }}>
+          <Row justify="space-between" align="middle">
+            <Col>
+              <Title level={3} style={{ margin: 0, fontWeight: 700, color: '#1e293b' }}>
+                <TeamOutlined style={{ color: '#ff7a00', marginRight: 12 }} />
+                Kullanıcı Yönetimi
+              </Title>
+              <Text type="secondary" style={{ marginLeft: 8 }}>
+                Eczacı, depocu, tedarikçi ve admin hesapları tek ekrandan yönetilir.
+              </Text>
+            </Col>
+            <Col>
+              <Space size={12}>
+                <Input
+                  allowClear
+                  placeholder="Kullanıcı ara..."
+                  prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={{ width: 280, borderRadius: 10 }}
+                />
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() => fetchUsers(roleFilter)}
+                  loading={loading}
+                  style={{ borderRadius: 10, border: '1px solid #e2e8f0' }}
+                />
+                <Button
+                  type="primary"
+                  icon={<UserAddOutlined />}
+                  onClick={() => setIsCreateModalVisible(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)',
+                    borderColor: 'transparent',
+                    borderRadius: 10,
+                    boxShadow: '0 4px 15px rgba(255, 122, 0, 0.3)',
+                  }}
+                >
+                  Yeni Kullanıcı Ekle
+                </Button>
+              </Space>
+            </Col>
+          </Row>
         </div>
 
-        <Space wrap>
-          <Input
-            allowClear
-            placeholder="Kullanıcı ara..."
-            prefix={<SearchOutlined />}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ width: 200 }}
-          />
-          <Select
-            value={roleFilter}
-            style={{ width: 180 }}
-            onChange={(value) => setRoleFilter(value)}
-            options={ROLE_FILTERS}
-          />
-          <Button icon={<ReloadOutlined />} onClick={() => fetchUsers(roleFilter)} loading={loading}>
-            Yenile
-          </Button>
-          <Button type="primary" icon={<UserAddOutlined />} onClick={() => setIsCreateModalVisible(true)} style={{ background: '#ff7a00', borderColor: '#ff7a00' }}>
-            Yeni Kullanıcı Ekle
-          </Button>
-        </Space>
-      </div>
-
-      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        {[
-          { key: 'Admin', label: 'Admin' },
-          { key: 'PharmacyAdmin', label: 'Eczacı' },
-          { key: 'WarehouseAdmin', label: 'Depocu' },
-          { key: 'Supplier', label: 'Tedarikçi' },
-        ].map(item => {
-          const count = users.filter(u => u.roleName === item.key).length;
-          const meta = ROLE_META[item.key];
-          return (
-            <Col xs={12} md={6} key={item.key}>
-              <Card size="small" style={{ borderColor: '#ffe0c2', background: '#fff9f5' }}>
-                <Space>
-                  <span style={{ color: '#ff7a00', fontSize: 20 }}>{meta?.icon}</span>
-                  <div>
-                    <Text type="secondary" style={{ fontSize: 12 }}>{item.label}</Text>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: '#333' }}>{roleFilter || search ? count : ''}</div>
-                  </div>
-                </Space>
-              </Card>
+        {/* KPI Cards - Modern White Surface */}
+        <Row gutter={[16, 16]} style={{ padding: '0 24px 24px' }}>
+          <Col xs={24} sm={12} md={6}>
+            <KPICard title="Toplam Kullanıcı" value={users.length} subtitle="kayıt" color="#FF7A00" icon={<TeamOutlined />} />
+          </Col>
+          {roleStats.map((role) => (
+            <Col xs={24} sm={12} md={6} key={role.key}>
+              <KPICard
+                title={role.label}
+                value={users.filter(u => u.roleName === role.key).length}
+                subtitle="kullanıcı"
+                color={role.color === 'volcano' ? '#FAAD14' : role.color === 'green' ? '#059669' : role.color === 'blue' ? '#1D4ED8' : '#FAAD14'}
+                icon={role.icon}
+              />
             </Col>
-          );
-        })}
-      </Row>
+          ))}
+        </Row>
 
-      {errorText && (
-        <Alert type="warning" showIcon message={errorText} style={{ marginBottom: 16 }} />
-      )}
+        {/* Main Table */}
+        <div style={{ padding: '0 24px 24px' }}>
+          {errorText && (
+            <Alert type="warning" showIcon message={errorText} style={{ marginBottom: 16 }} />
+          )}
 
-      <Spin spinning={loading}>
-        <Table
-          columns={columns as any}
-          dataSource={filteredUsers}
-          rowKey="id"
-          pagination={{ pageSize: 10, showSizeChanger: false }}
-          scroll={{ x: 900 }}
-        />
-      </Spin>
+          <Spin spinning={loading}>
+            <Table
+              columns={columns as any}
+              dataSource={filteredUsers}
+              rowKey="id"
+              pagination={{ pageSize: 10, showSizeChanger: false }}
+              bordered={false}
+              size="middle"
+              className="border border-slate-200 rounded-xl"
+              scroll={{ x: 900 }}
+              locale={{ emptyText: <Text type="secondary">Henüz kullanıcı kaydı yok</Text> }}
+            />
+          </Spin>
+        </div>
+      </Card>
 
+      {/* Create User Modal */}
       <CreateUserModal
         visible={isCreateModalVisible}
         onCancel={() => setIsCreateModalVisible(false)}
@@ -324,133 +350,6 @@ export default function UserManagementPage() {
         }}
         createUserAsync={createUserAsync}
       />
-
-      <Modal
-        title={<span style={{ color: '#ff7a00' }}>Kullanıcıyı Düzenle</span>}
-        open={isEditModalVisible}
-        onCancel={() => setIsEditModalVisible(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setIsEditModalVisible(false)}>İptal</Button>,
-          <Button key="save" type="primary" onClick={saveEditedUser} style={{ background: '#ff7a00', borderColor: '#ff7a00' }}>
-            Kaydet
-          </Button>
-        ]}
-        width={500}
-      >
-        {selectedUserForEdit && (
-          <Form layout="vertical">
-            <Divider orientationMargin={0}>Temel Bilgiler</Divider>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item label="Kullanıcı Adı" name="userName">
-                  <Input
-                    value={selectedUserForEdit.userName || ''}
-                    onChange={(e) => setSelectedUserForEdit({ ...selectedUserForEdit, userName: e.target.value })}
-                    prefix={<UserOutlined style={{ color: '#ff7a00' }} />}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="E-posta" name="email">
-                  <Input
-                    value={selectedUserForEdit.email || ''}
-                    onChange={(e) => setSelectedUserForEdit({ ...selectedUserForEdit, email: e.target.value })}
-                    prefix={<MailOutlined style={{ color: '#ff7a00' }} />}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item label="Ad" name="name">
-                  <Input value={selectedUserForEdit.name || ''} onChange={(e) => setSelectedUserForEdit({ ...selectedUserForEdit, name: e.target.value })} />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Soyad" name="surname">
-                  <Input value={selectedUserForEdit.surname || ''} onChange={(e) => setSelectedUserForEdit({ ...selectedUserForEdit, surname: e.target.value })} />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item label="Telefon" name="phoneNumber">
-                  <Input value={selectedUserForEdit.phoneNumber || ''} onChange={(e) => setSelectedUserForEdit({ ...selectedUserForEdit, phoneNumber: e.target.value })} />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Rol" name="roleName">
-                  <Select
-                    value={selectedUserForEdit.roleName}
-                    onChange={(value) => setSelectedUserForEdit({ ...selectedUserForEdit, roleName: value })}
-                    options={ROLE_FILTERS.filter(r => r.value).map(r => ({ value: r.value, label: r.label }))}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Form.Item label="Adres" name="address">
-              <Input.TextArea
-                rows={3}
-                value={selectedUserForEdit.address || ''}
-                onChange={(e) => setSelectedUserForEdit({ ...selectedUserForEdit, address: e.target.value })}
-              />
-            </Form.Item>
-
-            <Divider orientationMargin={0}>
-              <span style={{ color: '#ff7a00', fontWeight: 700 }}><LockOutlined /> Şifre Değişikliği</span>
-            </Divider>
-
-            <div style={{ background: '#fff9f5', padding: '12px 16px', borderRadius: 8, border: '1px solid #ffe0c2', marginBottom: 16 }}>
-              <Space>
-                <Button
-                  type={showPasswordSection ? 'primary' : 'default'}
-                  size="small"
-                  onClick={() => {
-                    setShowPasswordSection(!showPasswordSection);
-                    if (!showPasswordSection) {
-                      setNewPassword('');
-                      setConfirmNewPassword('');
-                    }
-                  }}
-                  style={{ background: showPasswordSection ? '#ff7a00' : undefined, color: showPasswordSection ? '#fff' : undefined }}
-                >
-                  {showPasswordSection ? 'Şifre Alanı Aktif' : 'Şifre Değiştir'}
-                </Button>
-              </Space>
-            </div>
-
-            {showPasswordSection && (
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item label="Yeni Şifre">
-                    <Input.Password
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      prefix={<LockOutlined style={{ color: '#ff7a00' }} />}
-                      placeholder="Yeni şifre"
-                      style={{ borderRadius: 8 }}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="Şifreyi Onayla">
-                    <Input.Password
-                      value={confirmNewPassword}
-                      onChange={(e) => setConfirmNewPassword(e.target.value)}
-                      prefix={<LockOutlined style={{ color: '#ff7a00' }} />}
-                      placeholder="Tekrar girin"
-                      style={{ borderRadius: 8 }}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-            )}
-          </Form>
-        )}
-      </Modal>
-    </Card>
+    </div>
   );
 }

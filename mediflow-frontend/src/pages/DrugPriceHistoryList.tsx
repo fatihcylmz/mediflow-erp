@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, message, Card, Button, Modal, Form, Select, DatePicker, Space, Popconfirm, InputNumber, Switch, Tag, Row, Col, Statistic, Empty, Tooltip } from 'antd';
-import { DollarOutlined, PlusOutlined, EditOutlined, DeleteOutlined, ShoppingOutlined, BarChartOutlined, PercentageOutlined, CalendarOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Typography, message, Card, Button, Modal, Form, Select, DatePicker, Space, Popconfirm, InputNumber, Switch, Tag, Row, Col, Empty } from 'antd';
+import { DollarOutlined, PlusOutlined, EditOutlined, DeleteOutlined, BarChartOutlined, PercentageOutlined, CalendarOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -181,46 +182,18 @@ export default function DrugPriceHistoryList() {
         }
       >
         {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Fiyat Kaydı</span>}
-                value={priceHistories.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<DollarOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam Fiyat Kaydı" value={priceHistories.length} subtitle="kayıt" color="#FF7A00" icon={<DollarOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Ortalama Fiyat</span>}
-                value={priceHistories.length > 0 ? Math.round(priceHistories.reduce((s, p) => s + p.price, 0) / priceHistories.length) : 0}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<BarChartOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Ortalama Fiyat" value={priceHistories.length > 0 ? Math.round(priceHistories.reduce((s, p) => s + p.price, 0) / priceHistories.length).toLocaleString('tr-TR') : 0} subtitle="₺" color="#1D4ED8" icon={<BarChartOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>SGK Kapsamında</span>}
-                value={priceHistories.filter(p => p.isCoveredByStateInsurance).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<PercentageOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="SGK Kapsamında" value={priceHistories.filter(p => p.isCoveredByStateInsurance).length} subtitle="kayıt" color="#059669" icon={<PercentageOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Aktif Kayıt</span>}
-                value={priceHistories.filter(p => !p.validTo || dayjs(p.validTo).isAfter(dayjs(), 'day')).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<CalendarOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Aktif Kayıt" value={priceHistories.filter(p => !p.validTo || dayjs(p.validTo).isAfter(dayjs(), 'day')).length} subtitle="kayıt" color="#FAAD14" icon={<CalendarOutlined />} />
           </Col>
         </Row>
 

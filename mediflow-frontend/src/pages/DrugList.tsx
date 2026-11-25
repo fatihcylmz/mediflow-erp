@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, message, Card, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Popconfirm, Tag, Divider, Row, Col, Avatar, Tooltip, Badge } from 'antd';
+import { Table, Typography, message, Card, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Popconfirm, Tag, Divider, Row, Col, Avatar, Tooltip, Badge, Empty } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ExperimentOutlined, MedicineBoxOutlined, SearchOutlined, FilterOutlined, BarChartOutlined, EyeOutlined, DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -381,53 +382,19 @@ export default function DrugList() {
           </Row>
         </div>
 
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ padding: '20px 24px' }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', color: 'white' }}>
-              <Row align="middle" gutter={12}>
-                <Col>
-                  <MedicineBoxOutlined style={{ fontSize: 28, opacity: 0.9 }} />
-                </Col>
-                <Col>
-                  <div style={{ fontSize: 24, fontWeight: 700 }}>{drugs.length}</div>
-                  <div style={{ opacity: 0.9, fontSize: 13 }}>Toplam İlaç</div>
-                </Col>
-              </Row>
-            </Card>
+        {/* KPI Cards - Modern White Surface */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam İlaç" value={drugs.length} subtitle="kayıt" color="#FF7A00" icon={<MedicineBoxOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #3b82f6, #60a5fa)' }}>
-              <Row align="middle" gutter={12}>
-                <Col><MedicineBoxOutlined style={{ fontSize: 28, opacity: 0.9, color: 'white' }} /></Col>
-                <Col>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>{ingredients.length}</div>
-                  <div style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Etken Madde</div>
-                </Col>
-              </Row>
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Etken Madde" value={ingredients.length} subtitle="madde kaydı" color="#1D4ED8" icon={<ExperimentOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #10b981, #34d399)' }}>
-              <Row align="middle" gutter={12}>
-                <Col><MedicineBoxOutlined style={{ fontSize: 28, opacity: 0.9, color: 'white' }} /></Col>
-                <Col>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>-</div>
-                  <div style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Soğuk Zincir</div>
-                </Col>
-              </Row>
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Soğuk Zincir Gerekli" value={drugs.filter(d => d.requiresColdChain).length} subtitle="ilaç" color="#0EA5E9" icon={<MedicineBoxOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #8b5cf6, #a78bfa)' }}>
-              <Row align="middle" gutter={12}>
-                <Col><BarChartOutlined style={{ fontSize: 28, opacity: 0.9, color: 'white' }} /></Col>
-                <Col>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>{filteredDrugs.length}</div>
-                  <div style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Arama Sonucu</div>
-                </Col>
-              </Row>
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Arama Sonucu" value={filteredDrugs.length} subtitle="sonuç bulundu" color="#64748B" icon={<BarChartOutlined />} />
           </Col>
         </Row>
 

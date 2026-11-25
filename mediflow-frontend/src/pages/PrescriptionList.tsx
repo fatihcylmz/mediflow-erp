@@ -266,47 +266,19 @@ export default function PrescriptionList() {
           </Row>
         </div>
 
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ padding: '20px 24px' }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Reçete</span>}
-                value={prescriptions.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<FileProtectOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+        {/* KPI Cards - Modern White Surface */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam Reçete" value={prescriptions.length} subtitle="reçete kaydı" color="#FF7A00" icon={<FileProtectOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #3b82f6, #60a5fa)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Bu Ay Yazılan</span>}
-                value={thisMonthCount}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<CalendarOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Bu Ay Yazılan" value={thisMonthCount} subtitle="aylık reçete" color="#1D4ED8" icon={<CalendarOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #10b981, #34d399)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Kayıtlı Doktor</span>}
-                value={uniqueDoctors}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<MedicineBoxOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Kayıtlı Doktor" value={uniqueDoctors} subtitle="doktor" color="#059669" icon={<MedicineBoxOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #8b5cf6, #a78bfa)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Kurum Sayısı</span>}
-                value={uniqueHospitals}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<TeamOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Kurum Sayısı" value={uniqueHospitals} subtitle="hastane/kurum" color="#7C3AED" icon={<TeamOutlined />} />
           </Col>
         </Row>
 

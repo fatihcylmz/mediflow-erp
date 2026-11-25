@@ -5,6 +5,7 @@ import {
   ReloadOutlined, SearchOutlined
 } from '@ant-design/icons';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -212,47 +213,16 @@ export default function IngredientList() {
           </Row>
         </div>
 
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ padding: '20px 24px' }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Madde</span>}
-                value={ingredients.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ExperimentOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+        {/* KPI Cards - Modern White Surface */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={8}>
+            <KPICard title="Toplam Madde" value={ingredients.length} subtitle="kayıt" color="#FF7A00" icon={<ExperimentOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #3b82f6, #60a5fa)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Ana Etken Madde</span>}
-                value={typeCounts[0] || 0}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ExperimentOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={8}>
+            <KPICard title="Ana Etken Madde" value={typeCounts[0] || 0} subtitle="active bileşen" color="#1D4ED8" icon={<ExperimentOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #10b981, #34d399)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Yardımcı Madde</span>}
-                value={typeCounts[1] || 0}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ExperimentOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Diğer (Asit/Baz/Tuz)</span>}
-                value={(typeCounts[2] || 0) + (typeCounts[3] || 0) + (typeCounts[4] || 0)}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ExperimentOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={8}>
+            <KPICard title="Yardımcı Madde" value={typeCounts[1] || 0} subtitle="excipient" color="#059669" icon={<ExperimentOutlined />} />
           </Col>
         </Row>
 

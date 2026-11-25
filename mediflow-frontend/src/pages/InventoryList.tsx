@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, message, Card, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Popconfirm, Tag, DatePicker, Row, Col, Drawer, Statistic, Empty, Tooltip } from 'antd';
+import { Table, Typography, message, Card, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Popconfirm, Tag, DatePicker, Row, Col, Drawer, Empty, Tooltip } from 'antd';
 import { InboxOutlined, PlusOutlined, EditOutlined, DeleteOutlined, HistoryOutlined, EyeOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -257,47 +258,19 @@ export default function InventoryList() {
           </Space>
         }
       >
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Lot</span>}
-                value={stockBatches.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<InboxOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+        {/* KPI Cards - Modern White Surface */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam Lot" value={stockBatches.length} subtitle="lot kaydı" color="#FF7A00" icon={<InboxOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Fiziki Stok</span>}
-                value={stockBatches.reduce((sum, b) => sum + b.quantity, 0)}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<InboxOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam Fiziki Stok" value={stockBatches.reduce((sum, b) => sum + b.quantity, 0)} subtitle="kutu" color="#1D4ED8" icon={<InboxOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Serbest Stok</span>}
-                value={stockBatches.reduce((sum, b) => sum + (b.quantity - (b.reservedQuantity || 0)), 0)}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<InboxOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam Serbest Stok" value={stockBatches.reduce((sum, b) => sum + (b.quantity - (b.reservedQuantity || 0)), 0)} subtitle="kutu" color="#059669" icon={<InboxOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Karantinada</span>}
-                value={stockBatches.filter(b => b.isQuarantined).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<InboxOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Karantinada" value={stockBatches.filter(b => b.isQuarantined).length} subtitle="lot" color="#DC2626" icon={<ReloadOutlined />} />
           </Col>
         </Row>
 
