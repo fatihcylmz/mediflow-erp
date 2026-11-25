@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Layout, Menu, Dropdown, Avatar, Space, Typography, Badge, Button } from 'antd';
 import type { MenuProps } from 'antd';
 import {
@@ -20,12 +20,33 @@ interface MainLayoutProps {
   children?: React.ReactNode;
 }
 
+// Menü izinleri
+const MENU_PERMISSIONS = {
+  admin: ['dashboard', 'users', 'drugs', 'pricing', 'ingredients', 'prescriptions', 'orders', 'shipments', 'invoices', 'inventories', 'returns', 'sales', 'payments'],
+  pharmacy: ['dashboard', 'orders', 'drugs', 'prescriptions', 'sales', 'payments', 'returns'],
+  supplier: ['dashboard', 'orders', 'shipments', 'invoices', 'payments'],
+  warehouse: ['dashboard', 'warehouses', 'inventories', 'shipments', 'drugs'],
+} as const;
+
+// Rol bazlı varsayılan yönlendirme
+const ROLE_DEFAULT_PAGE: Record<RoleType, string> = {
+  admin: 'dashboard',
+  pharmacy: 'dashboard',
+  supplier: 'dashboard',
+  warehouse: 'dashboard',
+};
+
 export default function MainLayout({ children }: MainLayoutProps) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
   const currentRole = (localStorage.getItem('role') || null) as RoleType | null;
   const currentUser = localStorage.getItem('username') || 'Kullanıcı';
+
+  const allowedMenus = useMemo(() => {
+    if (!currentRole) return [];
+    return MENU_PERMISSIONS[currentRole] || ['dashboard'];
+  }, [currentRole]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -43,21 +64,53 @@ export default function MainLayout({ children }: MainLayoutProps) {
   };
 
   const getPanelTitle = (): string => {
-    const titles: Record<RoleType, string> = {
+    const titles: Record<string, string> = {
       admin: 'Sistem Yönetimi',
       pharmacy: 'Eczane Paneli',
       supplier: 'Tedarikçi Portalı',
       warehouse: 'Depo Yönetimi',
     };
-    return titles[currentRole] || 'Yönetim Paneli';
+    return currentRole ? (titles[currentRole] || 'Yönetim Paneli') : 'Yönetim Paneli';
   };
 
-  // Get selected key from URL path
   const getPathKey = (): string => {
-    const path = window.location.pathname.split('/')[1];
-    if (!path) return 'dashboard';
-    return path;
+    const parts = window.location.pathname.split('/');
+    // URL şu şekildedir: /admin/dashboard, /admin/drugs ...
+    if (parts.length > 2 && parts[2]) return parts[2];
+    return 'dashboard';
   };
+
+  // İzin verilen menü öğeleri
+  const getVisibleMenuItems = () => {
+    const allItems: Record<string, JSX.Element> = {
+      dashboard: <Menu.Item key="dashboard" icon={<DashboardOutlined />}>Genel Özet</Menu.Item>,
+      users: <Menu.Item key="users" icon={<TeamOutlined />}>Kullanıcı Yönetimi</Menu.Item>,
+      drugs: <Menu.Item key="drugs" icon={<MedicineBoxOutlined />}>İlaç Envanteri</Menu.Item>,
+      pricing: <Menu.Item key="pricing" icon={<DollarOutlined />}>İlaç Fiyatları</Menu.Item>,
+      ingredients: <Menu.Item key="ingredients" icon={<ExperimentOutlined />}>Etken Maddeler</Menu.Item>,
+      prescriptions: <Menu.Item key="prescriptions" icon={<FileProtectOutlined />}>Reçeteler</Menu.Item>,
+      orders: <Menu.Item key="orders" icon={<ShoppingCartOutlined />}>Siparişler</Menu.Item>,
+      shipments: <Menu.Item key="shipments" icon={<CarOutlined />}>Sevkiyatlar</Menu.Item>,
+      invoices: <Menu.Item key="invoices" icon={<FileTextOutlined />}>Faturalar</Menu.Item>,
+      inventories: <Menu.Item key="inventories" icon={<InboxOutlined />}>Envanter</Menu.Item>,
+      returns: <Menu.Item key="returns" icon={<RollbackOutlined />}>İadeler</Menu.Item>,
+      sales: <Menu.Item key="sales" icon={<TagOutlined />}>Satışlar (POS)</Menu.Item>,
+      payments: <Menu.Item key="payments" icon={<DollarOutlined />}>Ödemeler</Menu.Item>,
+      warehouses: <Menu.Item key="warehouses" icon={<DatabaseOutlined />}>Depo Yönetimi</Menu.Item>,
+    };
+
+    return allowedMenus
+      .filter(key => key in allItems)
+      .map(key => allItems[key]);
+  };
+
+  // Rol değiştirildiğinde / yanlış sayfada kaldığında yönlendir
+  React.useEffect(() => {
+    const path = getPathKey();
+    if (!allowedMenus.includes(path) && allowedMenus.length > 0) {
+      navigate(`/${currentRole}/${allowedMenus[0]}`);
+    }
+  }, [currentRole, allowedMenus, navigate]);
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#F1F5F9' }}>
@@ -146,92 +199,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               paddingRight: 8,
             }}
           >
-            <Menu.Item key="dashboard" icon={<DashboardOutlined />}>
-              Genel Özet
-            </Menu.Item>
-
-            {currentRole === 'admin' && (
-              <>
-                <Menu.Item key="users" icon={<TeamOutlined />}>
-                  Kullanıcı Yönetimi
-                </Menu.Item>
-                <Menu.Item key="drugs" icon={<MedicineBoxOutlined />}>
-                  İlaç Envanteri
-                </Menu.Item>
-                <Menu.Item key="pricing" icon={<DollarOutlined />}>
-                  İlaç Fiyatları
-                </Menu.Item>
-                <Menu.Item key="ingredients" icon={<ExperimentOutlined />}>
-                  Etken Maddeler
-                </Menu.Item>
-                <Menu.Item key="prescriptions" icon={<FileProtectOutlined />}>
-                  Reçeteler
-                </Menu.Item>
-                <Menu.Item key="orders" icon={<ShoppingCartOutlined />}>
-                  Siparişler
-                </Menu.Item>
-                <Menu.Item key="shipments" icon={<CarOutlined />}>
-                  Sevkiyatlar
-                </Menu.Item>
-                <Menu.Item key="invoices" icon={<FileTextOutlined />}>
-                  Faturalar
-                </Menu.Item>
-                <Menu.Item key="inventories" icon={<InboxOutlined />}>
-                  Envanter
-                </Menu.Item>
-                <Menu.Item key="returns" icon={<RollbackOutlined />}>
-                  İadeler
-                </Menu.Item>
-                <Menu.Item key="sales" icon={<TagOutlined />}>
-                  Satışlar (POS)
-                </Menu.Item>
-              </>
-            )}
-
-            {currentRole === 'pharmacy' && (
-              <>
-                <Menu.Item key="orders" icon={<ShoppingCartOutlined />}>
-                  İlaç Siparişlerim
-                </Menu.Item>
-                <Menu.Item key="drugs" icon={<MedicineBoxOutlined />}>
-                  İlaç Fiyat & Stok
-                </Menu.Item>
-                <Menu.Item key="prescriptions" icon={<FileProtectOutlined />}>
-                  Reçete İşlemleri
-                </Menu.Item>
-                <Menu.Item key="sales" icon={<TagOutlined />}>
-                  Reçete Satış (POS)
-                </Menu.Item>
-              </>
-            )}
-
-            {currentRole === 'supplier' && (
-              <>
-                <Menu.Item key="orders" icon={<ShoppingCartOutlined />}>
-                  Gelen Siparişler
-                </Menu.Item>
-                <Menu.Item key="shipments" icon={<CarOutlined />}>
-                  Sevkiyat Yönetimi
-                </Menu.Item>
-                <Menu.Item key="invoices" icon={<FileTextOutlined />}>
-                  Faturalarım
-                </Menu.Item>
-              </>
-            )}
-
-            {currentRole === 'warehouse' && (
-              <>
-                <Menu.Item key="warehouses" icon={<DatabaseOutlined />}>
-                  Depo Yönetimi
-                </Menu.Item>
-                <Menu.Item key="inventories" icon={<InboxOutlined />}>
-                  Stok Takibi
-                </Menu.Item>
-                <Menu.Item key="shipments" icon={<CarOutlined />}>
-                  Depo Sevkiyatları
-                </Menu.Item>
-              </>
-            )}
+            {getVisibleMenuItems()}
           </Menu>
         </div>
 
