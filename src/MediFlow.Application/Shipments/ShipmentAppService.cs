@@ -1,13 +1,15 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp;
+using Volo.Abp.Uow;
 using MediFlow.Inventories;
 using MediFlow.Pharmacies;
-using MediFlow.Orders; 
+using MediFlow.Orders;
 
 namespace MediFlow.Shipments
 {
@@ -54,6 +56,7 @@ namespace MediFlow.Shipments
             await base.DeleteAsync(id);
         }
 
+        [UnitOfWork]
         public override async Task<ShipmentDto> UpdateAsync(Guid id, CreateUpdateShipmentDto input)
         {
             var existingShipment = await Repository.GetAsync(id);
@@ -76,78 +79,128 @@ namespace MediFlow.Shipments
                         var quantityToDeduct = item.ApprovedQuantity > 0 ? item.ApprovedQuantity : item.RequestedQuantity;
                         if (quantityToDeduct <= 0) continue;
 
-                        // FIFO MANTIĞI: Bu ilaca ait (DrugId) stokta olan lotları SKT'ye (ExpirationDate) göre sırala
-                        var availableBatchesQuery = await _stockBatchRepository.GetQueryableAsync();
-                        var availableBatches = availableBatchesQuery
-                            .Where(x => x.DrugId == item.DrugId && x.Quantity > 0)
-                            .OrderBy(x => x.ExpirationDate)
-                            .ToList();
+                        int remainingQuantity = quantityToDeduct;
 
-                        var remainingQuantity = quantityToDeduct;
-
-                        // İstenen miktarı karşılayana kadar lotlardan düşmeye başla
-                        foreach (var batch in availableBatches)
+                        // --- FIFO HATASI DÜZELTMESİ ---
+                        // Eğer OrderItem'da StockBatchId varsa (rezervasyon sırasında atandıysa) ÖNCE ONU KULLAN
+                        if (item.StockBatchId.HasValue)
                         {
-                            if (remainingQuantity <= 0) break;
+                            var reservedBatch = await _stockBatchRepository.GetAsync(item.StockBatchId.Value);
+                            remainingQuantity = await ProcessBatchDeductionAsync(reservedBatch, remainingQuantity, existingShipment, item.DrugId);
+                        }
 
-                            var deductedAmount = Math.Min(batch.Quantity, remainingQuantity);
+                        // Hala kalan miktar varsa (veya rezervasyon yoksa) FIFO ile tamamla
+                        if (remainingQuantity > 0)
+                        {
+                            var availableBatchesQuery = await _stockBatchRepository.GetQueryableAsync();
+                            var availableBatches = availableBatchesQuery
+                                .Where(x => x.DrugId == item.DrugId && x.Quantity > 0)
+                                .OrderBy(x => x.ExpirationDate)
+                                .ToList();
 
-                            // 1. Fiili Depo Miktarından ve Rezervasyondan Düş
-                            batch.Quantity -= deductedAmount;
-                            batch.ReservedQuantity -= deductedAmount;
-                            if (batch.ReservedQuantity < 0) batch.ReservedQuantity = 0;
-
-                            await _stockBatchRepository.UpdateAsync(batch);
-
-                            // 2. [K3] ShipmentItem kaydı oluştur (şimdi var!)
-                            await _shipmentItemRepository.InsertAsync(new ShipmentItem
+                            foreach (var batch in availableBatches)
                             {
-                                ShipmentId = existingShipment.Id,
-                                StockBatchId = batch.Id,
-                                Quantity = deductedAmount
-                            });
+                                if (remainingQuantity <= 0) break;
+                                // Zaten işlenmiş batch'i atla (StockBatchId ile gelen)
+                                if (item.StockBatchId.HasValue && batch.Id == item.StockBatchId.Value) continue;
 
-                            // 3. Depo Hareket Logu At (Çıkış)
-                            await _stockMovementLogRepository.InsertAsync(new StockMovementLog
-                            {
-                                StockBatchId = batch.Id,
-                                MovementType = (StockMovementType)1,
-                                QuantityChange = -deductedAmount,
-                                ReferenceId = existingShipment.Id,
-                                Description = $"Takip No: {existingShipment.TrackingNumber} ile eczaneye teslim edildi."
-                            });
-
-                            // 4. Eczane Raf Stokuna (PharmacyStock) Ekle / Güncelle
-                            var existingPharmacyStock = await _pharmacyStockRepository.FirstOrDefaultAsync(
-                                x => x.PharmacyId == existingShipment.PharmacyId &&
-                                     x.DrugId == batch.DrugId &&
-                                     x.LotNumber == batch.LotNumber
-                            );
-
-                            if (existingPharmacyStock != null)
-                            {
-                                existingPharmacyStock.Quantity += deductedAmount;
-                                await _pharmacyStockRepository.UpdateAsync(existingPharmacyStock);
+                                remainingQuantity = await ProcessBatchDeductionAsync(batch, remainingQuantity, existingShipment, item.DrugId);
                             }
-                            else
-                            {
-                                await _pharmacyStockRepository.InsertAsync(new PharmacyStock
-                                {
-                                    PharmacyId = existingShipment.PharmacyId,
-                                    DrugId = batch.DrugId,
-                                    LotNumber = batch.LotNumber,
-                                    ExpirationDate = batch.ExpirationDate,
-                                    Quantity = deductedAmount
-                                });
-                            }
+                        }
 
-                            remainingQuantity -= deductedAmount;
+                        if (remainingQuantity > 0)
+                        {
+                            throw new UserFriendlyException($"Stok miktarı yetersiz! {remainingQuantity} kutu eksik kalacak. (İlaç: {item.DrugId})");
                         }
                     }
                 }
             }
 
             return result;
+        }
+
+        private async Task<int> ProcessBatchDeductionAsync(StockBatch batch, int remainingQuantity, Shipment existingShipment, Guid drugId)
+        {
+            var deductedAmount = Math.Min(batch.Quantity, remainingQuantity);
+
+            // 1. Fiili Depo Miktarından ve Rezervasyondan Düş
+            if (batch.Quantity >= deductedAmount)
+            {
+                batch.Quantity -= deductedAmount;
+            }
+            else
+            {
+                throw new UserFriendlyException("Stok miktarı yetersiz. İşlem iptal edildi.");
+            }
+
+            batch.ReservedQuantity -= deductedAmount;
+            if (batch.ReservedQuantity < 0) batch.ReservedQuantity = 0;
+
+            await _stockBatchRepository.UpdateAsync(batch);
+
+            // 2. ShipmentItem kaydı oluştur
+            await _shipmentItemRepository.InsertAsync(new ShipmentItem
+            {
+                ShipmentId = existingShipment.Id,
+                StockBatchId = batch.Id,
+                Quantity = deductedAmount
+            });
+
+            // 3. Depo Hareket Logu At (Çıkış)
+            await _stockMovementLogRepository.InsertAsync(new StockMovementLog
+            {
+                StockBatchId = batch.Id,
+                MovementType = StockMovementType.Dispatch,
+                QuantityChange = -deductedAmount,
+                ReferenceId = existingShipment.Id,
+                Description = $"Takip No: {existingShipment.TrackingNumber} ile eczaneye teslim edildi."
+            });
+
+            // 4. Eczane Raf Stokuna (PharmacyStock) Ekle / Güncelle - CONCURRENCY HANDLING
+            await UpdatePharmacyStockWithRetryAsync(existingShipment.PharmacyId, batch, deductedAmount);
+
+            return remainingQuantity - deductedAmount;
+        }
+
+        private async Task UpdatePharmacyStockWithRetryAsync(Guid pharmacyId, StockBatch batch, int quantityToAdd, int maxRetries = 3)
+        {
+            for (int attempt = 0; attempt < maxRetries; attempt++)
+            {
+                try
+                {
+                    var existingPharmacyStock = await _pharmacyStockRepository.FirstOrDefaultAsync(
+                        x => x.PharmacyId == pharmacyId &&
+                             x.DrugId == batch.DrugId &&
+                             x.LotNumber == batch.LotNumber
+                    );
+
+                    if (existingPharmacyStock != null)
+                    {
+                        existingPharmacyStock.Quantity += quantityToAdd;
+                        await _pharmacyStockRepository.UpdateAsync(existingPharmacyStock);
+                    }
+                    else
+                    {
+                        await _pharmacyStockRepository.InsertAsync(new PharmacyStock
+                        {
+                            PharmacyId = pharmacyId,
+                            DrugId = batch.DrugId,
+                            LotNumber = batch.LotNumber,
+                            ExpirationDate = batch.ExpirationDate,
+                            Quantity = quantityToAdd
+                        });
+                    }
+                    return; // Başarılı, döngüden çık
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (attempt == maxRetries - 1)
+                        throw; // Son deneme de başarısız olursa exception fırlat
+
+                    // Kısa bekle ve yeniden dene (exponential backoff)
+                    await Task.Delay(50 * (attempt + 1));
+                }
+            }
         }
     }
 }

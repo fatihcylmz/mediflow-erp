@@ -55,8 +55,8 @@ export default function DrugList() {
     try {
       setLoading(true);
       const [drugRes, ingRes] = await Promise.all([
-        api.get('/drug'),
-        api.get('/ingredient')
+        api.get('/api/app/drug'),
+        api.get('/api/app/ingredient')
       ]);
       setDrugs(drugRes.data.items || []);
       setIngredients(ingRes.data.items || []);
@@ -93,7 +93,7 @@ export default function DrugList() {
         await api.put(`/drug/${editingDrugId}`, values);
         message.success('İlaç başarıyla güncellendi.');
       } else {
-        await api.post('/drug', values);
+        await api.post('/api/app/drug', values);
         message.success('Yeni ilaç sisteme eklendi.');
       }
       setIsDrugModalVisible(false);
@@ -120,7 +120,7 @@ export default function DrugList() {
     formulaForm.resetFields();
 
     try {
-      const response = await api.get('/drug-ingredient');
+      const response = await api.get('/api/app/drug-ingredient');
       const allItems = response.data.items || [];
       const filtered = allItems.filter((item: DrugIngredient) => item.drugId === drug.id);
       setDrugIngredients(filtered);
@@ -140,7 +140,7 @@ export default function DrugList() {
         amount: values.amount,
         unit: values.unit
       };
-      await api.post('/drug-ingredient', payload);
+      await api.post('/api/app/drug-ingredient', payload);
       message.success('Etken madde ilaca bağlandı.');
       showFormulaDetails(selectedDrug);
     } catch (error) {

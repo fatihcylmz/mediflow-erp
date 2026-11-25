@@ -6,6 +6,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>MediFlow</RootNamespace>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,12 +15,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Volo.Abp.Account.HttpApi" Version="10.6.1" />
+    <PackageReference Include="Volo.Abp.AspNetCore.Mvc" Version="10.6.1" />
+    <PackageReference Include="Volo.Abp.Authorization" Version="10.6.1" />
     <PackageReference Include="Volo.Abp.Identity.HttpApi" Version="10.6.1" />
     <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="10.6.1" />
     <PackageReference Include="Volo.Abp.TenantManagement.HttpApi" Version="10.6.1" />
     <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="10.6.1" />
     <PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="10.6.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.16.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
   </ItemGroup>
 
 </Project>

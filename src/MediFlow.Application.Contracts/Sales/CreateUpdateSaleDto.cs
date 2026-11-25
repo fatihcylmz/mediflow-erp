@@ -20,4 +20,6 @@ public class CreateUpdateSaleDto
     public List<CreateUpdateSaleItemDto>? Items { get; set; } = new();
 
     public Guid? InvoiceId { get; set; } // Faturayla ilişkilendirme
+    public Guid? OrderId { get; set; }   // Sipariş zinciri
+    public Guid? ShipmentId { get; set; } // Sevkiyat zinciri
 }

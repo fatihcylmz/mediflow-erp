@@ -75,10 +75,10 @@ export default function InventoryList() {
     try {
       setLoading(true);
       const [stockRes, drugRes, warehouseRes, supRes] = await Promise.all([
-        api.get('/stock-batch'),
-        api.get('/drug'),
-        api.get('/warehouse'),
-        api.get('/supplier')
+        api.get('/api/app/stock-batch'),
+        api.get('/api/app/drug'),
+        api.get('/api/app/warehouse'),
+        api.get('/api/app/supplier')
       ]);
       setStockBatches(stockRes.data.items || []);
       setDrugs(drugRes.data.items || []);
@@ -118,7 +118,7 @@ export default function InventoryList() {
         await api.put(`/stock-batch/${editingId}`, payload);
         message.success('Lot bilgisi güncellendi.');
       } else {
-        await api.post('/stock-batch', payload);
+        await api.post('/api/app/stock-batch', payload);
         message.success('Mal kabul başarılı (Yeni Lot ve Tedarikçi bağlandı).');
       }
       setIsFormModalVisible(false);
@@ -142,7 +142,7 @@ export default function InventoryList() {
     setIsLogDrawerVisible(true);
     setLoadingMovements(true);
     try {
-      const response = await api.get('/stock-movement-log');
+      const response = await api.get('/api/app/stock-movement-log');
       const allLogs = response.data.items || [];
       const filtered = allLogs.filter((log: StockMovementLog) => log.stockBatchId === batchId);
       setMovements(filtered);

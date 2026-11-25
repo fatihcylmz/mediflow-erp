@@ -43,8 +43,8 @@ export default function DrugPriceHistoryList() {
     try {
       setLoading(true);
       const [pricingRes, drugRes] = await Promise.all([
-        api.get('/drug-price-history'),
-        api.get('/drug')
+        api.get('/api/app/drug-price-history'),
+        api.get('/api/app/drug')
       ]);
       setPriceHistories(pricingRes.data.items || []);
       setDrugs(drugRes.data.items || []);
@@ -92,7 +92,7 @@ export default function DrugPriceHistoryList() {
         await api.put(`/drug-price-history/${editingId}`, payload);
         message.success('Fiyat kaydı güncellendi.');
       } else {
-        await api.post('/drug-price-history', payload);
+        await api.post('/api/app/drug-price-history', payload);
         message.success('Yeni fiyat kaydı oluşturuldu.');
       }
       setIsModalVisible(false);

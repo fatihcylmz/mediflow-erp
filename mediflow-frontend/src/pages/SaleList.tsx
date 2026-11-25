@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Table, Typography, message, Card, Button, Modal, Form, Select, DatePicker, Space, Popconfirm, InputNumber, Row, Col, Statistic } from 'antd';
-import { ShoppingCartOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UnorderedListOutlined, WarningOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
 
@@ -14,6 +14,15 @@ interface Sale {
   prescriptionId: string | null;
   saleDate: string;
   totalAmount: number;
+  status?: number;
+  invoiceId?: string;
+  orderId?: string;
+  shipmentId?: string;
+  invoiceNumber?: string;
+  orderNumber?: string;
+  shipmentTrackingNumber?: string;
+  pharmacyName?: string;
+  customerName?: string;
 }
 
 //[cite: 28]
@@ -60,12 +69,12 @@ export default function SaleList() {
     try {
       setLoading(true);
       const [saleRes, pharmRes, custRes, presRes, batchRes, drugRes] = await Promise.all([
-        api.get('/sale'),
-        api.get('/pharmacy'),
-        api.get('/customer'),
-        api.get('/prescription'),
-        api.get('/stock-batch'), // İzlenebilirlik için Lot eşleştirmesi
-        api.get('/drug') // Lotların içindeki ilaç isimleri
+        api.get('/api/app/sale'),
+        api.get('/api/app/pharmacy'),
+        api.get('/api/app/customer'),
+        api.get('/api/app/prescription'),
+        api.get('/api/app/stock-batch'), // İzlenebilirlik için Lot eşleştirmesi
+        api.get('/api/app/drug') // Lotların içindeki ilaç isimleri
       ]);
       setSales(saleRes.data.items || []);
       setPharmacies(pharmRes.data.items || []);
@@ -114,7 +123,7 @@ export default function SaleList() {
         await api.put(`/sale/${editingSaleId}`, payload);
         message.success('Satış kaydı güncellendi.');
       } else {
-        await api.post('/sale', payload);
+        await api.post('/api/app/sale', payload);
         message.success('Yeni satış kaydı oluşturuldu.');
       }
       setIsSaleModalVisible(false);
@@ -145,7 +154,7 @@ export default function SaleList() {
     itemForm.resetFields();
 
     try {
-      const response = await api.get('/sale-item');
+      const response = await api.get('/api/app/sale-item');
       const allItems = response.data.items || [];
       const filteredItems = allItems.filter((item: SaleItem) => item.saleId === saleData.id); //[cite: 28]
       setSaleItems(filteredItems);
@@ -165,7 +174,7 @@ export default function SaleList() {
         quantity: values.quantity,
         unitPrice: values.unitPrice
       };
-      await api.post('/sale-item', payload);
+      await api.post('/api/app/sale-item', payload);
       message.success('Satış kalemi eklendi.');
       showSaleDetails(selectedSale); // Listeyi yenile
     } catch (error) {
@@ -217,11 +226,32 @@ export default function SaleList() {
       key: 'saleDate',
       render: (date: string) => date ? new Date(date).toLocaleDateString('tr-TR') : '-' //[cite: 27]
     },
-    { 
-      title: 'Toplam Tutar', 
-      dataIndex: 'totalAmount', 
+    {
+      title: 'Toplam Tutar',
+      dataIndex: 'totalAmount',
       key: 'totalAmount',
       render: (amount: number) => <Text strong>{new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount)}</Text> //[cite: 27]
+    },
+    {
+      title: 'Fatura',
+      key: 'invoice',
+      render: (_: any, record: Sale) => record.invoiceNumber ? (
+        <Text type="secondary">{record.invoiceNumber}</Text>
+      ) : <Text type="secondary">-</Text>
+    },
+    {
+      title: 'Sipariş',
+      key: 'order',
+      render: (_: any, record: Sale) => record.orderNumber ? (
+        <Text type="secondary">{record.orderNumber}</Text>
+      ) : <Text type="secondary">-</Text>
+    },
+    {
+      title: 'Sevkiyat',
+      key: 'shipment',
+      render: (_: any, record: Sale) => record.shipmentTrackingNumber ? (
+        <Text type="secondary">{record.shipmentTrackingNumber}</Text>
+      ) : <Text type="secondary">-</Text>
     },
     {
       title: 'İşlemler',
@@ -229,10 +259,32 @@ export default function SaleList() {
       render: (_: any, record: Sale) => (
         <Space>
           <Button type="primary" icon={<UnorderedListOutlined />} onClick={() => showSaleDetails(record)}>İçerik</Button>
-          <Button ghost type="primary" icon={<EditOutlined />} onClick={() => showEditSaleModal(record)} />
-          <Popconfirm title="Satış kaydını silmek istediğinize emin misiniz?" onConfirm={() => handleSaleDelete(record.id)}>
-            <Button danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          {record.status === 0 && (
+            <Popconfirm
+              title="Bu satış kaydını iptal etmek istediğinize emin misiniz?"
+              description="İptal edilen satışların stokları eczaneye geri eklenecektir."
+              onConfirm={async () => {
+                try {
+                  await api.post(`/api/app/sale/${record.id}/cancel`);
+                  message.success('Satış iptal edildi ve stoklar geri alındı.');
+                  fetchData();
+                } catch (error: any) {
+                  const errorMsg = error.response?.data?.message || 'Satış iptal edilirken hata oluştu.';
+                  message.error(errorMsg);
+                }
+              }}
+              okText="Evet, İptal Et"
+              cancelText="Vazgeç"
+              okButtonProps={{ danger: true }}
+            >
+              <Button size="small" danger icon={<WarningOutlined />}>İptal</Button>
+            </Popconfirm>
+          )}
+          {record.status === 0 && (
+            <Popconfirm title="Satış kaydını silmek istediğinize emin misiniz?" onConfirm={() => handleSaleDelete(record.id)}>
+              <Button danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          )}
         </Space>
       ),
     }

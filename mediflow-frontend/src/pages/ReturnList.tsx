@@ -102,12 +102,12 @@ export default function ReturnList() {
     try {
       setLoading(true);
       const [returnRes, pharmRes, invRes, shipRes, drugRes, itemRes] = await Promise.all([
-        api.get('/return'),
-        api.get('/pharmacy'),
-        api.get('/invoice'),
-        api.get('/shipment'),
-        api.get('/drug'),
-        api.get('/return-item')
+        api.get('/api/app/return'),
+        api.get('/api/app/pharmacy'),
+        api.get('/api/app/invoice'),
+        api.get('/api/app/shipment'),
+        api.get('/api/app/drug'),
+        api.get('/api/app/return-item')
       ]);
 
       const returnList: ReturnData[] = returnRes.data.items || [];
@@ -200,7 +200,7 @@ export default function ReturnList() {
         await api.put(`/return/${editingReturnId}`, payload);
         message.success('İade kaydı güncellendi.');
       } else {
-        await api.post('/return', payload);
+        await api.post('/api/app/return', payload);
         message.success('Tamamlanmış fatura bağlantılı iade kaydı oluşturuldu.');
       }
       setIsReturnModalVisible(false);
@@ -228,14 +228,14 @@ export default function ReturnList() {
     setSelectedInvoiceItem(null);
 
     try {
-      const response = await api.get('/return-item');
+      const response = await api.get('/api/app/return-item');
       const allItems = response.data.items || [];
       const filteredItems = allItems.filter((item: ReturnItem) => item.returnId === returnData.id);
       setReturnItems(filteredItems);
 
       if (returnData.invoiceId) {
         try {
-          const invRes = await api.get(`/invoice/${returnData.invoiceId}`);
+          const invRes = await api.get(`/api/app/invoice/${returnData.invoiceId}`);
           setSelectedInvoice(invRes.data || null);
         } catch {
           const inv = allInvoices.find(i => i.id === returnData.invoiceId);
@@ -309,7 +309,7 @@ export default function ReturnList() {
         reason: values.reason
       };
 
-      await api.post('/return-item', payload);
+      await api.post('/api/app/return-item', payload);
       message.success('İade kalemi eklendi.');
       itemForm.resetFields();
       setSelectedInvoiceItem(null);

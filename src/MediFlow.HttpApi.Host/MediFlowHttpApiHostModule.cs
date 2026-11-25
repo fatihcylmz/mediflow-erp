@@ -117,7 +117,12 @@ public class MediFlowHttpApiHostModule : AbpModule
     {
         var configuration = context.Services.GetConfiguration();
         var keyString = configuration["StringEncryption:DefaultPassPhrase"] ?? "MediFlow_Default_Secret_Key_32Chars!";
-        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(keyString));
+        // Debug: Log the key being used
+        Console.WriteLine($"[ConfigureAuthentication] Using key: '{keyString}' (Length: {keyString.Length})");
+        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(keyString))
+        {
+            KeyId = "MediFlowKey"
+        };
 
         context.Services.AddAuthentication(options =>
         {
@@ -130,6 +135,7 @@ public class MediFlowHttpApiHostModule : AbpModule
             options.Authority = null;
             options.Audience = "MediFlow";
             options.RequireHttpsMetadata = false; // Allow HTTP for development
+            options.ConfigurationManager = null; // Prevent OpenIddict/configuration interference
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,

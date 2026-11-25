@@ -12,5 +12,11 @@ public class SaleDto : FullAuditedEntityDto<Guid>
     public Guid? PrescriptionId { get; set; }
     public DateTime SaleDate { get; set; }
     public decimal TotalAmount { get; set; }
-    public Guid? InvoiceId { get; set; } // İlişkili fatura ID
+    public SaleStatus Status { get; set; }
+    public Guid? InvoiceId { get; set; }
+    public string? InvoiceNumber { get; set; } // Traceability
+    public Guid? OrderId { get; set; }
+    public string? OrderNumber { get; set; }   // Traceability
+    public Guid? ShipmentId { get; set; }
+    public string? ShipmentTrackingNumber { get; set; } // Traceability
 }

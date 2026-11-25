@@ -6,6 +6,7 @@ namespace MediFlow.Invoices;
 public class InvoiceItemDto : EntityDto<Guid>
 {
     public Guid DrugId { get; set; }
+    public Guid StockBatchId { get; set; }
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }
     public decimal TaxRate { get; set; }

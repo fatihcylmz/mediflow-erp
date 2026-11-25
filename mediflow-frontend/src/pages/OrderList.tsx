@@ -77,11 +77,11 @@ export default function OrderList() {
     try {
       setLoading(true);
       const [orderRes, pharmRes, drugRes, itemsRes, stockRes] = await Promise.all([
-        api.get('/order'),
-        api.get('/pharmacy'),
-        api.get('/drug'),
-        api.get('/order-item'),
-        api.get('/stock-batch')
+        api.get('/api/app/order'),
+        api.get('/api/app/pharmacy'),
+        api.get('/api/app/drug'),
+        api.get('/api/app/order-item'),
+        api.get('/api/app/stock-batch')
       ]);
       setOrders(orderRes.data.items || []);
       setPharmacies(pharmRes.data.items || []);
@@ -192,7 +192,7 @@ export default function OrderList() {
         await api.put(`/order/${editingOrderId}`, orderPayload);
         message.success('Sipariş bilgileri güncellendi.');
       } else {
-        const orderRes = await api.post('/order', orderPayload);
+        const orderRes = await api.post('/api/app/order', orderPayload);
         message.success(`Sipariş ve ${items.length} ilaç kalemi başarıyla oluşturuldu!`);
       }
       setIsOrderModalVisible(false);
@@ -223,8 +223,8 @@ export default function OrderList() {
 
   const refreshOrderItems = async (order: Order) => {
     const [itemsRes, stockRes] = await Promise.all([
-      api.get('/order-item'),
-      api.get('/stock-batch')
+      api.get('/api/app/order-item'),
+      api.get('/api/app/stock-batch')
     ]);
     const allItems: OrderItem[] = itemsRes.data.items || [];
     setAllOrderItems(allItems);
@@ -264,7 +264,7 @@ export default function OrderList() {
         requestedQuantity: values.requestedQuantity,
         approvedQuantity: 0
       };
-      await api.post('/order-item', payload);
+      await api.post('/api/app/order-item', payload);
       await refreshOrderItems(selectedOrder);
       message.success('İlaç kalemi siparişe eklendi.');
       itemForm.resetFields();
@@ -464,7 +464,7 @@ export default function OrderList() {
 
           {!editingOrderId && (
             <>
-              <Divider orientation="left" style={{ margin: '12px 0' }}>Sipariş Edilecek İlaçlar (Canlı Depo Stoklu)</Divider>
+              <Divider style={{ margin: '12px 0' }}>Sipariş Edilecek İlaçlar (Canlı Depo Stoklu)</Divider>
               <Form.List name="items">
                 {(fields, { add, remove }) => (
                   <>

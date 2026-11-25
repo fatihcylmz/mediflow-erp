@@ -1,6 +1,8 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, Typography, Table, Badge } from 'antd';
-import { ShopOutlined, ShoppingCartOutlined, MedicineBoxOutlined, ClockCircleOutlined, LineChartOutlined, AlertOutlined } from '@ant-design/icons';
+import { Row, Col, Card, Statistic, Typography, Table, Badge, Spin, Alert } from 'antd';
+import { ShopOutlined, ShoppingCartOutlined, MedicineBoxOutlined, ClockCircleOutlined, LineChartOutlined, AlertOutlined, DollarOutlined } from '@ant-design/icons';
+
+import { TrendChart, DonutChart, FunnelChart } from '../components/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -43,67 +45,113 @@ export default function PharmacyDashboard() {
 
   return (
     <div className="space-y-4">
-      {/* Stats Cards */}
-      <Row gutter={[24, 24]}>
-        <Col xs={24} sm={12} xl={6}>
-          <Card
-            className="border-0 shadow-sm rounded-xl"
-            style={{ background: 'linear-gradient(135deg, #ec4899, #f472b6)' }}
+      {/* Ana grafik tabı */}
+      <div>
+        <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 20 }}>Eczane Dashboard</h2>
+        <div style={{ color: '#64748B', marginBottom: 16 }}>
+          <Select
+            style={{ width: 180, marginRight: 8 }}
+            placeholder="Dönem"
           >
-            <Statistic
-              title={<Text style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Aktif Reçeteler</Text>}
-              value={14}
-              prefix={<ShopOutlined style={{ color: 'white' }} />}
-              valueStyle={{ color: 'white' }}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={12} xl={6}>
-          <Card
-            className="border-0 shadow-sm rounded-xl"
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #a78bfa)' }}
+            <Select.Option value="day">Günlük</Select.Option>
+            <Select.Option value="week">Haftalık</Select.Option>
+            <Select.Option value="month">Aylık</Select.Option>
+            <Select.Option value="year">Yıllık</Select.Option>
+          </Select>
+          <Select
+            style={{ width: 180, marginRight: 8 }}
+            placeholder="Eczane"
           >
-            <Statistic
-              title={<Text style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Bekleyen Siparişler</Text>}
-              value={3}
-              prefix={<ShoppingCartOutlined style={{ color: 'white' }} />}
-              valueStyle={{ color: 'white' }}
-            />
-          </Card>
-        </Col>
+            <Select.Option value="1">Eczane 1</Select.Option>
+            <Select.Option value="2">Eczane 2</Select.Option>
+            <Select.Option value="3">Eczane 3</Select.Option>
+          </Select>
+        </div>
 
-        <Col xs={24} sm={12} xl={6}>
-          <Card
-            className="border-0 shadow-sm rounded-xl"
-            style={{ background: 'linear-gradient(135deg, #ef4444, #f87171)' }}
-          >
-            <Statistic
-              title={<Text style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Düşük Stok</Text>}
-              value={5}
-              prefix={<AlertOutlined style={{ color: 'white' }} />}
-              valueStyle={{ color: 'white' }}
-            />
-          </Card>
-        </Col>
+        {/* KPI Kartları */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={4}>
+            <Card size="small" style={{ borderRadius: 12, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Toplam İlaç Çeşidi</div>
+                <div className="text-xl font-bold text-blue-600">{14}</div>
+              </div>
+              <div className="text-xs text-slate-400 mt-1">İlaç Envanteri</div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} md={4}>
+            <Card size="small" style={{ borderRadius: 12, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Aktif Sipariş</div>
+                <div className="text-xl font-bold text-orange-600">{3}</div>
+              </div>
+              <div className="text-xs text-slate-400 mt-1">Stokta Beklemede</div>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} md={4}>
+            <Card size="small" style={{ borderRadius: 12, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Satış Tutar</div>
+                <div className="text-xl font-bold text-emerald-600">{47 ₺}</div>
+              </div>
+              <div className="text-xs text-slate-400 mt-1">Güncel Ciro</div>
+            </Card>
+          </Col>
+        </Row>
 
-        <Col xs={24} sm={12} xl={6}>
-          <Card
-            className="border-0 shadow-sm rounded-xl"
-            style={{ background: 'linear-gradient(135deg, #10b981, #34d399)' }}
-          >
-            <Statistic
-              title={<Text style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>Bugünkü Satış</Text>}
-              value={47}
-              prefix={<MedicineBoxOutlined style={{ color: 'white' }} />}
-              valueStyle={{ color: 'white' }}
-              suffix={<span style={{ fontSize: 14, opacity: 0.9 }}> ₺</span>}
-            />
-          </Card>
-        </Col>
-      </Row>
+        {/* Grafikler - Donut ve Funnel */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={6}>
+            <Card bordered={false} title={<div className="flex items-center gap-2"><FileTextOutlined className="text-emerald-600" /><span>Reçete Türü Dağılımı</span></div>} className="shadow-sm rounded-xl overflow-hidden" style={{ height: 300 }}>
+              <div className="p-4" style={{ height: 240 }}>
+                <DonutChart data={[
+                  { name: 'Reçetesiz(OTC)', value: 8 },
+                  { name: 'Beyaz Reçete', value: 5 },
+                  { name: 'Yeşil Reçete', value: 4 },
+                  { name: 'Kırmızı Reçete', value: 2 },
+                ]} />
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} lg={6}>
+            <Card bordered={false} title={<div className="flex items-center gap-2"><DollarOutlined className="text-emerald-600" /><span>Satış / Funnel Analizi</span></div>} className="shadow-sm rounded-xl overflow-hidden" style={{ height: 400 }}>
+              <div className="p-4" style={{ height: 340 }}>
+                {1 && <FunnelChart data={[
+                  { name: 'Toplam Sipariş', value: 23 },
+                  { name: 'Tamamlanan', value: 18 },
+                  { name: 'Onaylanan', value: 14 },
+                  { name: 'Sevk Edilen', value: 10 },
+                  { name: 'Teslim Edilen', value: 8 },
+                  { name: 'Tamamlanan Satış', value: 14 },
+                ]} />}
+              </div>
+            </Card>
+          </Col>
+        </Row>
 
-      {/* Recent Orders Card */}
+        {/* Trend Grafikleri - Çizgi grafikler yan yana */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={6}>
+            <Card bordered={false} title={<div className="flex items-center gap-2"><LineChartOutlined className="text-blue-600" /><span>Satış Trendi</span></div>} className="shadow-sm rounded-xl overflow-hidden" style={{ height: 280 }}>
+              <div className="p-4" style={{ height: 220 }}>
+                <div style={{ height: 220 }}>
+                  {1 && <TrendChart data={[{ date: 'Ağu', amount: 2400 }, { date: 'Eyl', amount: 3100 }, { date: 'Eki', amount: 2800 }, { date: 'Kas', amount: 3500 }], label: "amount"} color="#1D4ED8" />}
+                </div>
+              </div>
+            </Card>
+          </Col>
+          <Col xs={24} lg={6}>
+            <Card bordered={false} title={<div className="flex items-center gap-2"><ShoppingCartOutlined className="text-orange-500" /><span>Sipariş Trendi</span></div>} className="shadow-sm rounded-xl overflow-hidden" style={{ height: 280 }}>
+              <div className="p-4" style={{ height: 220 }}>
+                {1 && <TrendChart data={[{ date: 'Ağu', count: 35 }, { date: 'Eyl', count: 48 }, { date: 'Eki', count: 42 }, { date: 'Kas', count: 55 }], label: "count"} color="#FF7A00" />}
+                </div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+
+      {/* Tablo verileri */}
       <Card
         className="border-0 shadow-sm rounded-xl bg-white"
         title={

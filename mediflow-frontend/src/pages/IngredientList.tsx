@@ -31,7 +31,7 @@ export default function IngredientList() {
   const fetchIngredients = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/ingredient');
+      const response = await api.get('/api/app/ingredient');
       setIngredients(response.data.items || []);
     } catch (error: any) {
       const errorMsg = error.response?.data?.error?.message || 'Etken madde verileri çekilirken bir hata oluştu.';
@@ -60,7 +60,7 @@ export default function IngredientList() {
         await api.put(`/ingredient/${editingId}`, values);
         message.success('Etken madde başarıyla güncellendi.');
       } else {
-        await api.post('/ingredient', values);
+        await api.post('/api/app/ingredient', values);
         message.success('Yeni etken madde sisteme kaydedildi.');
       }
       setIsModalVisible(false);

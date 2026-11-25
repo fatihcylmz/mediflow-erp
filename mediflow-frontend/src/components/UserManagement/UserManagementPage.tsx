@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Typography, Table, Tag, Button, Space, Select, message, Popconfirm, Input, Row, Col, Spin, Alert, Modal, Form, Divider } from 'antd';
-import { LockOutlined } from '@ant-design/icons';
+import { LockOutlined, UserOutlined, MailOutlined } from '@ant-design/icons';
 import { UserAddOutlined, TeamOutlined, ReloadOutlined, DeleteOutlined, SearchOutlined, ShopOutlined, DatabaseOutlined, TruckOutlined, SafetyCertificateOutlined, EditOutlined } from '@ant-design/icons';
 import CreateUserModal from './CreateUserModal';
 import api from '../../services/api';
@@ -26,6 +26,7 @@ const ROLE_FILTERS = [
   { value: 'PharmacyAdmin', label: 'Eczacı' },
   { value: 'WarehouseAdmin', label: 'Depocu' },
   { value: 'Supplier', label: 'Tedarikçi' },
+  { value: 'Sales', label: 'Satış' },
 ];
 
 const ROLE_META: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -53,7 +54,7 @@ export default function UserManagementPage() {
     setLoading(true);
     setErrorText(null);
     try {
-      const response = await api.post('/UserManagement/get-users-by-role', { roleName: role });
+      const response = await api.post('/api/app/UserManagement/get-users-by-role', { roleName: role });
       const data = Array.isArray(response.data) ? response.data : response.data?.items ?? [];
       setUsers(data);
     } catch (error: any) {
@@ -74,13 +75,13 @@ export default function UserManagementPage() {
   }, [roleFilter, fetchUsers]);
 
   const createUserAsync = async (input: any): Promise<UserDto> => {
-    const response = await api.post('/UserManagement/create-user', input);
+    const response = await api.post('/api/app/UserManagement/create-user', input);
     return response.data;
   };
 
   const changeUserRole = async (userId: string, roleName: string) => {
     try {
-      await api.post('/UserManagement/set-user-role', { userId, roleName });
+      await api.post('/api/app/UserManagement/set-user-role', { userId, roleName });
       message.success('Kullanıcının rolü güncellendi');
       fetchUsers(roleFilter);
     } catch (error) {
@@ -90,7 +91,7 @@ export default function UserManagementPage() {
 
   const deleteUser = async (userId: string) => {
     try {
-      await api.post('/UserManagement/delete-user', { userId });
+      await api.post('/api/app/UserManagement/delete-user', { userId });
       message.success('Kullanıcı silindi');
       fetchUsers(roleFilter);
     } catch (error) {
@@ -106,7 +107,9 @@ export default function UserManagementPage() {
   const saveEditedUser = async () => {
     if (!selectedUserForEdit) return;
     try {
-      await api.post('/UserManagement/update-user', {
+      const passwordValue = showPasswordSection && newPassword ? newPassword : undefined;
+
+      await api.post('/api/app/UserManagement/update-user', {
         userId: selectedUserForEdit.id,
         userName: selectedUserForEdit.userName || '',
         email: selectedUserForEdit.email || '',
@@ -114,6 +117,7 @@ export default function UserManagementPage() {
         surname: selectedUserForEdit.surname || '',
         phoneNumber: selectedUserForEdit.phoneNumber || '',
         address: selectedUserForEdit.address || '',
+        password: passwordValue,
         roleName: selectedUserForEdit.roleName || ''
       });
 
@@ -130,15 +134,6 @@ export default function UserManagementPage() {
           message.error('şifre en az 6 karakter olmalıdır');
           return;
         }
-        await api.post('/UserManagement/set-password', {
-          userId: selectedUserForEdit.id,
-          newName: selectedUserForEdit.name || '',
-          surname: selectedUserForEdit.surname || '',
-          phoneNumber: selectedUserForEdit.phoneNumber || '',
-          address: selectedUserForEdit.address || '',
-          roleName: selectedUserForEdit.roleName || '',
-          password: ''
-        });
         message.success('Kullanıcı şifresi güncellendi');
       }
 
@@ -404,7 +399,7 @@ export default function UserManagementPage() {
               />
             </Form.Item>
 
-            <Divider orientationMargin={0} orientation="left">
+            <Divider orientationMargin={0}>
               <span style={{ color: '#ff7a00', fontWeight: 700 }}><LockOutlined /> Şifre Değişikliği</span>
             </Divider>
 

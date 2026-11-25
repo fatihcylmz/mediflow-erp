@@ -49,7 +49,7 @@ public class UserDataSeedContributor : IDataSeedContributor, ITransientDependenc
     {
         var users = new[]
         {
-            new { UserName = "mehmutzortmaz", Email = "admin@mediflow.local", Password = "Admin123!", Role = "Admin", Name = "Mehmet", Surname = "Zortmaz" },
+            new { UserName = "admin_mehmet", Email = "admin@mediflow.local", Password = "Admin123!", Role = "Admin", Name = "Mehmet", Surname = "Zortmaz" },
             new { UserName = "eczane_ahmet", Email = "eczane@mediflow.local", Password = "Pharmacy123!", Role = "PharmacyAdmin", Name = "Ahmet", Surname = "Eczacı" },
             new { UserName = "depo_ayse", Email = "depo@mediflow.local", Password = "Warehouse123!", Role = "WarehouseAdmin", Name = "Ayşe", Surname = "Depocu" },
             new { UserName = "tedarikci_mustafa", Email = "tedarikci@mediflow.local", Password = "Supplier123!", Role = "Supplier", Name = "Mustafa", Surname = "Tedarikçi" },
@@ -61,20 +61,28 @@ public class UserDataSeedContributor : IDataSeedContributor, ITransientDependenc
             var existing = await _userManager.FindByNameAsync(u.UserName);
             if (existing != null)
             {
-                // Kilidi aç
-                await _userManager.SetLockoutEnabledAsync(existing, false);
-                await _userManager.ResetAccessFailedCountAsync(existing);
+                // Kullanıcı varsa güncelle (şifre, email, isim, rol)
+                await _userManager.SetEmailAsync(existing, u.Email);
+                existing.Name = u.Name;
+                existing.Surname = u.Surname;
+                existing.SetEmailConfirmed(true);
+                await _userManager.UpdateAsync(existing);
 
-                var token = await _userManager.GeneratePasswordResetTokenAsync(existing);
-                var resetResult = await _userManager.ResetPasswordAsync(existing, token, u.Password);
-                if (!resetResult.Succeeded)
-                    throw new System.Exception($"Kullanıcı '{u.UserName}' şifresi güncellenemedi: {string.Join(", ", resetResult.Errors.Select(e => e.Description))}");
+                // Şifre güncelle
+                await _userManager.RemovePasswordAsync(existing);
+                await _userManager.AddPasswordAsync(existing, u.Password);
 
+                // Rol güncelle
                 var currentRoles = await _userManager.GetRolesAsync(existing);
-                if (currentRoles.Any())
-                    await _userManager.RemoveFromRolesAsync(existing, currentRoles);
+                foreach (var role in currentRoles)
+                {
+                    await _userManager.RemoveFromRoleAsync(existing, role);
+                }
+                if (!await _roleManager.RoleExistsAsync(u.Role))
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(Guid.NewGuid(), u.Role, _currentTenant.Id));
+                }
                 await _userManager.AddToRoleAsync(existing, u.Role);
-
                 continue;
             }
 

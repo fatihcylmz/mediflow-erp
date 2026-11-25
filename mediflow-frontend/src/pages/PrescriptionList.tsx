@@ -45,8 +45,8 @@ export default function PrescriptionList() {
     try {
       setLoading(true);
       const [presRes, custRes] = await Promise.all([
-        api.get('/prescription'),
-        api.get('/customer')
+        api.get('/api/app/prescription'),
+        api.get('/api/app/customer')
       ]);
       setPrescriptions(presRes.data.items || []);
       setCustomers(custRes.data.items || []);
@@ -85,7 +85,7 @@ export default function PrescriptionList() {
         await api.put(`/prescription/${editingId}`, payload);
         message.success('Reçete güncellendi.');
       } else {
-        await api.post('/prescription', payload);
+        await api.post('/api/app/prescription', payload);
         message.success('Yeni reçete sisteme işlendi.');
       }
       setIsModalVisible(false);

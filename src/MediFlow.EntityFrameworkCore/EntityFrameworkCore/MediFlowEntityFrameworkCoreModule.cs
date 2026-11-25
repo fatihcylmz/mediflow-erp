@@ -53,5 +53,6 @@ public class MediFlowEntityFrameworkCoreModule : AbpModule
             options.UseNpgsql();
         });
 
+        context.Services.AddTransient<UserDataSeedContributor>();
     }
 }

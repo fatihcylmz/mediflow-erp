@@ -92,10 +92,10 @@ public class OpenIddictDataSeedContributor : IDataSeedContributor, ITransientDep
 
             await CreateApplicationAsync(
                 name: appClientId!,
-                type: OpenIddictConstants.ClientTypes.Public,
+                type: OpenIddictConstants.ClientTypes.Confidential,
                 consentType: OpenIddictConstants.ConsentTypes.Implicit,
                 displayName: "MediFlow Web Arayüzü",
-                secret: null,
+                secret: configurationSection["MediFlow_App:ClientSecret"],
                 grantTypes: new List<string>
                 {
                     OpenIddictConstants.GrantTypes.Password,

@@ -9,6 +9,8 @@ public class PaymentTransaction : FullAuditedAggregateRoot<Guid>
     public Guid InvoiceId { get; set; }
     public Guid PaymentMethodId { get; set; }
     public decimal Amount { get; set; }
+    public decimal FeeAmount { get; set; } // Ödeme yöntemi ücreti
+    public decimal NetAmount { get; set; } // Net tutar (Amount - FeeAmount)
     public DateTime PaymentDate { get; set; }
     public string TransactionReference { get; set; } // Banka/Kart referans numarası
     public string Notes { get; set; }

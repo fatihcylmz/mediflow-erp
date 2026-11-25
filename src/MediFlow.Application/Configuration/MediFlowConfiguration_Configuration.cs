@@ -2,10 +2,10 @@ namespace MediFlow.Application.Configuration;
 
 public class MediFlowConfiguration
 {
-    public const string AdminUsername = "mehmutzortmaz";
-    public const string AdminFullName = "Mehmut Zortmaz";
+    public const string AdminUsername = "admin_mehmet";
+    public const string AdminFullName = "Mehmet Zortmaz";
     public const string AdminPassword = "Admin123!";
-    public const string AdminEmail = "mehmut.zortmaz@mediflow.local";
+    public const string AdminEmail = "admin@mediflow.local";
 
     public const string PharmacyAdminUsername = "eczane_ahmet";
     public const string PharmacyAdminFullName = "Ahmet Yılmaz";

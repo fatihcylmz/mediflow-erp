@@ -27,7 +27,7 @@ export default function WarehouseList() {
   const fetchWarehouses = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/warehouse');
+      const response = await api.get('/api/app/warehouse');
       setWarehouses(response.data.items || []);
     } catch (error) {
       message.error('Depolar yüklenirken bir hata oluştu.');
@@ -55,7 +55,7 @@ export default function WarehouseList() {
         await api.put(`/warehouse/${editingId}`, values);
         message.success('Depo güncellendi.');
       } else {
-        await api.post('/warehouse', values);
+        await api.post('/api/app/warehouse', values);
         message.success('Yeni depo eklendi.');
       }
       setIsModalVisible(false);

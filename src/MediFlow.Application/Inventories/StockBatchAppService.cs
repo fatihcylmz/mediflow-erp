@@ -4,6 +4,8 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp;
+using MediFlow.Drugs;
+using MediFlow.Warehouses;
 
 namespace MediFlow.Inventories;
 
@@ -15,12 +17,18 @@ public class StockBatchAppService : CrudAppService<
     CreateUpdateStockBatchDto>, IStockBatchAppService
 {
     private readonly IRepository<StockMovementLog, Guid> _stockMovementLogRepository;
+    private readonly IRepository<Warehouse, Guid> _warehouseRepository;
+    private readonly IRepository<Drug, Guid> _drugRepository;
 
     public StockBatchAppService(
         IRepository<StockBatch, Guid> repository,
-        IRepository<StockMovementLog, Guid> stockMovementLogRepository) : base(repository)
+        IRepository<StockMovementLog, Guid> stockMovementLogRepository,
+        IRepository<Warehouse, Guid> warehouseRepository,
+        IRepository<Drug, Guid> drugRepository) : base(repository)
     {
         _stockMovementLogRepository = stockMovementLogRepository;
+        _warehouseRepository = warehouseRepository;
+        _drugRepository = drugRepository;
     }
 
     /// <summary>
@@ -59,5 +67,21 @@ public class StockBatchAppService : CrudAppService<
             QuantityChange = quantityChange,
             Description = description ?? "Manuel stok işlemi"
         });
+    }
+
+    public override async Task<StockBatchDto> CreateAsync(CreateUpdateStockBatchDto input)
+    {
+        // [#10 Soğuk zincir validasyonu] RequiresColdChain=true olan ilaçlar sadece HasColdStorage=true depoya girebilir
+        var drug = await _drugRepository.GetAsync(input.DrugId);
+        if (drug.RequiresColdChain && !input.IsQuarantined)
+        {
+            var warehouse = await _warehouseRepository.GetAsync(input.WarehouseId);
+            if (!warehouse.HasColdStorage)
+            {
+                throw new UserFriendlyException("Soğuk zincir gerektiren ilaçlar sadece soğuk depolara atanabilir!");
+            }
+        }
+
+        return await base.CreateAsync(input);
     }
 }

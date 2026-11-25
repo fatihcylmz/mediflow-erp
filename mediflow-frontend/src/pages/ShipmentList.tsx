@@ -63,11 +63,11 @@ export default function ShipmentList() {
     try {
       setLoading(true);
       const [shipRes, pharmRes, orderRes, drugRes, itemRes] = await Promise.all([
-        api.get('/shipment'),
-        api.get('/pharmacy'),
-        api.get('/order'),
-        api.get('/drug'),
-        api.get('/order-item')
+        api.get('/api/app/shipment'),
+        api.get('/api/app/pharmacy'),
+        api.get('/api/app/order'),
+        api.get('/api/app/drug'),
+        api.get('/api/app/order-item')
       ]);
       setShipments(shipRes.data.items || []);
       setPharmacies(pharmRes.data.items || []);
@@ -134,7 +134,7 @@ export default function ShipmentList() {
         message.success('Sevkiyat güncellendi.');
       } else {
         // 1. Ana Sevkiyat Kaydını Oluştur
-        const response = await api.post('/shipment', payload);
+        const response = await api.post('/api/app/shipment', payload);
         const newShipmentId = response.data.id;
 
         // 2. KRİTİK NOKTA: Sipariş kalemlerini bul ve SEVKİYAT KALEMİ olarak veritabanına yaz!
@@ -144,7 +144,7 @@ export default function ShipmentList() {
           for (const item of relatedOrderItems) {
             // Eğer backend siparişte lot ayırmışsa direkt onu kullanıyoruz
             if(item.stockBatchId) {
-                await api.post('/shipment-item', {
+                await api.post('/api/app/shipment-item', {
                     shipmentId: newShipmentId,
                     stockBatchId: item.stockBatchId,
                     quantity: item.approvedQuantity || item.requestedQuantity

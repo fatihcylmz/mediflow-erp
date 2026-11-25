@@ -1,42 +1,49 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp; 
-using MediFlow.Shipments; 
-using MediFlow.Pricing;   
-using MediFlow.Orders; 
+using Volo.Abp;
+using Volo.Abp.Uow;
+using MediFlow.Shipments;
+using MediFlow.Orders;
+using MediFlow.Pricing;
+using MediFlow.Inventories;
+using MediFlow.Services;
 
 namespace MediFlow.Invoices;
 
 public class InvoiceAppService : CrudAppService<
-    Invoice, 
-    InvoiceDto, 
-    Guid, 
-    PagedAndSortedResultRequestDto, 
+    Invoice,
+    InvoiceDto,
+    Guid,
+    PagedAndSortedResultRequestDto,
     CreateUpdateInvoiceDto>, IInvoiceAppService
 {
     private readonly IRepository<Shipment, Guid> _shipmentRepository;
     private readonly IRepository<OrderItem, Guid> _orderItemRepository;
     private readonly IRepository<DrugPriceHistory, Guid> _drugPriceHistoryRepository;
+    private readonly IRepository<StockMovementLog, Guid> _stockMovementLogRepository;
+    private readonly PriceValidationService _priceValidationService;
 
     public InvoiceAppService(
         IRepository<Invoice, Guid> repository,
         IRepository<Shipment, Guid> shipmentRepository,
         IRepository<OrderItem, Guid> orderItemRepository,
-        IRepository<DrugPriceHistory, Guid> drugPriceHistoryRepository) : base(repository)
+        IRepository<DrugPriceHistory, Guid> drugPriceHistoryRepository,
+        IRepository<StockMovementLog, Guid> stockMovementLogRepository,
+        PriceValidationService priceValidationService) : base(repository)
     {
         _shipmentRepository = shipmentRepository;
         _orderItemRepository = orderItemRepository;
         _drugPriceHistoryRepository = drugPriceHistoryRepository;
+        _stockMovementLogRepository = stockMovementLogRepository;
+        _priceValidationService = priceValidationService;
     }
 
-    // Fatura detay veya listeleme çağrıldığında ilişkili kalemlerin (Items) veritabanından gelmesini sağlar
     protected override async Task<IQueryable<Invoice>> CreateFilteredQueryAsync(PagedAndSortedResultRequestDto input)
     {
-        // Include yerine ABP'nin WithDetails altyapısını kullanıyoruz (EntityFrameworkCore paketi istemez)
         return await Repository.WithDetailsAsync(x => x.Items);
     }
 
@@ -44,13 +51,12 @@ public class InvoiceAppService : CrudAppService<
     {
         var queryable = await Repository.WithDetailsAsync(x => x.Items);
         var entity = await AsyncExecuter.FirstOrDefaultAsync(queryable, x => x.Id == id);
-        
         return ObjectMapper.Map<Invoice, InvoiceDto>(entity);
     }
 
+    [UnitOfWork]
     public override async Task<InvoiceDto> CreateAsync(CreateUpdateInvoiceDto input)
     {
-        // 1. Ana Fatura Taslağını Oluştur
         var invoice = new Invoice
         {
             PharmacyId = input.PharmacyId,
@@ -61,87 +67,139 @@ public class InvoiceAppService : CrudAppService<
             Status = input.Status
         };
 
-        // 2. Seçilen Sevkiyatı ve Siparişi Bul
-        var shipment = await _shipmentRepository.GetAsync(input.ShipmentId);
-        
-        decimal subTotal = 0;
-        decimal taxTotal = 0;
-
-        if (shipment.OrderId.HasValue)
+        if (input.ShipmentId != Guid.Empty)
         {
-            var orderItems = await _orderItemRepository.GetListAsync(x => x.OrderId == shipment.OrderId.Value);
+            var shipment = await _shipmentRepository.GetAsync(input.ShipmentId);
 
-            foreach (var item in orderItems)
+            decimal subTotal = 0m;
+            decimal taxTotal = 0m;
+
+            if (shipment.OrderId.HasValue)
             {
-                int quantity = item.ApprovedQuantity > 0 ? item.ApprovedQuantity : item.RequestedQuantity;
-                if (quantity <= 0) continue;
+                var orderItems = await _orderItemRepository.GetListAsync(x => x.OrderId == shipment.OrderId.Value);
 
-                Guid targetDrugId = item.DrugId;
-
-                // 3. Faturanın kesildiği tarihte geçerli olan fiyatı bulur
-                var currentPriceRecord = await _drugPriceHistoryRepository.FirstOrDefaultAsync(
-                    p => p.DrugId == targetDrugId && 
-                         p.ValidFrom <= invoice.IssueDate && 
-                         (p.ValidTo == null || p.ValidTo >= invoice.IssueDate)
-                );
-                
-                decimal unitPrice = currentPriceRecord != null ? currentPriceRecord.Price : 0; 
-                decimal taxRate = currentPriceRecord != null ? currentPriceRecord.TaxRate : 8.0m; 
-
-                decimal lineSubTotal = quantity * unitPrice;
-                decimal lineTax = lineSubTotal * (taxRate / 100);
-                
-                subTotal += lineSubTotal;
-                taxTotal += lineTax;
-
-                // 4. Fatura Alt Kalemi Ekle
-                invoice.Items.Add(new InvoiceItem
+                foreach (var item in orderItems)
                 {
-                    DrugId = targetDrugId,
-                    StockBatchId = null, 
-                    Quantity = quantity,
-                    UnitPrice = unitPrice,
-                    TaxRate = taxRate,
-                    LineTotal = lineSubTotal + lineTax
-                });
+                    int quantity = item.ApprovedQuantity > 0 ? item.ApprovedQuantity : item.RequestedQuantity;
+                    if (quantity <= 0) continue;
+
+                    Guid targetDrugId = item.DrugId;
+                    var currentPriceRecord = await _drugPriceHistoryRepository.FirstOrDefaultAsync(
+                        p => p.DrugId == targetDrugId &&
+                             p.ValidFrom <= invoice.IssueDate &&
+                             (p.ValidTo == null || p.ValidTo >= invoice.IssueDate));
+
+                    decimal unitPrice = currentPriceRecord?.Price ?? 0m;
+                    decimal taxRate = currentPriceRecord?.TaxRate ?? 8m;
+
+                    // --- Fiyat doğrulama ---
+                    var validationResult = await _priceValidationService.ValidatePriceAsync(
+                        targetDrugId, invoice.IssueDate, unitPrice, taxRate);
+                    if (!validationResult.IsValid)
+                    {
+                        throw new UserFriendlyException(
+                            $"Fatura fiyat doğrulama hatası (İlaç ID: {targetDrugId}): {validationResult.Message}");
+                    }
+
+                    decimal lineSubTotal = quantity * unitPrice;
+                    decimal lineTax = lineSubTotal * (taxRate / 100m);
+                    subTotal += lineSubTotal;
+                    taxTotal += lineTax;
+
+                    invoice.Items.Add(new InvoiceItem
+                    {
+                        DrugId = targetDrugId,
+                        StockBatchId = item.StockBatchId ?? Guid.Empty,
+                        Quantity = quantity,
+                        UnitPrice = unitPrice,
+                        TaxRate = taxRate,
+                        LineTotal = lineSubTotal + lineTax
+                    });
+                }
             }
+
+            invoice.SubTotal = subTotal;
+            invoice.TaxTotal = taxTotal;
+            invoice.GrandTotal = subTotal + taxTotal;
         }
 
-        // 5. Toplamları Faturaya Yaz ve Kaydet
-        invoice.SubTotal = subTotal;
-        invoice.TaxTotal = taxTotal;
-        invoice.GrandTotal = subTotal + taxTotal;
-
         await Repository.InsertAsync(invoice, autoSave: true);
-
         return ObjectMapper.Map<Invoice, InvoiceDto>(invoice);
     }
 
-    // GÜNCELLEME KORUMASI: Statü değişirken tutarların sıfırlanmasını engeller
     public override async Task<InvoiceDto> UpdateAsync(Guid id, CreateUpdateInvoiceDto input)
     {
         var existingInvoice = await Repository.GetAsync(id);
+
+        if (existingInvoice.Status != InvoiceStatus.Draft && existingInvoice.Status != InvoiceStatus.Cancelled)
+            throw new UserFriendlyException("Tamamlanmış veya ödenmiş faturalar düzenlenemez.");
 
         existingInvoice.Status = input.Status;
         existingInvoice.InvoiceNumber = input.InvoiceNumber;
         existingInvoice.IssueDate = input.IssuedDate;
         existingInvoice.DueDate = input.DueDate;
 
-        await Repository.UpdateAsync(existingInvoice, autoSave: true);
+        existingInvoice.Items.Clear();
+        foreach (var item in input.Items)
+        {
+            existingInvoice.Items.Add(new InvoiceItem
+            {
+                DrugId = item.DrugId,
+                StockBatchId = item.StockBatchId,
+                Quantity = item.Quantity,
+                UnitPrice = item.UnitPrice,
+                TaxRate = item.TaxRate,
+                LineTotal = item.LineTotal
+            });
+        }
 
+        existingInvoice.SubTotal = existingInvoice.Items.Sum(i => i.Quantity * i.UnitPrice);
+        existingInvoice.TaxTotal = existingInvoice.Items.Sum(i => i.Quantity * i.UnitPrice * (i.TaxRate / 100m));
+        existingInvoice.GrandTotal = existingInvoice.SubTotal + existingInvoice.TaxTotal;
+
+        await Repository.UpdateAsync(existingInvoice, autoSave: true);
         return ObjectMapper.Map<Invoice, InvoiceDto>(existingInvoice);
     }
 
-    // SİLME KORUMASI: Ödenmiş faturaların silinmesini engeller
     public override async Task DeleteAsync(Guid id)
     {
         var invoice = await Repository.GetAsync(id);
+        if (invoice.Status != InvoiceStatus.Draft && invoice.Status != InvoiceStatus.Cancelled)
+            throw new UserFriendlyException($"Silme engellendi! Fatura durumu '{invoice.Status}' — yalnızca taslak veya iptal edilmiş faturalar silinebilir.");
+        await base.DeleteAsync(id);
+    }
 
-        if (invoice.Status == InvoiceStatus.Paid) 
+    /// <summary>
+    /// Faturayı iptal eder. Ödenmiş faturalar iptal edilemez, kredi notu süreci izlenmelidir.
+    /// </summary>
+    [UnitOfWork]
+    public async Task CancelInvoiceAsync(Guid invoiceId)
+    {
+        var invoice = await Repository.GetAsync(invoiceId);
+
+        if (invoice.Status == InvoiceStatus.Cancelled)
+            return;
+
+        if (invoice.Status == InvoiceStatus.Paid)
+            throw new UserFriendlyException("Ödenmiş faturalar iptal edilemez. Lütfen kredi notası kesilmesini uygulayın.");
+
+        // İptal edilen kalemler için stok hareket logu oluştur
+        foreach (var item in invoice.Items.ToList())
         {
-            throw new UserFriendlyException("Tahsilatı yapılmış ve ödenmiş faturalar silinemez!");
+            if (item.StockBatchId.HasValue && item.StockBatchId.Value != Guid.Empty)
+            {
+                await _stockMovementLogRepository.InsertAsync(new StockMovementLog
+                {
+                    StockBatchId = item.StockBatchId.Value,
+                    MovementType = StockMovementType.Scrap,
+                    QuantityChange = -item.Quantity,
+                    ReferenceId = invoice.Id,
+                    Description = $"Fatura iptali ({invoice.InvoiceNumber}): {item.Quantity} adet geri alındı."
+                });
+            }
         }
 
-        await base.DeleteAsync(id);
+        invoice.Status = InvoiceStatus.Cancelled;
+        await Repository.UpdateAsync(invoice);
     }
 }

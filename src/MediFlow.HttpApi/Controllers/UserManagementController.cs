@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc;
+using MediFlow.Permissions;
 using MediFlow.Users;
 
 namespace MediFlow.HttpApi.Controllers;
 
 [Area("admin")]
 [Route("api/app/[controller]")]
-[Authorize(Roles = "Admin")]  // [Item 9] Rol bazlı yetki kontrolü
+[Authorize(MediFlowPermissions.Users)]
 public class UserManagementController : AbpController
 {
     private readonly IUserManagementAppService _userManagementAppService;
@@ -21,6 +22,7 @@ public class UserManagementController : AbpController
     }
 
     [HttpPost("get-users-by-role")]
+    [Authorize(MediFlowPermissions.UsersView)]
     public async Task<ActionResult<List<UserDto>>> GetUsersByRoleAsync([FromBody] GetUsersByRoleInput input)
     {
         var users = await _userManagementAppService.GetUsersByRoleAsync(input?.RoleName ?? string.Empty);
@@ -28,6 +30,7 @@ public class UserManagementController : AbpController
     }
 
     [HttpPost("create-user")]
+    [Authorize(MediFlowPermissions.UsersCreate)]
     public async Task<ActionResult<UserDto>> CreateUserAsync([FromBody] CreateUserDtoDto input)
     {
         if (input == null)
@@ -58,6 +61,7 @@ public class UserManagementController : AbpController
     }
 
     [HttpPost("set-user-role")]
+    [Authorize(MediFlowPermissions.UsersManageRoles)]
     public async Task<ActionResult<UserDto>> SetUserRoleAsync([FromBody] SetUserRoleInput input)
     {
         var user = await _userManagementAppService.SetUserRoleAsync(input.UserId, input.RoleName);
@@ -65,6 +69,7 @@ public class UserManagementController : AbpController
     }
 
     [HttpPost("delete-user")]
+    [Authorize(MediFlowPermissions.UsersDelete)]
     public async Task<IActionResult> DeleteUserAsync([FromBody] DeleteUserInput input)
     {
         await _userManagementAppService.DeleteUserAsync(input.UserId);
@@ -72,17 +77,30 @@ public class UserManagementController : AbpController
     }
 
     [HttpPost("update-user")]
+    [Authorize(MediFlowPermissions.UsersEdit)]
     public async Task<ActionResult<UserDto>> UpdateUserAsync([FromBody] UpdateUserInput input)
     {
         var updateDto = new UpdateUserDto
         {
+            UserId = input.UserId,
+            UserName = input.UserName,
+            Email = input.Email,
             Name = input.Name,
             Surname = input.Surname,
             PhoneNumber = input.PhoneNumber,
             Address = input.Address,
+            Password = input.Password,
             RoleName = input.RoleName
         };
         var user = await _userManagementAppService.UpdateUserAsync(input.UserId, updateDto);
+        return Ok(user);
+    }
+
+    [HttpPost("set-password")]
+    [Authorize(MediFlowPermissions.UsersEdit)]
+    public async Task<ActionResult<UserDto>> SetPasswordAsync([FromBody] SetPasswordInput input)
+    {
+        var user = await _userManagementAppService.SetPasswordAsync(input);
         return Ok(user);
     }
 }
@@ -125,10 +143,12 @@ public class CreateUserDtoDto
 public class UpdateUserInput
 {
     public Guid UserId { get; set; }
+    public string? UserName { get; set; }
+    public string? Email { get; set; }
     public string? Name { get; set; }
     public string? Surname { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Address { get; set; }
+    public string? Password { get; set; }
     public string RoleName { get; set; } = string.Empty;
 }
-

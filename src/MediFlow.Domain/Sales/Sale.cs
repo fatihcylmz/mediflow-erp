@@ -11,6 +11,10 @@ public class Sale : FullAuditedAggregateRoot<Guid>
     
     public DateTime SaleDate { get; set; }
     public decimal TotalAmount { get; set; } // Toplam Tutar
+    public SaleStatus Status { get; set; } = SaleStatus.Active;
 
     public Guid? InvoiceId { get; set; } // İlişkili fatura (Invoice→Sale zinciri)
+
+    public Guid? OrderId { get; set; } // Sipariş zinciri izlenebilirliği
+    public Guid? ShipmentId { get; set; } // Sevkiyat zinciri izlenebilirliği
 }

@@ -19,7 +19,7 @@ namespace MediFlow.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.PostgreSql)
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -359,6 +359,12 @@ namespace MediFlow.Migrations
                     b.Property<int>("ReservedQuantity")
                         .HasColumnType("integer");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
+
                     b.Property<string>("ShelfLocation")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -410,10 +416,15 @@ namespace MediFlow.Migrations
                     b.Property<Guid?>("ReferenceId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("ReferenceType")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("StockBatchId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StockBatchId", "ReferenceType", "ReferenceId");
 
                     b.ToTable("AppStockMovementLogs", (string)null);
                 });
@@ -787,6 +798,9 @@ namespace MediFlow.Migrations
                         .HasColumnType("text")
                         .HasColumnName("ExtraProperties");
 
+                    b.Property<decimal>("FeeAmount")
+                        .HasColumnType("numeric");
+
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uuid");
 
@@ -803,6 +817,9 @@ namespace MediFlow.Migrations
                     b.Property<Guid?>("LastModifierId")
                         .HasColumnType("uuid")
                         .HasColumnName("LastModifierId");
+
+                    b.Property<decimal>("NetAmount")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Notes")
                         .IsRequired()
@@ -975,7 +992,15 @@ namespace MediFlow.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PharmacyId", "DrugId", "LotNumber");
 
                     b.ToTable("AppPharmacyStocks", (string)null);
                 });
@@ -1293,6 +1318,9 @@ namespace MediFlow.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("LastModifierId");
 
+                    b.Property<Guid?>("OrderId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("PharmacyId")
                         .HasColumnType("uuid");
 
@@ -1301,6 +1329,12 @@ namespace MediFlow.Migrations
 
                     b.Property<DateTime>("SaleDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid?>("ShipmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");

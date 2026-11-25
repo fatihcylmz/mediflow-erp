@@ -54,8 +54,8 @@ export default function PharmacyList() {
     try {
       setLoading(true);
       const [pharmRes, drugRes] = await Promise.all([
-        api.get('/pharmacy'),
-        api.get('/drug') 
+        api.get('/api/app/pharmacy'),
+        api.get('/api/app/drug') 
       ]);
       setPharmacies(pharmRes.data.items || []);
       setDrugs(drugRes.data.items || []);
@@ -84,7 +84,7 @@ export default function PharmacyList() {
         await api.put(`/pharmacy/${editingId}`, values);
         message.success('Eczane bilgileri güncellendi.');
       } else {
-        await api.post('/pharmacy', values);
+        await api.post('/api/app/pharmacy', values);
         message.success('Yeni eczane sisteme kaydedildi.');
       }
       setIsModalVisible(false);
@@ -111,7 +111,7 @@ export default function PharmacyList() {
     setLoadingStocks(true);
 
     try {
-      const response = await api.get('/pharmacy-stock');
+      const response = await api.get('/api/app/pharmacy-stock');
       
       // KONSOL KONTROLLERİ: Sorunun nerede olduğunu tam buradan anlayacağız.
       console.log("BACKEND'DEN GELEN TÜM STOKLAR:", response.data);

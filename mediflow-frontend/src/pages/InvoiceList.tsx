@@ -3,7 +3,8 @@ import { Table, Typography, message, Card, Button, Modal, Form, Input, InputNumb
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, PrinterOutlined,
   ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined,
-  ExclamationCircleOutlined, SendOutlined, DollarOutlined, BarcodeOutlined
+  ExclamationCircleOutlined, SendOutlined, DollarOutlined, BarcodeOutlined,
+  StopOutlined, WarningOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
@@ -54,10 +55,10 @@ export default function InvoiceList() {
     try {
       setLoading(true);
       const [invoiceRes, pharmacyRes, shipmentRes, drugRes] = await Promise.all([
-        api.get('/invoice'),
-        api.get('/pharmacy'),
-        api.get('/shipment'),
-        api.get('/drug')
+        api.get('/api/app/invoice'),
+        api.get('/api/app/pharmacy'),
+        api.get('/api/app/shipment'),
+        api.get('/api/app/drug')
       ]);
       setInvoices(invoiceRes.data.items || []);
       setPharmacies(pharmacyRes.data.items || []);
@@ -105,7 +106,7 @@ export default function InvoiceList() {
         await api.put(`/invoice/${editingId}`, payload);
         message.success('Fatura başarıyla güncellendi.');
       } else {
-        await api.post('/invoice', payload);
+        await api.post('/api/app/invoice', payload);
         message.success('Yeni fatura sisteme eklendi.');
       }
       setIsModalVisible(false);
@@ -125,6 +126,17 @@ export default function InvoiceList() {
     }
   };
 
+  const handleCancel = async (id: string, invoiceNumber: string) => {
+    try {
+      await api.post(`/api/app/invoice/${id}/cancel`);
+      message.success(`Fatura "${invoiceNumber}" başarıyla iptal edildi.`);
+      fetchInitialData();
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Fatura iptal edilirken hata oluştu.';
+      message.error(errorMsg);
+    }
+  };
+
   const showPrintModal = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
     setIsPrintModalVisible(true);
@@ -134,8 +146,9 @@ export default function InvoiceList() {
     switch (status) {
       case 0: return <Badge status="processing" text={<Text style={{ color: '#0ea5e9', fontWeight: 600 }}>Taslak</Text>} />;
       case 1: return <Badge status="success" text={<Text style={{ color: '#16a34a' }}>Gönderildi</Text>} />;
-      case 2: return <Badge status="warning" text={<Text style={{ color: '#d97706' }}>Beklemede</Text>} />;
-      case 3: return <Badge status="error" text={<Text style={{ color: '#dc2626' }}>İptal Edildi</Text>} />;
+      case 2: return <Badge status="warning" text={<Text style={{ color: '#d97706' }}>Ödendi</Text>} />;
+      case 3: return <Badge status="error" text={<Text style={{ color: '#dc2626' }}>Vadesi Geçti</Text>} />;
+      case 4: return <Badge status="default" text={<Text style={{ color: '#6b7280' }}>İptal Edildi</Text>} />;
       default: return <Tag>{status}</Tag>;
     }
   };
@@ -229,18 +242,43 @@ export default function InvoiceList() {
             </Button>
           </Tooltip>
           <Space size={4} style={{ width: '100%' }}>
-            <Tooltip title="Düzenle">
-              <Button
-                icon={<EditOutlined />}
-                onClick={() => showEditModal(record)}
-                style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 6 }}
-              />
-            </Tooltip>
-            <Tooltip title="Sil">
-              <Popconfirm title="Bu faturayı silmek istediğinize emin misiniz?" onConfirm={() => handleDelete(record.id)}>
-                <Button danger icon={<DeleteOutlined />} style={{ flex: 1, border: '1px solid #fecaca', borderRadius: 6 }} />
-              </Popconfirm>
-            </Tooltip>
+            {record.status === 0 && (
+              <Tooltip title="Faturayı İptal Et">
+                <Popconfirm
+                  title={`"${record.invoiceNumber}" numaralı faturayı iptal etmek istediğinize emin misiniz?`}
+                  description="İptal edilen faturalar artık düzenlenemez."
+                  onConfirm={() => handleCancel(record.id, record.invoiceNumber)}
+                  okText="Evet, İptal Et"
+                  cancelText="Vazgeç"
+                  okButtonProps={{ danger: true }}
+                >
+                  <Button
+                    danger
+                    icon={<StopOutlined />}
+                    size="small"
+                    style={{ width: '100%', background: '#fff1f0', border: '1px solid #ffa39e', borderRadius: 8 }}
+                  >
+                    İptal Et
+                  </Button>
+                </Popconfirm>
+              </Tooltip>
+            )}
+            {(record.status === 0 || record.status === 1) && (
+              <Tooltip title="Düzenle">
+                <Button
+                  icon={<EditOutlined />}
+                  onClick={() => showEditModal(record)}
+                  style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 8 }}
+                />
+              </Tooltip>
+            )}
+            {record.status === 0 && (
+              <Tooltip title="Sil">
+                <Popconfirm title="Bu faturayı silmek istediğinize emin misiniz?" onConfirm={() => handleDelete(record.id)}>
+                  <Button danger icon={<DeleteOutlined />} style={{ flex: 1, border: '1px solid #fecaca', borderRadius: 8 }} />
+                </Popconfirm>
+              </Tooltip>
+            )}
           </Space>
         </Space>
       ),
@@ -402,8 +440,9 @@ export default function InvoiceList() {
                   options={[
                     { value: 0, label: 'Taslak' },
                     { value: 1, label: 'Gönderildi' },
-                    { value: 2, label: 'Beklemede' },
-                    { value: 3, label: 'İptal Edildi' },
+                    { value: 2, label: 'Ödenmiş' },
+                    { value: 3, label: 'Vadesi Geçti' },
+                    { value: 4, label: 'İptal Edildi' },
                   ]}
                 />
               </Form.Item>

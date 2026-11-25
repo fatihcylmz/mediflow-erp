@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import {
-  Form, Input, Button, Typography, message, Card, Space, Alert, Row, Col,
+  Form, Input, Button, Typography, message, Card, Space, Alert,
 } from 'antd';
-import { UserOutlined, LockOutlined, SafetyCertificateOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
-import { accountApi } from '../services/api';
+import { UserOutlined, LockOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
@@ -16,10 +16,10 @@ interface DemoAccount {
 }
 
 const DEMO_ACCOUNTS: DemoAccount[] = [
-  { user: 'mehmutzortmaz', pass: 'Admin123!', role: 'Yönetici', color: '#FF7A00' },
-  { user: 'eczane_ahmet', pass: 'Pharmacy123!', role: 'Eczacı', color: '#EC4899' },
+  { user: 'admin_mehmet', pass: 'Admin123!', role: 'Admin', color: '#FF7A00' },
+  { user: 'eczane_ahmet', pass: 'Pharmacy123!', role: 'Eczaci', color: '#EC4899' },
   { user: 'depo_ayse', pass: 'Warehouse123!', role: 'Depocu', color: '#10B981' },
-  { user: 'tedarikci_mustafa', pass: 'Supplier123!', role: 'Tedarikçi', color: '#3B82F6' },
+  { user: 'tedarikci_mustafa', pass: 'Supplier123!', role: 'Tedarikci', color: '#3B82F6' },
 ];
 
 export default function LoginPage() {
@@ -30,20 +30,22 @@ export default function LoginPage() {
   const handleLogin = async (values: any) => {
     setLoading(true);
     try {
-      const response = await accountApi.post('/login', {
-        userNameOrEmailAddress: values.username,
+      // Use custom AuthController login endpoint (works with HTTP)
+      const response = await api.post('/api/app/auth/login', {
+        userName: values.username,
         password: values.password,
       });
 
-      const accessToken = response.data?.result?.accessToken;
+      const accessToken = response.data?.accessToken || response.data?.token;
       if (accessToken) localStorage.setItem('token', accessToken);
 
-      const u = values.username.toLowerCase();
-      let assignedRole = 'admin';
-      if (u.includes('eczane') || u.includes('ahmet')) assignedRole = 'pharmacy';
-      else if (u.includes('tedarikci') || u.includes('mustafa')) assignedRole = 'supplier';
-      else if (u.includes('depo') || u.includes('ayse')) assignedRole = 'warehouse';
-      else if (u.includes('sales') || u.includes('cemal')) assignedRole = 'sales';
+      // Decode JWT to get roles - handle both 'role' and long claim type
+      const payload = JSON.parse(atob(accessToken.split('.')[1]));
+      const roles: string[] = Array.isArray(payload['role']) ? payload['role'] :
+                              (payload['role'] ? [payload['role']] :
+                              (Array.isArray(payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']) ? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] :
+                              (payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ? [payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']] : [])));
+      const assignedRole = roles.find(r => ['admin','pharmacy','warehouse','supplier','sales'].includes(r.toLowerCase())) ?? 'admin';
 
       localStorage.setItem('role', assignedRole);
       localStorage.setItem('username', values.username);
@@ -51,7 +53,7 @@ export default function LoginPage() {
       message.success('Giriş başarılı! Yönlendiriliyorsunuz...');
       navigate(`/${assignedRole}`);
     } catch (error: any) {
-      const msg = error?.response?.data?.description || error?.response?.data?.message || 'Giriş başarısız! Lütfen bilgilerinizi kontrol edin.';
+      const msg = error?.response?.data?.message || error?.response?.data?.error_description || 'Giriş başarısız! Lütfen bilgilerinizi kontrol edin.';
       message.error(msg);
     } finally {
       setLoading(false);
@@ -76,7 +78,6 @@ export default function LoginPage() {
     >
       <div style={{ width: '100%', maxWidth: 1000, display: 'flex', gap: 32, alignItems: 'center' }}>
 
-        {/* Sol: Brand Panel */}
         <div
           style={{
             flex: 1,
@@ -105,15 +106,15 @@ export default function LoginPage() {
               MediFlow ERP
             </Title>
             <Text type="secondary" style={{ fontSize: 15, letterSpacing: '0.01em', lineHeight: 1.6 }}>
-              Sağlık &amp; Tedarik Zinciri<br />
-              Yönetim Sistemi
+              Saglik & Tedarik Zinciri<br />
+              Yonetim Sistemi
             </Text>
           </div>
 
           <Card
-            title={<Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0F172A' }}>Hızlı Erişim (Demo)</Title>}
+            title={<Title level={3} style={{ margin: 0, fontWeight: 700, color: '#0F172A' }}>Hizli Erisim (Demo)</Title>}
             extra={
-              <Text type="secondary" style={{ fontSize: 12 }}>Kullanıcı bilgileri otomatik doldurulur</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>Kullanici bilgileri otomatik doldurulur</Text>
             }
             style={{ marginBottom: 24 }}
           >
@@ -155,19 +156,19 @@ export default function LoginPage() {
             <div style={{ background: '#FFF7ED', borderRadius: 10, padding: 14, border: '1px solid #FFE7BA' }}>
               <Text style={{ fontSize: 12, color: '#92400E', lineHeight: 1.5 }}>
                 <strong>Demo Hesaplar:</strong><br />
-                • {DEMO_ACCOUNTS[0].user} / {DEMO_ACCOUNTS[0].pass}<br />
-                • {DEMO_ACCOUNTS[1].user} / {DEMO_ACCOUNTS[1].pass}<br />
-                • {DEMO_ACCOUNTS[2].user} / {DEMO_ACCOUNTS[2].pass}
+                * {DEMO_ACCOUNTS[0].user} / {DEMO_ACCOUNTS[0].pass}<br />
+                * {DEMO_ACCOUNTS[1].user} / {DEMO_ACCOUNTS[1].pass}<br />
+                * {DEMO_ACCOUNTS[2].user} / {DEMO_ACCOUNTS[2].pass}<br />
+                * {DEMO_ACCOUNTS[3].user} / {DEMO_ACCOUNTS[3].pass}
               </Text>
             </div>
           </Card>
 
           <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: 11 }}>
-            © 2024 MediFlow ERP. Tüm hakları saklıdır.
+            © 2024 MediFlow ERP. Tum haklari saklidir.
           </div>
         </div>
 
-        {/* Sağ: Giriş Formu */}
         <div style={{ flex: 1, minWidth: 340, maxWidth: 420 }}>
           <Card
             size="small"
@@ -180,10 +181,10 @@ export default function LoginPage() {
           >
             <div style={{ marginBottom: 28 }}>
               <Title level={4} style={{ margin: '0 0 8px', fontWeight: 800, color: '#0F172A' }}>
-                Hesabınıza giriş yapın
+                Hesabiniza giris yapin
               </Title>
               <Text type="secondary" style={{ fontSize: 14, color: '#64748B' }}>
-                MediFlow ERP yönetim paneline erişmek için bilgilerinizi giriniz.
+                MediFlow ERP yonetim paneline erismek icin bilgilerinizi giriniz.
               </Text>
             </div>
 
@@ -198,15 +199,16 @@ export default function LoginPage() {
                 name="username"
                 label={
                   <span style={{ fontWeight: 600, color: '#334155', fontSize: 13 }}>
-                    <UserOutlined style={{ color: '#FF7A00', marginRight: 8 }} /> Kullanıcı Adı / E-posta
+                    <UserOutlined style={{ color: '#FF7A00', marginRight: 8 }} /> Kullanici Adi / E-posta
                   </span>
                 }
-                rules={[{ required: true, message: 'Kullanıcı adı veya e-posta gereklidir!' }]}
+                rules={[{ required: true, message: 'Kullanici adi veya e-posta gereklidir!' }]}
               >
                 <Input
                   prefix={<UserOutlined style={{ color: '#94A3B8' }} />}
-                  placeholder="Örn: mehmutzortmaz veya admin@mediflow.local"
+                  placeholder="Orn: mehmutzortmaz veya admin@mediflow.local"
                   size="large"
+                  autoComplete="username"
                   style={{ borderRadius: 10, height: 46, fontSize: 14 }}
                 />
               </Form.Item>
@@ -215,15 +217,16 @@ export default function LoginPage() {
                 name="password"
                 label={
                   <span style={{ fontWeight: 600, color: '#334155', fontSize: 13 }}>
-                    <LockOutlined style={{ color: '#FF7A00', marginRight: 8 }} /> Şifre
+                    <LockOutlined style={{ color: '#FF7A00', marginRight: 8 }} /> Sifre
                   </span>
                 }
-                rules={[{ required: true, message: 'Şifre gereklidir!' }]}
+                rules={[{ required: true, message: 'Sifre gereklidir!' }]}
               >
                 <Input.Password
                   prefix={<LockOutlined style={{ color: '#94A3B8' }} />}
                   placeholder="••••••••"
                   size="large"
+                  autoComplete="current-password"
                   style={{ borderRadius: 10, height: 46, fontSize: 14 }}
                 />
               </Form.Item>
@@ -239,43 +242,43 @@ export default function LoginPage() {
                   }}
                   onClick={(e) => {
                     e.preventDefault();
-                    message.info('Şifre sıfırlama özelliği yakında aktif olacak.');
+                    message.info('Sifre sifirlama ozelligi yakinda aktif olacak.');
                   }}
                 >
-                  Şifremi unuttum
+                  Sifremi unuttum
                 </a>
+              </Form.Item>
+
+              <Form.Item style={{ textAlign: 'center', margin: '16px 0 0 0' }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={loading}
+                  size="large"
+                  style={{
+                    background: 'linear-gradient(135deg, #FF7A00, #FF9E4D)',
+                    borderColor: 'transparent',
+                    height: 48,
+                    borderRadius: 12,
+                    fontSize: 15,
+                    fontWeight: 700,
+                    boxShadow: '0 8px 20px -4px rgba(255,122,0,0.35)',
+                    letterSpacing: '0.01em',
+                  }}
+                >
+                  {loading ? 'Giris yapiliyorsa...' : 'Giris Yap'}
+                </Button>
               </Form.Item>
             </Form>
 
             <Alert
-              message="Giriş Bilgisi"
+              title="Giris Bilgisi"
               description="Demo hesabı seçerek hızlıca giriş yapabilirsiniz. Tüm demo hesapların şifreleri yukarıdaki kartta listelenmiştir."
               type="info"
               showIcon
               style={{ marginBottom: 20, borderRadius: 10, fontSize: 13 }}
             />
-
-            <Form.Item style={{ textAlign: 'center', margin: '16px 0 0 0' }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                block
-                loading={loading}
-                size="large"
-                style={{
-                  background: 'linear-gradient(135deg, #FF7A00, #FF9E4D)',
-                  borderColor: 'transparent',
-                  height: 48,
-                  borderRadius: 12,
-                  fontSize: 15,
-                  fontWeight: 700,
-                  boxShadow: '0 8px 20px -4px rgba(255,122,0,0.35)',
-                  letterSpacing: '0.01em',
-                }}
-              >
-                {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-              </Button>
-            </Form.Item>
           </Card>
 
           <div style={{ marginTop: 16, textAlign: 'center', color: '#94A3B8', fontSize: 12 }}>
@@ -284,15 +287,6 @@ export default function LoginPage() {
         </div>
 
       </div>
-
-      {/* Mobil: altda dağılan layout için media query */}
-      <style>{`
-        @media (max-width: 768px) {
-          .login-wrapper { flex-direction: column !important; }
-          .brand-panel { border-right: none !important; border-bottom: 1px solid #E2E8F0 !important; padding-right: 0 !important; padding-bottom: 24px !important; }
-          .form-panel { max-width: 100% !important; min-width: auto !important; }
-        }
-      `}</style>
     </div>
   );
 }

@@ -37,8 +37,7 @@ x-common-frontend-config: &frontend-config
   ports:
     - "3000:80"
   environment:
-    - NEXT_PUBLIC_API_URL=https://localhost:44396/api/app
-    - NEXT_PUBLIC_AUTH_URL=https://localhost:44396/api/account
+    - VITE_API_URL=https://localhost:44396
   depends_on:
     - mediflow-backend
   restart: unless-stopped

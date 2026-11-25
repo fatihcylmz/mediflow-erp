@@ -29,7 +29,7 @@ export default function SupplierList() {
   const fetchSuppliers = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/supplier');
+      const response = await api.get('/api/app/supplier');
       setSuppliers(response.data.items || []);
     } catch (error) {
       console.error('API Hatası:', error);
@@ -57,7 +57,7 @@ export default function SupplierList() {
         await api.put(`/supplier/${editingId}`, values);
         message.success('Tedarikçi başarıyla güncellendi.');
       } else {
-        await api.post('/supplier', values);
+        await api.post('/api/app/supplier', values);
         message.success('Yeni tedarikçi başarıyla eklendi.');
       }
       setIsModalVisible(false);

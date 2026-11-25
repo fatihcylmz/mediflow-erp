@@ -1,4 +1,6 @@
-﻿using Volo.Abp;
+﻿using System;
+using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Application;
 using Volo.Abp.Mapperly;
@@ -9,7 +11,7 @@ using Volo.Abp.PermissionManagement;
 using Volo.Abp.SettingManagement;
 using Volo.Abp.TenantManagement;
 using Microsoft.Extensions.DependencyInjection;
-using MediFlow.Application.Services;
+using Volo.Abp.DependencyInjection;
 
 namespace MediFlow;
 
@@ -28,12 +30,5 @@ public class MediFlowApplicationModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.AddMapperlyObjectMapper<MediFlowApplicationModule>();
-        context.Services.AddTransient<UserInitializationService>();
-    }
-
-    public override void OnApplicationInitialization(ApplicationInitializationContext context)
-    {
-        var userInitializationService = context.ServiceProvider.GetRequiredService<UserInitializationService>();
-        userInitializationService.InitializeDefaultUsersAsync().GetAwaiter().GetResult();
     }
 }

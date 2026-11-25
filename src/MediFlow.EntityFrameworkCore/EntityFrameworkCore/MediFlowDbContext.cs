@@ -161,6 +161,9 @@ using MediFlow.Payment;
                 b.HasOne<Warehouse>().WithMany().HasForeignKey(x => x.WarehouseId).IsRequired();
                 b.HasOne<Supplier>().WithMany().HasForeignKey(x => x.SupplierId).IsRequired();
 
+                // Optimistic concurrency token - aynı anda iki kullanıcı stok güncellemeye çalışınca lost update önlenir
+                b.Property(x => x.RowVersion).IsConcurrencyToken();
+
                 // [K5] Veritabanı indexleri
                 b.HasIndex(x => x.DrugId);
                 b.HasIndex(x => x.WarehouseId);
@@ -173,6 +176,7 @@ using MediFlow.Payment;
                 b.ToTable(MediFlowConsts.DbTablePrefix + "StockMovementLogs", MediFlowConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.Description).HasMaxLength(256);
+                b.HasIndex(x => new { x.StockBatchId, x.ReferenceType, x.ReferenceId });
             });
 
             // 3. Eczane, Hasta ve Reçete
@@ -188,6 +192,10 @@ using MediFlow.Payment;
             {
                 b.ToTable(MediFlowConsts.DbTablePrefix + "PharmacyStocks", MediFlowConsts.DbSchema);
                 b.ConfigureByConvention();
+                b.HasIndex(x => new { x.PharmacyId, x.DrugId, x.LotNumber });
+
+                // Optimistic concurrency token - aynı anda iki satış yapılınca lost update önlenir
+                b.Property(x => x.RowVersion).IsConcurrencyToken();
             });
 
             builder.Entity<Customer>(b =>
@@ -250,8 +258,8 @@ using MediFlow.Payment;
             {
                 b.ToTable(MediFlowConsts.DbTablePrefix + "Sales", MediFlowConsts.DbSchema);
                 b.ConfigureByConvention();
-                // Parasal işlemlerde veritabanı hassasiyeti (18 hane, 2 ondalık)
                 b.Property(x => x.TotalAmount).HasColumnType("decimal(18,2)");
+                b.Property(x => x.Status).HasConversion<int>();
             });
 
             builder.Entity<SaleItem>(b =>

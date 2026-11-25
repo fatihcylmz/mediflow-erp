@@ -255,6 +255,13 @@ public class UserManagementAppService : MediFlowAppService, IUserManagementAppSe
             user.ExtraProperties.Remove("Address");
         }
 
+        // Şifre güncelleme
+        if (!string.IsNullOrWhiteSpace(input.Password))
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            await _userManager.ResetPasswordAsync(user, token, input.Password.Trim());
+        }
+
         // Rol değiştirme
         var normalizedRole = MediFlowRoles.Normalize(input.RoleName);
         if (!string.IsNullOrWhiteSpace(normalizedRole))
