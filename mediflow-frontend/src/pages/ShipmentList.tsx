@@ -3,6 +3,7 @@ import { Table, Typography, message, Card, Button, Modal, Form, Input, Select, D
 import { TruckOutlined, PlusOutlined, EditOutlined, DeleteOutlined, SyncOutlined, CheckCircleOutlined, CloseCircleOutlined, SendOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -321,49 +322,21 @@ export default function ShipmentList() {
           </Space>
         }
       >
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Sevkiyat</span>}
-                value={shipments.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<TruckOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Hazırlanıyor</span>}
-                value={shipments.filter(s => s.status === 0).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<SyncOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Yola Çıkan</span>}
-                value={shipments.filter(s => s.status === 1).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<SendOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Teslim Edilen</span>}
-                value={shipments.filter(s => s.status === 2).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<CheckCircleOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-        </Row>
+      {/* KPI Cards - Modern White Surface */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Toplam Sevkiyat" value={shipments.length} subtitle="kargo kaydı" color="#FF7A00" icon={<TruckOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Hazırlanıyor" value={shipments.filter(s => s.status === 0).length} subtitle="paketleniyor" color="#FAAD14" icon={<SyncOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Yola Çıkan" value={shipments.filter(s => s.status === 1).length} subtitle="şu an yolda" color="#1D4ED8" icon={<SendOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Teslim Edilen" value={shipments.filter(s => s.status === 2).length} subtitle="teslim tamamlandı" color="#059669" icon={<CheckCircleOutlined />} />
+        </Col>
+      </Row>
 
         <Table dataSource={shipments} columns={columns} rowKey="id" loading={loading} bordered={false} scroll={{ x: 900 }} size="middle" className="border border-slate-200 rounded-xl" locale={{ emptyText: <Empty description="Henüz sevkiyat kaydı yok" /> }} />
       </Card>

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Table, Typography, message, Card, Button, Modal, Form, Input, Select, DatePicker, Tag, Space, Popconfirm, InputNumber, Row, Col, Badge, Statistic } from 'antd';
-import { 
-  RollbackOutlined, PlusOutlined, EditOutlined, DeleteOutlined, 
-  CheckCircleOutlined, SyncOutlined, CheckOutlined, CloseCircleOutlined, 
-  AlertOutlined, FileTextOutlined, SolutionOutlined 
+import {
+  RollbackOutlined, PlusOutlined, EditOutlined, DeleteOutlined,
+  CheckCircleOutlined, SyncOutlined, CheckOutlined, CloseCircleOutlined,
+  AlertOutlined, FileTextOutlined, SolutionOutlined, ShoppingCartOutlined, DollarOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -509,49 +510,21 @@ export default function ReturnList() {
         title={<Title level={2} style={{ margin: 0, fontWeight: 700 }}><RollbackOutlined style={{ color: '#ff7a00', marginRight: 12 }} />İade Yönetimi</Title>}
         extra={<Button type="primary" icon={<PlusOutlined />} onClick={showAddReturnModal} size="large" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderColor: 'transparent', borderRadius: 10 }}>Yeni İade Kaydı</Button>}
       >
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam İade</span>}
-                value={returns.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<RollbackOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>İncelemede</span>}
-                value={returns.filter(r => getEffectiveStatus(r) === 0).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<SyncOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Onaylanan</span>}
-                value={returns.filter(r => getEffectiveStatus(r) === 1).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<CheckCircleOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Karantina / Diğer</span>}
-                value={returns.filter(r => getEffectiveStatus(r) >= 2).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<CloseCircleOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-        </Row>
+      {/* KPI Cards - Modern White Surface */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Toplam İade" value={returns.length} subtitle="iade kaydı" color="#FF7A00" icon={<RollbackOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="İncelemede" value={returns.filter(r => getEffectiveStatus(r) === 0).length} subtitle="bekliyor" color="#FAAD14" icon={<SyncOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Onaylanan" value={returns.filter(r => getEffectiveStatus(r) === 1).length} subtitle="kabul edildi" color="#059669" icon={<CheckCircleOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Karantina / Diğer" value={returns.filter(r => getEffectiveStatus(r) >= 2).length} subtitle="reddedildi / askıda" color="#DC2626" icon={<CloseCircleOutlined />} />
+        </Col>
+      </Row>
 
         <Table dataSource={returns} columns={returnColumns} rowKey="id" loading={loading} bordered={false} size="middle" className="border border-slate-200 rounded-xl" />
       </Card>

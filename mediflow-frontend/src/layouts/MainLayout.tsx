@@ -82,7 +82,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   // İzin verilen menü öğeleri
   const getVisibleMenuItems = () => {
-    const allItems: Record<string, JSX.Element> = {
+    const allItems: Record<string, React.ReactNode> = {
       dashboard: <Menu.Item key="dashboard" icon={<DashboardOutlined />}>Genel Özet</Menu.Item>,
       users: <Menu.Item key="users" icon={<TeamOutlined />}>Kullanıcı Yönetimi</Menu.Item>,
       drugs: <Menu.Item key="drugs" icon={<MedicineBoxOutlined />}>İlaç Envanteri</Menu.Item>,
@@ -99,7 +99,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       warehouses: <Menu.Item key="warehouses" icon={<DatabaseOutlined />}>Depo Yönetimi</Menu.Item>,
     };
 
-    return allowedMenus
+    return (allowedMenus as string[])
       .filter(key => key in allItems)
       .map(key => allItems[key]);
   };
@@ -107,8 +107,9 @@ export default function MainLayout({ children }: MainLayoutProps) {
   // Rol değiştirildiğinde / yanlış sayfada kaldığında yönlendir
   React.useEffect(() => {
     const path = getPathKey();
-    if (!allowedMenus.includes(path) && allowedMenus.length > 0) {
-      navigate(`/${currentRole}/${allowedMenus[0]}`);
+    const menus = allowedMenus as string[];
+    if (!menus.includes(path) && menus.length > 0) {
+      navigate(`/${currentRole}/${menus[0]}`);
     }
   }, [currentRole, allowedMenus, navigate]);
 

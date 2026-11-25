@@ -7,10 +7,12 @@ import {
 import {
   ShoppingOutlined, CheckCircleOutlined, SyncOutlined, CloseCircleOutlined,
   PlusOutlined, EditOutlined, DeleteOutlined, WarningOutlined, SaveOutlined,
-  MinusCircleOutlined, CheckOutlined, InboxOutlined, ShoppingCartOutlined
+  MinusCircleOutlined, CheckOutlined, InboxOutlined, ShoppingCartOutlined,
+  CarOutlined, ClockCircleOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -398,18 +400,45 @@ export default function OrderList() {
   ];
 
   return (
-    <div style={{ padding: '24px', height: '100%' }}>
+    <div className="p-6 space-y-5">
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 22 }}>
+            <ShoppingCartOutlined style={{ color: '#FF7A00', marginRight: 10, verticalAlign: 'middle' }} />
+            Sipariş Yönetimi
+          </h2>
+          <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>Tüm tedarik siparişlerini görüntüleyin ve yönetin.</p>
+        </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={showAddOrderModal} size="large"
+          style={{ background: '#FF7A00', borderColor: '#FF7A00', borderRadius: 10 }}>
+          Yeni Sipariş
+        </Button>
+      </div>
+
+      {/* KPI Cards - Modern White Surface */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Toplam Sipariş" value={orders.length} subtitle="Kayıt" color="#FF7A00" icon={<ShoppingCartOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Onay Bekleyen" value={orders.filter((o) => o.status === 0).length} subtitle="pending onay" color="#FAAD14" icon={<ClockCircleOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Onaylanan" value={orders.filter((o) => o.status === 1).length} subtitle="onaylı sipariş" color="#1D4ED8" icon={<CheckCircleOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Tamamlanan" value={orders.filter((o) => o.status === 2).length} subtitle="tamamlandı/sevk" color="#059669" icon={<CarOutlined />} />
+        </Col>
+      </Row>
+
+      {/* Table Card */}
       <Card
-        title={<Title level={2} style={{ margin: 0, fontWeight: 700 }}><ShoppingCartOutlined style={{ color: '#ff7a00', marginRight: 12 }} />Sipariş Yönetimi</Title>}
-        extra={<Button type="primary" icon={<PlusOutlined />} onClick={showAddOrderModal} size="large" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderColor: 'transparent', borderRadius: 10, boxShadow: '0 4px 15px rgba(255, 122, 0, 0.3)' }}>Yeni Sipariş</Button>}
+        className="shadow-sm rounded-xl overflow-hidden"
+        styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '16px 20px' }, body: { padding: 0 } }}
+        title={<span style={{ fontSize: 15, fontWeight: 600, color: '#0F172A' }}>Sipariş Listesi</span>}
       >
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col span={6}><Card size="small" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}><Statistic title={<span style={{color:'white'}}>Toplam Sipariş</span>} value={orders.length} valueStyle={{color:'white'}}/></Card></Col>
-          <Col span={6}><Card size="small" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}><Statistic title={<span style={{color:'white'}}>Onay Bekleyen</span>} value={orders.filter(o=>o.status===0).length} valueStyle={{color:'white'}}/></Card></Col>
-          <Col span={6}><Card size="small" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}><Statistic title={<span style={{color:'white'}}>Onaylanan</span>} value={orders.filter(o=>o.status===1).length} valueStyle={{color:'white'}}/></Card></Col>
-          <Col span={6}><Card size="small" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}><Statistic title={<span style={{color:'white'}}>Tamamlanan</span>} value={orders.filter(o=>o.status===2).length} valueStyle={{color:'white'}}/></Card></Col>
-        </Row>
-        <Table dataSource={orders} columns={orderColumns} rowKey="id" loading={loading} />
+        <Table dataSource={orders} columns={orderColumns} rowKey="id" loading={loading} bordered={false} size="middle" locale={{ emptyText: <Text type="secondary">Henüz sipariş kaydı bulunmuyor.</Text> }} />
       </Card>
 
       {/* ANA SİPARİŞ MODALI */}

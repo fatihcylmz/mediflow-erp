@@ -4,10 +4,11 @@ import {
   PlusOutlined, EditOutlined, DeleteOutlined, PrinterOutlined,
   ClockCircleOutlined, CheckCircleOutlined, CloseCircleOutlined,
   ExclamationCircleOutlined, SendOutlined, DollarOutlined, BarcodeOutlined,
-  StopOutlined, WarningOutlined
+  StopOutlined, WarningOutlined, FileTextOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -324,53 +325,19 @@ export default function InvoiceList() {
           </Row>
         </div>
 
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ padding: '20px 24px' }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #3b82f6, #60a5fa)', color: 'white' }}>
-              <Row align="middle" gutter={12}>
-                <Col>
-                  <DollarOutlined style={{ fontSize: 28, opacity: 0.9 }} />
-                </Col>
-                <Col>
-                  <div style={{ fontSize: 24, fontWeight: 700 }}>{invoices.length}</div>
-                  <div style={{ opacity: 0.9, fontSize: 13 }}>Toplam Fatura</div>
-                </Col>
-              </Row>
-            </Card>
+        {/* KPI Cards - Modern White Surface */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam Fatura" value={invoices.length} subtitle="fatura kaydı" color="#1D4ED8" icon={<FileTextOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #10b981, #34d399)' }}>
-              <Row align="middle" gutter={12}>
-                <Col><DollarOutlined style={{ fontSize: 28, opacity: 0.9, color: 'white' }} /></Col>
-                <Col>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>{invoices.reduce((sum, inv) => sum + inv.grandTotal, 0).toLocaleString()} ₺</div>
-                  <div style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Tutar</div>
-                </Col>
-              </Row>
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Toplam Tutar" value={invoices.reduce((sum, inv) => sum + inv.grandTotal, 0).toLocaleString('tr-TR')} subtitle="₺" color="#059669" icon={<DollarOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #8b5cf6, #a78bfa)' }}>
-              <Row align="middle" gutter={12}>
-                <Col><ClockCircleOutlined style={{ fontSize: 28, opacity: 0.9, color: 'white' }} /></Col>
-                <Col>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>{invoices.filter(i => i.status === 0).length}</div>
-                  <div style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Bekleyen Faturalar</div>
-                </Col>
-              </Row>
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Bekleyen Fatura" value={invoices.filter(i => i.status === 0).length} subtitle="hazırlandı" color="#FAAD14" icon={<ClockCircleOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}>
-              <Row align="middle" gutter={12}>
-                <Col><SendOutlined style={{ fontSize: 28, opacity: 0.9, color: 'white' }} /></Col>
-                <Col>
-                  <div style={{ fontSize: 24, fontWeight: 700, color: 'white' }}>{invoices.filter(i => i.status === 1).length}</div>
-                  <div style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Gönderilen Faturalar</div>
-                </Col>
-              </Row>
-            </Card>
+          <Col xs={24} sm={12} lg={6}>
+            <KPICard title="Gönderilen Fatura" value={invoices.filter(i => i.status === 1).length} subtitle="müşteriye gönderildi" color="#7C3AED" icon={<SendOutlined />} />
           </Col>
         </Row>
 

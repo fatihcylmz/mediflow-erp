@@ -1,8 +1,12 @@
-import React from 'react';
-import { Row, Col, Card, Statistic, Typography, Table, Badge, Spin, Alert } from 'antd';
-import { ShopOutlined, ShoppingCartOutlined, MedicineBoxOutlined, ClockCircleOutlined, LineChartOutlined, AlertOutlined, DollarOutlined } from '@ant-design/icons';
-
-import { TrendChart, DonutChart, FunnelChart } from '../components/DashboardCharts';
+import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Typography, Table, Badge, Select, Segmented, Spin, Alert, Button } from 'antd';
+import {
+  ShopOutlined, ShoppingCartOutlined, MedicineBoxOutlined, ClockCircleOutlined,
+  LineChartOutlined, AlertOutlined, DollarOutlined, FileTextOutlined, CheckCircleOutlined,
+} from '@ant-design/icons';
+import { TrendChart, DonutChart, FunnelChart, KPICard } from '../components/charts/DashboardCharts';
+import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
@@ -16,6 +20,93 @@ interface OrderItem {
 }
 
 export default function PharmacyDashboard() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [period, setPeriod] = useState<'day' | 'week' | 'month' | 'year'>('month');
+  const [pharmacies, setPharmacies] = useState<Array<{ id: string; name: string }>>([]);
+  const [selectedPharmacyId, setSelectedPharmacyId] = useState<string>('');
+  const [stats, setStats] = useState<any>(null);
+  const [trendData, setTrendData] = useState<any>(null);
+
+  const fetchAllData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Fetch stats
+      const statsRes = await api.post('/api/app/dashboard/get-stats');
+      const d = statsRes.data?.data ?? statsRes.data;
+      setStats({
+        totalDrugs: d.totalDrugs ?? 0,
+        pendingOrders: d.pendingOrders ?? 0,
+        totalOrders: d.totalOrders ?? 0,
+        totalSalesAmount: d.totalSalesAmount ?? 0,
+        totalPrescriptions: d.totalPrescriptions ?? 0,
+        criticalStockCount: d.criticalStockCount ?? 0,
+      });
+
+      // Fetch trend data
+      const params = new URLSearchParams();
+      params.append('period', period);
+      if (selectedPharmacyId) params.append('pharmacyId', selectedPharmacyId);
+      const trendRes = await api.get(`/api/app/dashboard/trend?${params.toString()}`);
+      const td = trendRes.data?.data ?? trendRes.data;
+      setTrendData({
+        dailySales: td.dailySales ?? [],
+        dailyOrders: td.dailyOrders ?? [],
+        categoryDistribution: td.categoryDistribution ?? [],
+        stockDistribution: td.stockDistribution ?? [],
+        totalSales: td.totalSales ?? 0,
+        totalSalesAmount: td.totalSalesAmount ?? 0,
+        totalOrders: td.totalOrders ?? 0,
+      });
+
+      // Fetch pharmacy list for filter
+      const pharmRes = await api.get<any>('/api/app/pharmacy?skipCount=0&maxResultCount=100');
+      const items = pharmRes?.data?.data?.items ?? pharmRes?.data?.items ?? [];
+      setPharmacies(items.map((p: any) => ({ id: p.id, name: p.name })));
+    } catch (err: any) {
+      console.error(err);
+      if (err?.response?.status === 401) {
+        setError('Oturumunuz süresi dolmuş. Lütfen tekrar giriş yapın.');
+        localStorage.removeItem('token');
+        window.location.href = '/';
+        return;
+      }
+      setError('Veriler yüklenemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleFilterChange = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('period', period);
+      if (selectedPharmacyId) params.append('pharmacyId', selectedPharmacyId);
+      const trendRes = await api.get(`/api/app/dashboard/trend?${params.toString()}`);
+      const td = trendRes.data?.data ?? trendRes.data;
+      setTrendData({
+        dailySales: td.dailySales ?? [],
+        dailyOrders: td.dailyOrders ?? [],
+        categoryDistribution: td.categoryDistribution ?? [],
+        stockDistribution: td.stockDistribution ?? [],
+        totalSales: td.totalSales ?? 0,
+        totalSalesAmount: td.totalSalesAmount ?? 0,
+        totalOrders: td.totalOrders ?? 0,
+      });
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const dataSource: OrderItem[] = [
     { key: '1', orderNo: 'ORD-2026-001', drug: 'Parol 500mg', qty: 50, status: 'Onaylandı', date: '2026-11-17' },
     { key: '2', orderNo: 'ORD-2026-002', drug: 'Avelox 400mg', qty: 20, status: 'Kargoda', date: '2026-11-16' },
@@ -32,7 +123,7 @@ export default function PharmacyDashboard() {
       key: 'status',
       width: 120,
       render: (status: string) => {
-        switch(status) {
+        switch (status) {
           case 'Onaylandı': return <Badge status="success" text={<Text style={{ color: '#16a34a' }}>Onaylandı</Text>} />;
           case 'Kargoda': return <Badge status="processing" text={<Text style={{ color: '#0ea5e9' }}>Kargoda</Text>} />;
           case 'Beklemede': return <Badge status="warning" text={<Text style={{ color: '#d97706' }}>Beklemede</Text>} />;
@@ -45,175 +136,214 @@ export default function PharmacyDashboard() {
 
   return (
     <div className="space-y-4">
-      {/* Ana grafik tabı */}
-      <div>
-        <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 20 }}>Eczane Dashboard</h2>
-        <div style={{ color: '#64748B', marginBottom: 16 }}>
-          <Select
-            style={{ width: 180, marginRight: 8 }}
-            placeholder="Dönem"
-          >
-            <Select.Option value="day">Günlük</Select.Option>
-            <Select.Option value="week">Haftalık</Select.Option>
-            <Select.Option value="month">Aylık</Select.Option>
-            <Select.Option value="year">Yıllık</Select.Option>
-          </Select>
-          <Select
-            style={{ width: 180, marginRight: 8 }}
-            placeholder="Eczane"
-          >
-            <Select.Option value="1">Eczane 1</Select.Option>
-            <Select.Option value="2">Eczane 2</Select.Option>
-            <Select.Option value="3">Eczane 3</Select.Option>
-          </Select>
+      {error && <Alert message={error} type="error" showIcon closable style={{ marginBottom: 16 }} />}
+
+      {/* Başlık ve Filtre */}
+      <div className="bg-white rounded-xl border border-[#E2E8F0] shadow-sm p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 20 }}>Eczane Dashboard</h2>
+            <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 13 }}>Reçete, sipariş ve stok analizleri</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Segmented
+              options={[
+                { label: 'Günlük', value: 'day' },
+                { label: 'Haftalık', value: 'week' },
+                { label: 'Aylık', value: 'month' },
+                { label: 'Yıllık', value: 'year' },
+              ]}
+              value={period}
+              onChange={(val: any) => { setPeriod(val); handleFilterChange(); }}
+            />
+          </div>
         </div>
 
-        {/* KPI Kartları */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} md={4}>
-            <Card size="small" style={{ borderRadius: 12, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Toplam İlaç Çeşidi</div>
-                <div className="text-xl font-bold text-blue-600">{14}</div>
-              </div>
-              <div className="text-xs text-slate-400 mt-1">İlaç Envanteri</div>
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={4}>
-            <Card size="small" style={{ borderRadius: 12, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Aktif Sipariş</div>
-                <div className="text-xl font-bold text-orange-600">{3}</div>
-              </div>
-              <div className="text-xs text-slate-400 mt-1">Stokta Beklemede</div>
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={4}>
-            <Card size="small" style={{ borderRadius: 12, border: '1px solid #E2E8F0', background: '#FFFFFF' }}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Satış Tutar</div>
-                <div className="text-xl font-bold text-emerald-600">{47 ₺}</div>
-              </div>
-              <div className="text-xs text-slate-400 mt-1">Güncel Ciro</div>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Grafikler - Donut ve Funnel */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={6}>
-            <Card bordered={false} title={<div className="flex items-center gap-2"><FileTextOutlined className="text-emerald-600" /><span>Reçete Türü Dağılımı</span></div>} className="shadow-sm rounded-xl overflow-hidden" style={{ height: 300 }}>
-              <div className="p-4" style={{ height: 240 }}>
-                <DonutChart data={[
-                  { name: 'Reçetesiz(OTC)', value: 8 },
-                  { name: 'Beyaz Reçete', value: 5 },
-                  { name: 'Yeşil Reçete', value: 4 },
-                  { name: 'Kırmızı Reçete', value: 2 },
-                ]} />
-              </div>
-            </Card>
-          </Col>
-          <Col xs={24} lg={6}>
-            <Card bordered={false} title={<div className="flex items-center gap-2"><DollarOutlined className="text-emerald-600" /><span>Satış / Funnel Analizi</span></div>} className="shadow-sm rounded-xl overflow-hidden" style={{ height: 400 }}>
-              <div className="p-4" style={{ height: 340 }}>
-                {1 && <FunnelChart data={[
-                  { name: 'Toplam Sipariş', value: 23 },
-                  { name: 'Tamamlanan', value: 18 },
-                  { name: 'Onaylanan', value: 14 },
-                  { name: 'Sevk Edilen', value: 10 },
-                  { name: 'Teslim Edilen', value: 8 },
-                  { name: 'Tamamlanan Satış', value: 14 },
-                ]} />}
-              </div>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Trend Grafikleri - Çizgi grafikler yan yana */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} lg={6}>
-            <Card bordered={false} title={<div className="flex items-center gap-2"><LineChartOutlined className="text-blue-600" /><span>Satış Trendi</span></div>} className="shadow-sm rounded-xl overflow-hidden" style={{ height: 280 }}>
-              <div className="p-4" style={{ height: 220 }}>
-                <div style={{ height: 220 }}>
-                  {1 && <TrendChart data={[{ date: 'Ağu', amount: 2400 }, { date: 'Eyl', amount: 3100 }, { date: 'Eki', amount: 2800 }, { date: 'Kas', amount: 3500 }], label: "amount"} color="#1D4ED8" />}
-                </div>
-              </div>
-            </Card>
-          </Col>
-          <Col xs={24} lg={6}>
-            <Card bordered={false} title={<div className="flex items-center gap-2"><ShoppingCartOutlined className="text-orange-500" /><span>Sipariş Trendi</span></div>} className="shadow-sm rounded-xl overflow-hidden" style={{ height: 280 }}>
-              <div className="p-4" style={{ height: 220 }}>
-                {1 && <TrendChart data={[{ date: 'Ağu', count: 35 }, { date: 'Eyl', count: 48 }, { date: 'Eki', count: 42 }, { date: 'Kas', count: 55 }], label: "count"} color="#FF7A00" />}
-                </div>
-              </div>
-            </Card>
-          </Col>
-        </Row>
+        <div className="flex flex-wrap items-center gap-3 pb-4 border-b border-[#F1F5F9]">
+          <span style={{ fontSize: 13, color: '#475569', fontWeight: 500 }}>Eczane:</span>
+          <Select
+            style={{ width: 200 }}
+            placeholder="Tüm Eczaneler"
+            allowClear
+            showSearch
+            value={selectedPharmacyId || undefined}
+            onChange={val => { setSelectedPharmacyId(val as string); handleFilterChange(); }}
+            options={pharmacies.map(p => ({ value: p.id, label: p.name }))}
+          />
+          <Button type="primary" size="small" onClick={handleFilterChange} loading={loading}
+            style={{ background: '#FF7A00', borderColor: '#FF7A00', marginLeft: 8 }}>
+            Güncelle
+          </Button>
+        </div>
       </div>
 
-      {/* Tablo verileri */}
-      <Card
-        className="border-0 shadow-sm rounded-xl bg-white"
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <ClockCircleOutlined style={{ color: '#ec4899', fontSize: 20 }} />
-            <Title level={5} style={{ margin: 0, color: '#1e293b' }}>Son Eczane İşlemleri</Title>
-          </div>
-        }
-      >
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={false}
-          rowKey="key"
-          bordered={false}
-          size="middle"
-          style={{ borderRadius: 12, overflow: 'hidden' }}
-          className="rounded-xl"
-        />
-      </Card>
+      {/* KPI Kartları */}
+      {loading && !trendData ? (
+        <div className="flex justify-center py-12"><Spin size="large" /></div>
+      ) : (
+        <>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} xl={4}>
+              <KPICard title="Toplam İlaç Çeşidi" value={stats?.totalDrugs ?? 0} subtitle="Envanter" color="#1D4ED8" icon={<MedicineBoxOutlined />} />
+            </Col>
+            <Col xs={24} sm={12} xl={4}>
+              <KPICard title="Aktif Sipariş" value={stats?.pendingOrders ?? 0} subtitle="Stokta Beklemede" color="#FF7A00" icon={<ShoppingCartOutlined />} />
+            </Col>
+            <Col xs={24} sm={12} xl={4}>
+              <KPICard title="Satış Tutarı" value={`${new Intl.NumberFormat('tr-TR').format(stats?.totalSalesAmount ?? 0)} ₺`} subtitle="Güncel Ciro" color="#059669" icon={<DollarOutlined />} />
+            </Col>
+            <Col xs={24} sm={12} xl={4}>
+              <KPICard title="Toplam Reçete" value={stats?.totalPrescriptions ?? 0} subtitle="Reçeteler" color="#DC2626" icon={<FileTextOutlined />} />
+            </Col>
+            <Col xs={24} sm={12} xl={4}>
+              <KPICard title="Kritik Stok" value={stats?.criticalStockCount ?? 0} subtitle="Uyarılar" color="#DC2626" icon={<AlertOutlined />} />
+            </Col>
+            <Col xs={24} sm={12} xl={4}>
+              <KPICard title="Toplam Satış" value={trendData?.totalSales ?? 0} subtitle="Adet" color="#1D4ED8" icon={<LineChartOutlined />} />
+            </Col>
+          </Row>
 
-      {/* Quick Actions */}
-      <Row gutter={[24, 24]}>
-        <Col xs={24} md={8}>
-          <Card
-            className="border-0 shadow-sm rounded-xl hover:shadow-lg transition-shadow cursor-pointer"
-            bodyStyle={{ padding: 0 }}
-          >
-            <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)' }}>
-              <ShoppingCartOutlined style={{ fontSize: 40, color: '#0ea5e9', marginBottom: 16 }} />
-              <Title level={4} style={{ margin: '16px 0 8px', color: '#0c4a6e' }}>Yeni Sipariş</Title>
-              <Text type="secondary">Stok kontrolü yaparak yeni sipariş oluşturun</Text>
-            </div>
-          </Card>
-        </Col>
+          {/* Grafikler - Donut ve Funnel */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Card
+                className="shadow-sm rounded-xl overflow-hidden"
+                styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
+                title={
+                  <div className="flex items-center gap-2">
+                    <FileTextOutlined style={{ color: '#059669' }} />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Reçete Türü Dağılımı</span>
+                  </div>
+                }
+              >
+                <DonutChart data={trendData?.categoryDistribution ?? []} size={160} title="REÇETE" />
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card
+                className="shadow-sm rounded-xl overflow-hidden"
+                styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
+                title={
+                  <div className="flex items-center gap-2">
+                    <LineChartOutlined style={{ color: '#1D4ED8' }} />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Satış / Funnel Analizi</span>
+                  </div>
+                }
+              >
+                <FunnelChart data={[
+                  { name: 'Toplam Sipariş', value: trendData?.totalOrders ?? 0 },
+                  { name: 'Tamamlanan', value: Math.round((trendData?.totalOrders ?? 0) * 0.8) },
+                  { name: 'Onaylanan', value: Math.round((trendData?.totalOrders ?? 0) * 0.6) },
+                  { name: 'Sevk Edilen', value: Math.round((trendData?.totalOrders ?? 0) * 0.4) },
+                  { name: 'Teslim Edilen', value: Math.round((trendData?.totalOrders ?? 0) * 0.3) },
+                  { name: 'Tamamlanan Satış', value: trendData?.totalSales ?? 0 },
+                ]} />
+              </Card>
+            </Col>
+          </Row>
 
-        <Col xs={24} md={8}>
-          <Card
-            className="border-0 shadow-sm rounded-xl hover:shadow-lg transition-shadow cursor-pointer"
-            bodyStyle={{ padding: 0 }}
-          >
-            <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #fdf4ff, #fae8ff)' }}>
-              <MedicineBoxOutlined style={{ fontSize: 40, color: '#8b5cf6', marginBottom: 16 }} />
-              <Title level={4} style={{ margin: '16px 0 8px', color: '#5b21b6' }}>Reçete Göster</Title>
-              <Text type="secondary">E-reçete bilgilerini görüntüleyin</Text>
-            </div>
-          </Card>
-        </Col>
+          {/* Trend Grafikleri */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Card
+                className="shadow-sm rounded-xl overflow-hidden"
+                styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
+                title={
+                  <div className="flex items-center gap-2">
+                    <LineChartOutlined style={{ color: '#1D4ED8' }} />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Satış Trendi</span>
+                  </div>
+                }
+                extra={<span style={{ fontSize: 15, fontWeight: 700, color: '#1D4ED8' }}>{new Intl.NumberFormat('tr-TR').format(trendData?.totalSalesAmount ?? 0)} ₺</span>}
+              >
+                <TrendChart data={trendData?.dailySales ?? []} label="amount" color="#1D4ED8" height={200} />
+              </Card>
+            </Col>
+            <Col xs={24} md={12}>
+              <Card
+                className="shadow-sm rounded-xl overflow-hidden"
+                styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
+                title={
+                  <div className="flex items-center gap-2">
+                    <ShoppingCartOutlined style={{ color: '#FF7A00' }} />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Sipariş Trendi</span>
+                  </div>
+                }
+                extra={<span style={{ fontSize: 15, fontWeight: 700, color: '#FF7A00' }}>{trendData?.totalOrders ?? 0}</span>}
+              >
+                <TrendChart data={trendData?.dailyOrders ?? []} label="count" color="#FF7A00" height={200} />
+              </Card>
+            </Col>
+          </Row>
 
-        <Col xs={24} md={8}>
+          {/* Tablo */}
           <Card
-            className="border-0 shadow-sm rounded-xl hover:shadow-lg transition-shadow cursor-pointer"
-            bodyStyle={{ padding: 0 }}
+            className="shadow-sm rounded-xl"
+            styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
+            title={
+              <div className="flex items-center gap-2">
+                <ClockCircleOutlined style={{ color: '#ec4899' }} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Son Eczane İşlemleri</span>
+              </div>
+            }
           >
-            <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #fef3c7, #fde68a)' }}>
-              <LineChartOutlined style={{ fontSize: 40, color: '#d97706', marginBottom: 16 }} />
-              <Title level={4} style={{ margin: '16px 0 8px', color: '#92400e' }}>Satış Raporu</Title>
-              <Text type="secondary">Günlük/haftalık satış performansını inceleyin</Text>
-            </div>
+            <Table<OrderItem>
+              dataSource={dataSource}
+              columns={columns}
+              pagination={false}
+              rowKey="key"
+              size="middle"
+              locale={{ emptyText: <Text type="secondary">Henüz işlem bulunmuyor.</Text> }}
+            />
           </Card>
-        </Col>
-      </Row>
+
+          {/* Quick Actions */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Card
+                className="shadow-sm rounded-xl cursor-pointer hover:shadow-md transition-shadow"
+                styles={{ body: { padding: 0, borderRadius: 12 } }}
+                bodyStyle={{ padding: 0, borderRadius: 12 }}
+                onClick={() => navigate('/pharmacy/orders')}
+              >
+                <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)' }}>
+                  <ShoppingCartOutlined style={{ fontSize: 36, color: '#0ea5e9', marginBottom: 12 }} />
+                  <Title level={5} style={{ margin: '8px 0 4px', color: '#0c4a6e', fontWeight: 700 }}>Yeni Sipariş</Title>
+                  <Text type="secondary">Stok kontrolü yaparak yeni sipariş oluşturun</Text>
+                </div>
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card
+                className="shadow-sm rounded-xl cursor-pointer hover:shadow-md transition-shadow"
+                styles={{ body: { padding: 0, borderRadius: 12 } }}
+                bodyStyle={{ padding: 0, borderRadius: 12 }}
+                onClick={() => navigate('/pharmacy/prescriptions')}
+              >
+                <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #fdf4ff, #fae8ff)' }}>
+                  <MedicineBoxOutlined style={{ fontSize: 36, color: '#8b5cf6', marginBottom: 12 }} />
+                  <Title level={5} style={{ margin: '8px 0 4px', color: '#5b21b6', fontWeight: 700 }}>Reçete Göster</Title>
+                  <Text type="secondary">E-reçete bilgilerini görüntüleyin</Text>
+                </div>
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card
+                className="shadow-sm rounded-xl cursor-pointer hover:shadow-md transition-shadow"
+                styles={{ body: { padding: 0, borderRadius: 12 } }}
+                bodyStyle={{ padding: 0, borderRadius: 12 }}
+                onClick={() => navigate('/admin/dashboard')}
+              >
+                <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #fef3c7, #fde68a)' }}>
+                  <LineChartOutlined style={{ fontSize: 36, color: '#d97706', marginBottom: 12 }} />
+                  <Title level={5} style={{ margin: '8px 0 4px', color: '#92400e', fontWeight: 700 }}>Satış Raporu</Title>
+                  <Text type="secondary">Günlük/haftalık satış performansını inceleyin</Text>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </>
+      )}
     </div>
   );
 }

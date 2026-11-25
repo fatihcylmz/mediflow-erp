@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Table, Typography, message, Card, Button, Modal, Form, Select, DatePicker, Space, Popconfirm, InputNumber, Row, Col, Statistic } from 'antd';
-import { ShoppingCartOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UnorderedListOutlined, WarningOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UnorderedListOutlined, WarningOutlined, CheckCircleOutlined, ClockCircleOutlined, DollarOutlined, FileProtectOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -328,56 +329,45 @@ export default function SaleList() {
   ];
 
   return (
-    <div style={{ padding: '24px', height: '100%' }}>
-      <Card
-        title={<Title level={2} style={{ margin: 0, fontWeight: 700 }}><ShoppingCartOutlined style={{ color: '#ff7a00', marginRight: 12 }} />Satış ve Reçete İşlemleri</Title>}
-        extra={<Button type="primary" icon={<PlusOutlined />} onClick={showAddSaleModal} size="large" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderColor: 'transparent', borderRadius: 10 }}>Yeni Satış Kaydı</Button>}
-      >
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Satış</span>}
-                value={sales.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ShoppingCartOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Gelir</span>}
-                value={sales.reduce((sum, s) => sum + (s.totalAmount || 0), 0)}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ShoppingCartOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Reçeteli Satış</span>}
-                value={sales.filter(s => s.prescriptionId).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ShoppingCartOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Reçetesiz Satış</span>}
-                value={sales.filter(s => !s.prescriptionId).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ShoppingCartOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-        </Row>
+    <div className="p-6 space-y-5">
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 22 }}>
+            <ShoppingCartOutlined style={{ color: '#FF7A00', marginRight: 10, verticalAlign: 'middle' }} />
+            Satış ve Reçete İşlemleri
+          </h2>
+          <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>Tüm satış kayıtlarını görüntüleyin, analiz edin ve yönetin.</p>
+        </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={showAddSaleModal} size="large"
+          style={{ background: '#FF7A00', borderColor: '#FF7A00', borderRadius: 10 }}>
+          Yeni Satış Kaydı
+        </Button>
+      </div>
 
-        <Table dataSource={sales} columns={saleColumns} rowKey="id" loading={loading} bordered={false} size="middle" className="border border-slate-200 rounded-xl" />
+      {/* KPI Cards - Modern White Surface */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Toplam Satış" value={sales.length} subtitle="işlem" color="#FF7A00" icon={<ShoppingCartOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Toplam Gelir" value={new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(sales.reduce((sum, s) => sum + (s.totalAmount || 0), 0))} subtitle="TL" color="#1D4ED8" icon={<DollarOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Reçeteli Satış" value={sales.filter(s => s.prescriptionId).length} subtitle="reçeteli işlem" color="#059669" icon={<FileProtectOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Reçetesiz Satış" value={sales.filter(s => !s.prescriptionId).length} subtitle="reçetesiz işlem" color="#64748B" icon={<ShoppingCartOutlined />} />
+        </Col>
+      </Row>
+
+      {/* Table Card */}
+      <Card
+        className="shadow-sm rounded-xl overflow-hidden"
+        styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '16px 20px' }, body: { padding: 0 } }}
+        title={<span style={{ fontSize: 15, fontWeight: 600, color: '#0F172A' }}>Satış Kayıtları</span>}
+      >
+        <Table dataSource={sales} columns={saleColumns} rowKey="id" loading={loading} bordered={false} size="middle" locale={{ emptyText: <Text type="secondary">Henüz satış kaydı bulunmuyor.</Text> }} />
       </Card>
 
       {/* ANA SATIŞ CRUD MODALI */}

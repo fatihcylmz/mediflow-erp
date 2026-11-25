@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Table, Typography, message, Card, Button, Modal, Form, Input, Space, Popconfirm, Tag, Row, Col, Statistic, Empty, Tooltip } from 'antd';
-import { ShopOutlined, PlusOutlined, EditOutlined, DeleteOutlined, InboxOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { ShopOutlined, PlusOutlined, EditOutlined, DeleteOutlined, InboxOutlined, ReloadOutlined, SearchOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -185,49 +186,36 @@ export default function PharmacyList() {
         title={<Title level={2} style={{ margin: 0, fontWeight: 700 }}><ShopOutlined style={{ color: '#ff7a00', marginRight: 12 }} />Eczane Yönetimi</Title>}
         extra={<Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderColor: 'transparent', borderRadius: 10 }}>Yeni Eczane Ekle</Button>}
       >
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Eczane</span>}
-                value={pharmacies.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ShopOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Aktif Eczane</span>}
-                value={pharmacies.filter(p => p.pharmacistName).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ShopOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>GLN Kaydı Olan</span>}
-                value={pharmacies.filter(p => p.gln).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<InboxOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Tam Verili</span>}
-                value={pharmacies.filter(p => p.pharmacistLicenseNumber && p.address).length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<InboxOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-        </Row>
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 22 }}>
+            <ShopOutlined style={{ color: '#FF7A00', marginRight: 10, verticalAlign: 'middle' }} />
+            Eczane Yönetimi
+          </h2>
+          <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>Tüm eczane kayıtlarını görüntüleyin ve yönetin.</p>
+        </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large"
+          style={{ background: '#FF7A00', borderColor: '#FF7A00', borderRadius: 10 }}>
+          Yeni Eczane Ekle
+        </Button>
+      </div>
+
+      {/* KPI Cards - Modern White Surface */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Toplam Eczane" value={pharmacies.length} subtitle="kayıt" color="#FF7A00" icon={<ShopOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Aktif Eczane" value={pharmacies.filter(p => p.pharmacistName).length} subtitle="eczacı atanmış" color="#059669" icon={<CheckCircleOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="GLN Kaydı Olan" value={pharmacies.filter(p => p.gln).length} subtitle="ITS numarası tanımlı" color="#1D4ED8" icon={<InboxOutlined />} />
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <KPICard title="Tam Verili" value={pharmacies.filter(p => p.pharmacistLicenseNumber && p.address).length} subtitle="eksiksiz kayıt" color="#64748B" icon={<InboxOutlined />} />
+        </Col>
+      </Row>
 
         <Table dataSource={pharmacies} columns={columns} rowKey="id" loading={loading} bordered={false} size="middle" className="border border-slate-200 rounded-xl" />
       </Card>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Table, Typography, message, Card, Button, Modal, Form, Input, Switch, Space, Popconfirm, Tag, Row, Col, Statistic, Divider } from 'antd';
 import { DatabaseOutlined, PlusOutlined, EditOutlined, DeleteOutlined, ApartmentOutlined, EnvironmentOutlined, UserOutlined, FireOutlined, BulbOutlined } from '@ant-design/icons';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -132,22 +133,16 @@ export default function WarehouseList() {
           </Row>
         </div>
 
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ padding: '16px 24px' }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #3b82f6, #60a5fa)', color: 'white' }}>
-              <Statistic title={<span style={{ opacity: 0.9, fontSize: 12 }}>Toplam Depo</span>} value={warehouses.length} valueStyle={{ color: '#fff', fontWeight: 700 }} />
-            </Card>
+        {/* KPI Cards - Modern White Surface */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={8}>
+            <KPICard title="Toplam Depo" value={warehouses.length} subtitle="depovariante" color="#1D4ED8" icon={<DatabaseOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #0ea5e9, #38bdf8)', color: 'white' }}>
-              <Statistic title={<span style={{ opacity: 0.9, fontSize: 12 }}>Soğuk Zincir Aktif</span>} value={coldCount} valueStyle={{ color: '#fff', fontWeight: 700 }} />
-            </Card>
+          <Col xs={24} sm={12} lg={8}>
+            <KPICard title="Soğuk Zincir Aktif" value={coldCount} subtitle="soğuk zincir depolara sahip" color="#0EA5E9" icon={<FireOutlined />} />
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #10b981, #34d399)', color: 'white' }}>
-              <Statistic title={<span style={{ opacity: 0.9, fontSize: 12 }}>Soğuk Zincir Yok</span>} value={warehouses.length - coldCount} valueStyle={{ color: '#fff', fontWeight: 700 }} />
-            </Card>
+          <Col xs={24} sm={12} lg={8}>
+            <KPICard title="Soğuk Zincir Yok" value={warehouses.length - coldCount} subtitle="standart depo" color="#10B981" icon={<BulbOutlined />} />
           </Col>
         </Row>
 

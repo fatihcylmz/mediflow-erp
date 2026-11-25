@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Table, Typography, message, Card, Button, Modal, Form, Input, Space, Popconfirm, Tag, Row, Col, Statistic, Divider } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ShopOutlined, PhoneOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
 import api from '../services/api';
+import { KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -128,12 +129,10 @@ export default function SupplierList() {
           </Row>
         </div>
 
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ padding: '16px 24px' }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', color: 'white' }}>
-              <Statistic title={<span style={{ opacity: 0.9, fontSize: 12 }}>Toplam Tedarikçi</span>} value={suppliers.length} valueStyle={{ color: '#fff', fontWeight: 700 }} />
-            </Card>
+        {/* KPI Card - Modern White Surface */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12} lg={8}>
+            <KPICard title="Toplam Tedarikçi" value={suppliers.length} subtitle="kayıt" color="#FF7A00" icon={<ShopOutlined />} />
           </Col>
         </Row>
 

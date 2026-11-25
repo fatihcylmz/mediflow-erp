@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Table, Typography, message, Card, Button, Modal, Form, Input, InputNumber, Select, Space, Popconfirm, Tag, Descriptions, Row, Col, Statistic } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, DollarOutlined, CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useEffect, useState, useMemo } from 'react';
+import { Table, Typography, message, Card, Button, Modal, Form, Input, InputNumber, Select, Space, Popconfirm, Tag, Descriptions, Row, Col } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, DollarOutlined, CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, PieChartOutlined, LineChartOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
+import { DonutChart, KPICard } from '../components/charts/DashboardCharts';
 
 const { Title, Text } = Typography;
 
@@ -116,10 +117,46 @@ export default function PaymentTransactionList() {
     }
   };
 
-  // Özet istatistikler
-  const totalAmount = transactions.reduce((sum, t) => sum + (t.amount || 0), 0);
-  const completedCount = transactions.filter(t => t.status === 1).length;
-  const pendingCount = transactions.filter(t => t.status === 0).length;
+  // Memoized computed values
+  const totalAmount = useMemo(() => transactions.reduce((sum, t) => sum + (t.amount || 0), 0), [transactions]);
+  const completedCount = useMemo(() => transactions.filter(t => t.status === 1).length, [transactions]);
+  const pendingCount = useMemo(() => transactions.filter(t => t.status === 0).length, [transactions]);
+
+  // Donut chart data - payment method distribution
+  const methodDistribution = useMemo(() => {
+    const map = new Map<string, { name: string; value: number }>();
+    transactions.forEach(t => {
+      const m = methods.find(m => m.id === t.paymentMethodId);
+      const name = m?.name || 'Bilinmeyen';
+      const existing = map.get(name);
+      map.set(name, { name, value: (existing?.value || 0) + (t.amount || 0) });
+    });
+    return Array.from(map.values());
+  }, [transactions, methods]);
+
+  // Donut chart data - collection status distribution
+  const statusDistribution = useMemo(() => {
+    const map = new Map<number, { name: string; value: number }>();
+    const statusLabels: Record<number, string> = {
+      0: 'Beklemede',
+      1: 'Tamamlandı',
+      2: 'Başarısız',
+      3: 'İade Edildi',
+      4: 'İptal Edildi'
+    };
+    const statusColors: Record<number, string> = {
+      0: '#FAAD14',
+      1: '#52C41A',
+      2: '#FF4D4F',
+      3: '#1890FF',
+      4: '#8C8C8C'
+    };
+    transactions.forEach(t => {
+      const existing = map.get(t.status);
+      map.set(t.status, { name: statusLabels[t.status] || 'Bilinmiyor', value: (existing?.value || 0) + 1 });
+    });
+    return Array.from(map.values());
+  }, [transactions]);
 
   const columns = [
     {
@@ -127,7 +164,7 @@ export default function PaymentTransactionList() {
       key: 'invoice',
       render: (_: any, r: PaymentTransaction) => {
         const inv = invoices.find(i => i.id === r.invoiceId);
-        return inv ? <Text strong style={{ color: '#1890ff' }}>{inv.invoiceNumber}</Text> : <Text type="secondary">{r.invoiceId?.slice(0, 8)}...</Text>;
+        return inv ? <Text strong style={{ color: '#1D4ED8' }}>{inv.invoiceNumber}</Text> : <Text type="secondary">{r.invoiceId?.slice(0, 8)}...</Text>;
       }
     },
     {
@@ -142,7 +179,7 @@ export default function PaymentTransactionList() {
       title: 'Tutar',
       dataIndex: 'amount',
       key: 'amount',
-      render: (v: number) => <Text strong style={{ color: '#ff7a00' }}>{new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(v)}</Text>
+      render: (v: number) => <Text strong style={{ color: '#FF7A00' }}>{new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(v)}</Text>
     },
     {
       title: 'Ücret',
@@ -194,58 +231,122 @@ export default function PaymentTransactionList() {
     }
   ];
 
+  const currencyFormat = (value: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value);
+
   return (
     <div style={{ padding: '24px', height: '100%' }}>
-      <Card
-        title={<Title level={2} style={{ margin: 0, fontWeight: 700 }}><DollarOutlined style={{ color: '#ff7a00', marginRight: 12 }} />Ödeme İşlemleri</Title>}
-        extra={<Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderColor: 'transparent', borderRadius: 10 }}>Yeni Ödeme Kaydı</Button>}
-      >
-        {/* Stats Row */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Ödeme</span>}
-                value={transactions.length}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<DollarOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Toplam Tutar</span>}
-                value={totalAmount.toFixed(2)}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<DollarOutlined style={{ color: 'white' }} />}
-                suffix="₺"
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #52c41a, #73d13d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Tamamlanan</span>}
-                value={completedCount}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<CheckCircleOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small" className="border-0 shadow-sm rounded-lg" style={{ background: 'linear-gradient(135deg, #faad14, #ffc53d)' }}>
-              <Statistic
-                title={<span style={{ opacity: 0.9, fontSize: 13, color: 'white' }}>Bekleyen</span>}
-                value={pendingCount}
-                valueStyle={{ color: '#fff', fontWeight: 700 }}
-                prefix={<ClockCircleOutlined style={{ color: 'white' }} />}
-              />
-            </Card>
-          </Col>
-        </Row>
+      {/* Page Header */}
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 22 }}>
+            <DollarOutlined style={{ color: '#FF7A00', marginRight: 10, verticalAlign: 'middle' }} />
+            Ödeme İşlemleri
+          </h2>
+          <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>Tahsilat ve ödeme kayıtlarını görüntüleyin, yönetin ve analiz edin.</p>
+        </div>
+        <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large"
+          style={{ background: 'linear-gradient(135deg, #FF7A00, #FF9E4D)', borderColor: 'transparent', borderRadius: 10 }}>
+          Yeni Ödeme Kaydı
+        </Button>
+      </div>
 
-        <Table dataSource={transactions} columns={columns} rowKey="id" loading={loading} bordered={false} size="middle" className="border border-slate-200 rounded-xl" />
+      {/* KPI Cards - Modern White Surface */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={12} md={6}>
+          <KPICard
+            title="Toplam İşlem"
+            value={transactions.length}
+            subtitle="Kayıt"
+            color="#FF7A00"
+            icon={<DollarOutlined />}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <KPICard
+            title="Toplam Tutar"
+            value={currencyFormat(totalAmount)}
+            subtitle="İşlem hacmi"
+            color="#1D4ED8"
+            icon={<DollarOutlined />}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <KPICard
+            title="Tamamlanan"
+            value={completedCount}
+            subtitle="Başarılı işlem"
+            color="#059669"
+            icon={<CheckCircleOutlined />}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <KPICard
+            title="Bekleyen"
+            value={pendingCount}
+            subtitle="Onay bekliyor"
+            color="#FAAD14"
+            icon={<ClockCircleOutlined />}
+          />
+        </Col>
+      </Row>
+
+      {/* Charts Row - Donut Charts */}
+      <Row gutter={[16, 16]} className="mb-6">
+        {/* Payment Method Distribution */}
+        <Col xs={24} lg={12}>
+          <Card
+            className="shadow-sm rounded-xl overflow-hidden"
+            styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
+            title={<div className="flex items-center gap-2"><PieChartOutlined style={{ color: '#7C3AED' }} /><span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Ödeme Yöntemi Dağılımı</span></div>}
+          >
+            <div style={{ height: 280 }}>
+              {loading ? (
+                <div className="flex h-full items-center justify-center"><div className="text-slate-400">Yükleniyor...</div></div>
+              ) : methodDistribution.length > 0 ? (
+                <DonutChart data={methodDistribution} title="TOPLAM" size={160} />
+              ) : (
+                <div className="flex h-full items-center justify-center text-slate-400">Ödeme yöntemi verisi yok</div>
+              )}
+            </div>
+          </Card>
+        </Col>
+
+        {/* Collection Status Distribution */}
+        <Col xs={24} lg={12}>
+          <Card
+            className="shadow-sm rounded-xl overflow-hidden"
+            styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
+            title={<div className="flex items-center gap-2"><LineChartOutlined style={{ color: '#059669' }} /><span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Tahsilat Durumu Dağılımı</span></div>}
+          >
+            <div style={{ height: 280 }}>
+              {loading ? (
+                <div className="flex h-full items-center justify-center"><div className="text-slate-400">Yükleniyor...</div></div>
+              ) : statusDistribution.length > 0 ? (
+                <DonutChart data={statusDistribution} title="TOPLAM" size={160} />
+              ) : (
+                <div className="flex h-full items-center justify-center text-slate-400">Durum verisi yok</div>
+              )}
+            </div>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Table Card - Modern White Surface */}
+      <Card
+        className="shadow-sm rounded-xl overflow-hidden"
+        styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '16px 20px' }, body: { padding: 0 } }}
+        title={<div style={{ fontSize: 15, fontWeight: 600, color: '#0F172A' }}>Ödeme İşlemleri Listesi</div>}
+      >
+        <Table
+          dataSource={transactions}
+          columns={columns}
+          rowKey="id"
+          loading={loading}
+          bordered={false}
+          size="middle"
+          pagination={{ pageSize: 15, showSizeChanger: true }}
+          locale={{ emptyText: <Text type="secondary">Ödeme kaydı bulunmuyor.</Text> }}
+        />
       </Card>
 
       {/* MODAL */}
@@ -261,7 +362,7 @@ export default function PaymentTransactionList() {
             <Select placeholder="Fatura Seçin" showSearch optionFilterProp="children">
               {invoices.filter(i => i.status !== 1).map(inv => (
                 <Select.Option key={inv.id} value={inv.id}>
-                  {inv.invoiceNumber} - {new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(inv.grandTotal)}
+                  {inv.invoiceNumber} - {currencyFormat(inv.grandTotal)}
                 </Select.Option>
               ))}
             </Select>
@@ -275,16 +376,24 @@ export default function PaymentTransactionList() {
             </Select>
           </Form.Item>
 
-          <Form.Item name="amount" label="Ödeme Tutarı" rules={[{ required: true, message: 'Tutar giriniz' }]}>
-            <InputNumber min={0} step={0.01} style={{ width: '100%' }} addonAfter="₺" />
+          <Form.Item name="amount" label="Tutar (₺)" rules={[{ required: true, message: 'Tutar giriniz' }]}>
+            <InputNumber precision={2} min={0.01} style={{ width: '100%' }} />
           </Form.Item>
 
-          <Form.Item name="transactionReference" label="İşlem Referans No">
-            <Input placeholder="Banka/kart referans numarası" />
+          <Form.Item name="feeAmount" label="İşlem Ücreti (₺)">
+            <InputNumber precision={2} min={0} style={{ width: '100%' }} />
           </Form.Item>
 
-          <Form.Item name="status" label="Durum" initialValue={0}>
-            <Select>
+          <Form.Item name="paymentDate" label="Ödeme Tarihi" rules={[{ required: true, message: 'Tarih seçiniz' }]}>
+            <Select.Option key="now" value={dayjs().format('YYYY-MM-DDTHH:mm:ss')}>Şimdi</Select.Option>
+          </Form.Item>
+
+          <Form.Item name="transactionReference" label="Referans / İşlem No">
+            <Input placeholder="Banka referans numarası vb." style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item name="status" label="Durum" rules={[{ required: true, message: 'Durum seçiniz' }]}>
+            <Select placeholder="Durum Seçin" style={{ width: '100%' }}>
               <Select.Option value={0}>Beklemede</Select.Option>
               <Select.Option value={1}>Tamamlandı</Select.Option>
               <Select.Option value={2}>Başarısız</Select.Option>
@@ -294,13 +403,15 @@ export default function PaymentTransactionList() {
           </Form.Item>
 
           <Form.Item name="notes" label="Notlar">
-            <Input.TextArea rows={2} placeholder="Opsiyonel not..." />
+            <Input.TextArea rows={3} placeholder="İsteğe bağlı notlar..." style={{ width: '100%' }} />
           </Form.Item>
 
-          <Form.Item style={{ textAlign: 'right', margin: 0 }}>
-            <Button onClick={() => setIsModalVisible(false)} style={{ marginRight: 8, borderRadius: 10 }}>İptal</Button>
-            <Button type="primary" htmlType="submit" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderRadius: 10 }}>Kaydet</Button>
-          </Form.Item>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 16, borderTop: '1px solid #F1F5F9' }}>
+            <Button type="default" onClick={() => setIsModalVisible(false)}>İptal</Button>
+            <Button type="primary" htmlType="submit" loading={loading} style={{ background: '#FF7A00', borderColor: '#FF7A00' }}>
+              {editingId ? 'Güncelle' : 'Oluştur'}
+            </Button>
+          </div>
         </Form>
       </Modal>
     </div>
