@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, message, Card, Button, Modal, Form, Input, Switch, Space, Popconfirm, Tag, Row, Col, Statistic, Divider } from 'antd';
+import { Table, Typography, message, Card, Button, Modal, Form, Input, Switch, Space, Popconfirm, Tag, Row, Col, Divider } from 'antd';
 import { DatabaseOutlined, PlusOutlined, EditOutlined, DeleteOutlined, ApartmentOutlined, EnvironmentOutlined, UserOutlined, FireOutlined, BulbOutlined } from '@ant-design/icons';
 import api from '../services/api';
 import { KPICard } from '../components/charts/DashboardCharts';

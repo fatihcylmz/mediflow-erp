@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Table, Typography, message, Card, Button, Modal, Form, Input,
   Select, DatePicker, Tag, Space, Popconfirm, InputNumber, Row, Col,
-  Drawer, Divider, Badge, Descriptions, Empty, Tooltip, Statistic
+  Drawer, Divider, Badge, Descriptions, Empty, Tooltip
 } from 'antd';
 import {
   ShoppingOutlined, CheckCircleOutlined, SyncOutlined, CloseCircleOutlined,

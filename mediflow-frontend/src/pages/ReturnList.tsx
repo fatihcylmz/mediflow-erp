@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, message, Card, Button, Modal, Form, Input, Select, DatePicker, Tag, Space, Popconfirm, InputNumber, Row, Col, Badge, Statistic } from 'antd';
+import { Table, Typography, message, Card, Button, Modal, Form, Input, Select, DatePicker, Tag, Space, Popconfirm, InputNumber, Row, Col, Badge } from 'antd';
 import {
   RollbackOutlined, PlusOutlined, EditOutlined, DeleteOutlined,
   CheckCircleOutlined, SyncOutlined, CheckOutlined, CloseCircleOutlined,

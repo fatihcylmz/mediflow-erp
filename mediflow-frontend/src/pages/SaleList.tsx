@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, message, Card, Button, Modal, Form, Select, DatePicker, Space, Popconfirm, InputNumber, Row, Col, Statistic } from 'antd';
+import { Table, Typography, message, Card, Button, Modal, Form, Select, DatePicker, Space, Popconfirm, InputNumber, Row, Col } from 'antd';
 import { ShoppingCartOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UnorderedListOutlined, WarningOutlined, CheckCircleOutlined, ClockCircleOutlined, DollarOutlined, FileProtectOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
