@@ -8,6 +8,8 @@ public class InvoiceDto : FullAuditedEntityDto<Guid>
 {
     public Guid PharmacyId { get; set; }
     public string? PharmacyName { get; set; } // [D5] N+1 önleme
+    public Guid? WarehouseId { get; set; } // Depo bazlı B2B tedarik zinciri muhatabı
+    public string? WarehouseName { get; set; } // Depo adı (N+1 önleme)
     public Guid ShipmentId { get; set; }
     public string? ShipmentTrackingNumber { get; set; } // [D5]
     public string InvoiceNumber { get; set; }

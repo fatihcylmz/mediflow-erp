@@ -7,6 +7,7 @@ namespace MediFlow.Invoices;
 public class CreateUpdateInvoiceDto
 {
     public Guid PharmacyId { get; set; }
+    public Guid? WarehouseId { get; set; } // Depo bazlı B2B tedarik zinciri muhatabı
     public Guid ShipmentId { get; set; }
 
     [Required]

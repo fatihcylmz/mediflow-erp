@@ -233,7 +233,24 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
 
         await _warehouseRepository.InsertAsync(new Warehouse
         {
-            Name = "Merkez Depo - İstanbul Anadolu"
+            Name = "Ana Lojistik Dağıtım Merkezi",
+            LocationAddress = "Tuzla, İstanbul",
+            ManagerName = "Depo Yöneticisi 1",
+            HasColdStorage = true
+        }, autoSave: true);
+        await _warehouseRepository.InsertAsync(new Warehouse
+        {
+            Name = "Marmara Merkez Depo",
+            LocationAddress = "Gebze, Kocaeli",
+            ManagerName = "Depo Yöneticisi 2",
+            HasColdStorage = false
+        }, autoSave: true);
+        await _warehouseRepository.InsertAsync(new Warehouse
+        {
+            Name = "İstanbul Merkez Depo",
+            LocationAddress = "Esenyurt, İstanbul",
+            ManagerName = "Depo Yöneticisi 3",
+            HasColdStorage = true
         }, autoSave: true);
     }
 
@@ -252,28 +269,28 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
         if (drugs.Count < 3 || suppliers.Count < 3 || !warehouses.Any()) return;
 
         var now = DateTime.Today;
-        var batches = new List<(int DrugIdx, string LotNo, decimal Price, int Qty, DateTime ExpDate, int SupIdx)>
+        var batches = new List<(int DrugIdx, string LotNo, decimal Price, int Qty, DateTime ExpDate, int SupIdx, int WhIdx)>
         {
-            (0, "LOT-PND-2024-001", 42.00m, 200, now.AddMonths(18), 0),
-            (0, "LOT-PND-2024-002", 44.50m, 150, now.AddMonths(24), 1),
-            (1, "LOT-ADV-2024-001", 35.00m, 120, now.AddMonths(15), 2),
-            (1, "LOT-ADV-2024-002", 37.25m, 80, now.AddMonths(20), 0),
-            (2, "LOT-AUG-2024-001", 110.00m, 60, now.AddMonths(12), 1),
-            (2, "LOT-AUG-2024-002", 115.50m, 90, now.AddMonths(18), 3),
-            (3, "LOT-ASP-2024-001", 20.00m, 300, now.AddMonths(30), 2),
-            (4, "LOT-PRL-2024-001", 80.00m, 100, now.AddMonths(24), 0),
-            (5, "LOT-MET-2024-001", 60.00m, 150, now.AddMonths(16), 3),
-            (6, "LOT-ATV-2024-001", 140.00m, 70, now.AddMonths(22), 4),
-            (7, "LOT-ENS-2024-001", 90.00m, 80, now.AddMonths(18), 1),
-            (8, "LOT-LOS-2024-001", 105.00m, 60, now.AddMonths(20), 2),
-            (9, "LOT-LVT-2024-001", 50.00m, 100, now.AddMonths(26), 4)
+            (0, "LOT-PND-2024-001", 42.00m, 200, now.AddMonths(18), 0, 0),
+            (0, "LOT-PND-2024-002", 44.50m, 150, now.AddMonths(24), 1, 1),
+            (1, "LOT-ADV-2024-001", 35.00m, 120, now.AddMonths(15), 2, 0),
+            (1, "LOT-ADV-2024-002", 37.25m, 80, now.AddMonths(20), 0, 2),
+            (2, "LOT-AUG-2024-001", 110.00m, 60, now.AddMonths(12), 1, 1),
+            (2, "LOT-AUG-2024-002", 115.50m, 90, now.AddMonths(18), 3, 2),
+            (3, "LOT-ASP-2024-001", 20.00m, 300, now.AddMonths(30), 2, 0),
+            (4, "LOT-PRL-2024-001", 80.00m, 100, now.AddMonths(24), 0, 1),
+            (5, "LOT-MET-2024-001", 60.00m, 150, now.AddMonths(16), 3, 2),
+            (6, "LOT-ATV-2024-001", 140.00m, 70, now.AddMonths(22), 4, 0),
+            (7, "LOT-ENS-2024-001", 90.00m, 80, now.AddMonths(18), 1, 1),
+            (8, "LOT-LOS-2024-001", 105.00m, 60, now.AddMonths(20), 2, 2),
+            (9, "LOT-LVT-2024-001", 50.00m, 100, now.AddMonths(26), 4, 0)
         };
 
         foreach (var b in batches)
         {
             var drug = drugs[b.DrugIdx];
             var sup = suppliers[b.SupIdx];
-            var wh = warehouses[0];
+            var wh = warehouses[b.WhIdx];
 
             var sb = new StockBatch
             {
@@ -399,7 +416,7 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
     }
 
     // ─────────────────────────────────────────────────────────────────────
-    // 8. SİPARİŞ → SEVKİYAT → FATURA ZİNCİRİ
+    // 8. SİPARİŞ → SEVKİYAT → FATURA ZİNCİRİ (Depo bazlı B2B tedarik zinciri)
     // ─────────────────────────────────────────────────────────────────────
 
     private async Task SeedOrdersAndShipmentsAndInvoicesAsync()
@@ -407,29 +424,33 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
         var orders = await _orderRepository.GetListAsync();
         if (orders.Any()) return;
 
-        var pharmacies = await _pharmacyRepository.GetListAsync();
+        var warehouses = await _warehouseRepository.GetListAsync();
         var customers = await _customerRepository.GetListAsync();
         var batches = await _stockBatchRepository.GetListAsync();
 
-        if (pharmacies.Count < 3 || customers.Count < 3 || batches.Count < 5) return;
+        if (warehouses.Count < 3 || customers.Count < 3 || batches.Count < 5) return;
 
         var now = DateTime.Today;
 
-        // Sipariş 1 → Şifa Eczanesi
+        // Sipariş 1 → Ana Lojistik Dağıtım Merkezi
         var order1 = new Order
         {
-            PharmacyId = pharmacies[0].Id,
+            PharmacyId = Guid.Empty, // Depo bazlı B2B: eczane değil depo muhatap
             CustomerId = customers[0].Id,
+            WarehouseId = warehouses[0].Id,
+            WarehouseName = warehouses[0].Name,
             OrderNumber = "ORD-2024-001",
             OrderDate = now.AddDays(-10),
             Status = OrderStatus.Fulfilled,
-            Notes = "Rutin sipariş"
+            Notes = "Rutin depoda mal siparişi"
         };
         await _orderRepository.InsertAsync(order1, autoSave: true);
 
         var ship1 = new Shipment
         {
-            PharmacyId = pharmacies[0].Id,
+            PharmacyId = Guid.Empty,
+            WarehouseId = warehouses[0].Id,
+            WarehouseName = warehouses[0].Name,
             OrderId = order1.Id,
             TrackingNumber = "SHP-2024-001",
             ShipmentDate = now.AddDays(-9),
@@ -440,7 +461,9 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
 
         var inv1 = new Invoice
         {
-            PharmacyId = pharmacies[0].Id,
+            PharmacyId = Guid.Empty,
+            WarehouseId = warehouses[0].Id,
+            WarehouseName = warehouses[0].Name,
             ShipmentId = ship1.Id,
             InvoiceNumber = "INV-2024-001",
             IssueDate = now.AddDays(-8),
@@ -452,21 +475,25 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
         };
         await _invoiceRepository.InsertAsync(inv1, autoSave: true);
 
-        // Sipariş 2 → Hayat Eczanesi
+        // Sipariş 2 → Marmara Merkez Depo
         var order2 = new Order
         {
-            PharmacyId = pharmacies[1].Id,
+            PharmacyId = Guid.Empty,
             CustomerId = customers[1].Id,
+            WarehouseId = warehouses[1].Id,
+            WarehouseName = warehouses[1].Name,
             OrderNumber = "ORD-2024-002",
             OrderDate = now.AddDays(-7),
             Status = OrderStatus.Fulfilled,
-            Notes = "Acil sipariş"
+            Notes = "Acil depoda mal siparişi"
         };
         await _orderRepository.InsertAsync(order2, autoSave: true);
 
         var ship2 = new Shipment
         {
-            PharmacyId = pharmacies[1].Id,
+            PharmacyId = Guid.Empty,
+            WarehouseId = warehouses[1].Id,
+            WarehouseName = warehouses[1].Name,
             OrderId = order2.Id,
             TrackingNumber = "SHP-2024-002",
             ShipmentDate = now.AddDays(-6),
@@ -477,7 +504,9 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
 
         var inv2 = new Invoice
         {
-            PharmacyId = pharmacies[1].Id,
+            PharmacyId = Guid.Empty,
+            WarehouseId = warehouses[1].Id,
+            WarehouseName = warehouses[1].Name,
             ShipmentId = ship2.Id,
             InvoiceNumber = "INV-2024-002",
             IssueDate = now.AddDays(-5),
@@ -489,21 +518,25 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
         };
         await _invoiceRepository.InsertAsync(inv2, autoSave: true);
 
-        // Sipariş 3 → Sağlık Eczanesi
+        // Sipariş 3 → İstanbul Merkez Depo
         var order3 = new Order
         {
-            PharmacyId = pharmacies[2].Id,
+            PharmacyId = Guid.Empty,
             CustomerId = customers[2].Id,
+            WarehouseId = warehouses[2].Id,
+            WarehouseName = warehouses[2].Name,
             OrderNumber = "ORD-2024-003",
             OrderDate = now.AddDays(-4),
             Status = OrderStatus.Fulfilled,
-            Notes = "Aylık stok yenileme"
+            Notes = "Aylık stok yenileme (depo bazlı)"
         };
         await _orderRepository.InsertAsync(order3, autoSave: true);
 
         var ship3 = new Shipment
         {
-            PharmacyId = pharmacies[2].Id,
+            PharmacyId = Guid.Empty,
+            WarehouseId = warehouses[2].Id,
+            WarehouseName = warehouses[2].Name,
             OrderId = order3.Id,
             TrackingNumber = "SHP-2024-003",
             ShipmentDate = now.AddDays(-3),
@@ -514,7 +547,9 @@ public class PharmaDataSeedContributor : IDataSeedContributor, ITransientDepende
 
         var inv3 = new Invoice
         {
-            PharmacyId = pharmacies[2].Id,
+            PharmacyId = Guid.Empty,
+            WarehouseId = warehouses[2].Id,
+            WarehouseName = warehouses[2].Name,
             ShipmentId = ship3.Id,
             InvoiceNumber = "INV-2024-003",
             IssueDate = now.AddDays(-2),

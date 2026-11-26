@@ -8,7 +8,7 @@ import {
   ShoppingOutlined, CheckCircleOutlined, SyncOutlined, CloseCircleOutlined,
   PlusOutlined, EditOutlined, DeleteOutlined, WarningOutlined, SaveOutlined,
   MinusCircleOutlined, CheckOutlined, InboxOutlined, ShoppingCartOutlined,
-  CarOutlined, ClockCircleOutlined
+  CarOutlined, ClockCircleOutlined, FileTextOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
@@ -19,6 +19,8 @@ const { Title, Text } = Typography;
 interface Order {
   id: string;
   pharmacyId: string;
+  warehouseId?: string;
+  warehouseName?: string;
   orderNumber: string;
   orderDate: string;
   status: number;
@@ -49,6 +51,9 @@ interface StockBatch {
 
 interface Pharmacy { id: string; name: string; }
 interface Drug { id: string; name: string; }
+interface Warehouse { id: string; name: string; locationAddress?: string; }
+
+const isSupplier = () => localStorage.getItem('role') === 'supplier';
 
 export default function OrderList() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -56,6 +61,7 @@ export default function OrderList() {
   const [stockBatches, setStockBatches] = useState<StockBatch[]>([]);
   const [pharmacies, setPharmacies] = useState<Pharmacy[]>([]);
   const [drugs, setDrugs] = useState<Drug[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
@@ -78,18 +84,20 @@ export default function OrderList() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [orderRes, pharmRes, drugRes, itemsRes, stockRes] = await Promise.all([
+      const [orderRes, pharmRes, drugRes, itemsRes, stockRes, warehouseRes] = await Promise.all([
         api.get('/api/app/order'),
         api.get('/api/app/pharmacy').catch(() => ({ data: { items: [] } })),
         api.get('/api/app/drug').catch(() => ({ data: { items: [] } })),
         api.get('/api/app/order-item').catch(() => ({ data: { items: [] } })),
-        api.get('/api/app/stock-batch').catch(() => ({ data: { items: [] } }))
+        api.get('/api/app/stock-batch').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/warehouse').catch(() => ({ data: { items: [] } }))
       ]);
       setOrders(orderRes.data.items || []);
       setPharmacies(pharmRes.data.items || []);
       setDrugs(drugRes.data.items || []);
       setAllOrderItems(itemsRes.data.items || []);
       setStockBatches(stockRes.data.items || []);
+      setWarehouses(warehouseRes.data.items || []);
     } catch (error: any) {
       const errorMsg = error.response?.data?.error?.message || 'Sipariş ve stok verileri yüklenirken bir hata oluştu.';
       message.error(errorMsg);
@@ -179,6 +187,7 @@ export default function OrderList() {
       const items = values.items || [];
       const orderPayload = {
         pharmacyId: values.pharmacyId,
+        warehouseId: values.warehouseId,
         orderNumber: values.orderNumber,
         orderDate: values.orderDate ? values.orderDate.toISOString() : null,
         status: values.status ?? 0,
@@ -361,6 +370,13 @@ export default function OrderList() {
     }
   };
 
+  const getCounterpartyName = (record: Order) => {
+    if (isSupplier()) {
+      return record.warehouseName || 'Bilinmeyen Depo';
+    }
+    return pharmacies.find(p => p.id === record.pharmacyId)?.name || 'Bilinmeyen';
+  };
+
   const renderDrugOptions = () => drugs.map(d => {
     const availStock = getAvailableStockForDrug(d.id);
     return (
@@ -375,15 +391,29 @@ export default function OrderList() {
 
   const orderColumns = [
     { title: 'Sipariş No', dataIndex: 'orderNumber', key: 'orderNumber', render: (text: string, record: Order) => <Button type="link" onClick={() => showOrderDetails(record)}>{text}</Button> },
-    { title: 'Eczane', key: 'pharmacy', render: (_: any, r: Order) => <Text strong>{pharmacies.find(p => p.id === r.pharmacyId)?.name || '-'}</Text> },
+    { title: isSupplier() ? 'Sipariş Veren Depo' : 'Eczane', key: 'counterparty', render: (_: any, r: Order) => (
+      <div>
+        <Text strong>{getCounterpartyName(r)}</Text>
+        {isSupplier() && r.warehouseName && (
+          <div style={{ fontSize: 11, color: '#64748B' }}>
+            <InboxOutlined style={{ marginRight: 4, verticalAlign: 'middle' }} />
+            {r.warehouseName}
+          </div>
+        )}
+      </div>
+    )},
     { title: 'Kalem', key: 'items', render: (_: any, r: Order) => <Badge count={allOrderItems.filter(i => i.orderId === r.id).length} /> },
     { title: 'Tarih', dataIndex: 'orderDate', key: 'orderDate', render: (d: string) => d ? new Date(d).toLocaleDateString('tr-TR') : '-' },
     { title: 'Durum', dataIndex: 'status', key: 'status', render: (s: number) => getStatusTag(s) },
     { title: 'İşlemler', key: 'actions', render: (_: any, r: Order) => (
       <Space>
         <Button type="primary" icon={<ShoppingOutlined />} onClick={() => showOrderDetails(r)}>Detay</Button>
-        <Button icon={<EditOutlined />} onClick={() => showEditOrderModal(r)} />
-        <Popconfirm title="Sil?" onConfirm={() => handleOrderDelete(r.id)}><Button danger icon={<DeleteOutlined />} /></Popconfirm>
+        {!isSupplier() && (
+          <>
+            <Button icon={<EditOutlined />} onClick={() => showEditOrderModal(r)} />
+            <Popconfirm title="Sil?" onConfirm={() => handleOrderDelete(r.id)}><Button danger icon={<DeleteOutlined />} /></Popconfirm>
+          </>
+        )}
       </Space>
     )}
   ];
@@ -399,6 +429,40 @@ export default function OrderList() {
     )}
   ];
 
+  const supplierKpiCards = (
+    <Row gutter={[16, 16]} className="mb-6">
+      <Col xs={24} sm={12} lg={6}>
+        <KPICard title="Toplam Sipariş" value={orders.length} subtitle="Kayıt" color="#FF7A00" icon={<ShoppingCartOutlined />} />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KPICard title="Bekleyen" value={orders.filter((o) => o.status === 0).length} subtitle="onay bekliyor" color="#FAAD14" icon={<ClockCircleOutlined />} />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KPICard title="Onaylanan" value={orders.filter((o) => o.status === 1).length} subtitle="onaylı sipariş" color="#1D4ED8" icon={<CheckCircleOutlined />} />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KPICard title="Depoya Gönderildi" value={orders.filter((o) => o.status === 2).length} subtitle="sevk edildi" color="#7C3AED" icon={<InboxOutlined />} />
+      </Col>
+    </Row>
+  );
+
+  const defaultKpiCards = (
+    <Row gutter={[16, 16]} className="mb-6">
+      <Col xs={24} sm={12} lg={6}>
+        <KPICard title="Toplam Sipariş" value={orders.length} subtitle="Kayıt" color="#FF7A00" icon={<ShoppingCartOutlined />} />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KPICard title="Onay Bekleyen" value={orders.filter((o) => o.status === 0).length} subtitle="pending onay" color="#FAAD14" icon={<ClockCircleOutlined />} />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KPICard title="Onaylanan" value={orders.filter((o) => o.status === 1).length} subtitle="onaylı sipariş" color="#1D4ED8" icon={<CheckCircleOutlined />} />
+      </Col>
+      <Col xs={24} sm={12} lg={6}>
+        <KPICard title="Tamamlanan" value={orders.filter((o) => o.status === 2).length} subtitle="tamamlandı/sevk" color="#059669" icon={<CarOutlined />} />
+      </Col>
+    </Row>
+  );
+
   return (
     <div className="p-6 space-y-5">
       {/* Page Header */}
@@ -406,222 +470,224 @@ export default function OrderList() {
         <div>
           <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 22 }}>
             <ShoppingCartOutlined style={{ color: '#FF7A00', marginRight: 10, verticalAlign: 'middle' }} />
-            Sipariş Yönetimi
+            {isSupplier() ? 'B2B Sipariş Yönetimi' : 'Sipariş Yönetimi'}
           </h2>
-          <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>Tüm tedarik siparişlerini görüntüleyin ve yönetin.</p>
+          <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>
+            {isSupplier() ? 'Depo siparişlerini görüntüleyin ve takip edin.' : 'Tüm tedarik siparişlerini görüntüleyin ve yönetin.'}
+          </p>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={showAddOrderModal} size="large"
-          style={{ background: '#FF7A00', borderColor: '#FF7A00', borderRadius: 10 }}>
-          Yeni Sipariş
-        </Button>
+        {!isSupplier() && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={showAddOrderModal} size="large"
+            style={{ background: '#FF7A00', borderColor: '#FF7A00', borderRadius: 10 }}>
+            Yeni Sipariş
+          </Button>
+        )}
       </div>
 
       {/* KPI Cards - Modern White Surface */}
-      <Row gutter={[16, 16]} className="mb-6">
-        <Col xs={24} sm={12} lg={6}>
-          <KPICard title="Toplam Sipariş" value={orders.length} subtitle="Kayıt" color="#FF7A00" icon={<ShoppingCartOutlined />} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <KPICard title="Onay Bekleyen" value={orders.filter((o) => o.status === 0).length} subtitle="pending onay" color="#FAAD14" icon={<ClockCircleOutlined />} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <KPICard title="Onaylanan" value={orders.filter((o) => o.status === 1).length} subtitle="onaylı sipariş" color="#1D4ED8" icon={<CheckCircleOutlined />} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <KPICard title="Tamamlanan" value={orders.filter((o) => o.status === 2).length} subtitle="tamamlandı/sevk" color="#059669" icon={<CarOutlined />} />
-        </Col>
-      </Row>
+      {isSupplier() ? supplierKpiCards : defaultKpiCards}
 
       {/* Table Card */}
       <Card
         className="shadow-sm rounded-xl overflow-hidden"
         styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '16px 20px' }, body: { padding: 0 } }}
-        title={<span style={{ fontSize: 15, fontWeight: 600, color: '#0F172A' }}>Sipariş Listesi</span>}
+        title={<span style={{ fontSize: 15, fontWeight: 600, color: '#0F172A' }}>{isSupplier() ? 'Depo Sipariş Listesi' : 'Sipariş Listesi'}</span>}
       >
         <Table dataSource={orders} columns={orderColumns} rowKey="id" loading={loading} bordered={false} size="middle" locale={{ emptyText: <Text type="secondary">Henüz sipariş kaydı bulunmuyor.</Text> }} />
       </Card>
 
-      {/* ANA SİPARİŞ MODALI */}
-      <Modal
-        title={editingOrderId ? "Sipariş Bilgilerini Düzenle" : "Yeni Sipariş ve İçerik Oluştur"}
-        open={isOrderModalVisible}
-        onCancel={() => setIsOrderModalVisible(false)}
-        width={780}
-        footer={null}
-      >
-        <Form form={orderForm} layout="vertical" onFinish={handleOrderSave}>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="pharmacyId" label="Siparişi Veren Eczane" rules={[{ required: true, message: 'Eczane seçiniz' }]}>
-                <Select placeholder="Eczane Seçin" showSearch optionFilterProp="children">
-                  {pharmacies.map(p => <Select.Option key={p.id} value={p.id}>{p.name}</Select.Option>)}
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="orderNumber" label="Sipariş Numarası" rules={[{ required: true, max: 50 }]}>
-                <Input placeholder="ORD-2026-001" />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name="orderDate" label="Sipariş Tarihi" rules={[{ required: true }]}>
-                <DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-          </Row>
+      {!isSupplier() && (
+        <>
+          {/* ANA SİPARİŞ MODALI */}
+          <Modal
+            title={editingOrderId ? "Sipariş Bilgilerini Düzenle" : "Yeni Sipariş ve İçerik Oluştur"}
+            open={isOrderModalVisible}
+            onCancel={() => setIsOrderModalVisible(false)}
+            width={780}
+            footer={null}
+          >
+            <Form form={orderForm} layout="vertical" onFinish={handleOrderSave}>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item name="pharmacyId" label="Siparişi Veren Eczane" rules={[{ required: true, message: 'Eczane seçiniz' }]}>
+                    <Select placeholder="Eczane Seçin" showSearch optionFilterProp="children">
+                      {pharmacies.map(p => <Select.Option key={p.id} value={p.id}>{p.name}</Select.Option>)}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item name="warehouseId" label="Hedef Depo" rules={[{ required: true, message: 'Depo seçiniz' }]}>
+                    <Select placeholder="Depo Seçin" showSearch optionFilterProp="children">
+                      {warehouses.map(w => <Select.Option key={w.id} value={w.id}>{w.name}</Select.Option>)}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={6}>
+                  <Form.Item name="orderNumber" label="Sipariş Numarası" rules={[{ required: true, max: 50 }]}>
+                    <Input placeholder="ORD-2026-001" />
+                  </Form.Item>
+                </Col>
+                <Col span={6}>
+                  <Form.Item name="orderDate" label="Sipariş Tarihi" rules={[{ required: true }]}>
+                    <DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-          <Row gutter={16}>
-            {editingOrderId && (
-              <Col span={8}>
-                <Form.Item name="status" label="Sipariş Durumu">
-                  <Select>
-                    <Select.Option value={0}>Bekliyor</Select.Option>
-                    <Select.Option value={1}>Onaylandı</Select.Option>
-                    <Select.Option value={2}>Tamamlandı/Sevk Edildi</Select.Option>
-                    <Select.Option value={3}>İptal Edildi</Select.Option>
-                    <Select.Option value={4}>Kısmi Onaylandı</Select.Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            )}
-            <Col span={editingOrderId ? 16 : 24}>
-              <Form.Item name="notes" label="Sipariş Notu">
-                <Input placeholder="Örn: Acil sevkiyat, soğuk zincir dikkat vb." />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          {!editingOrderId && (
-            <>
-              <Divider style={{ margin: '12px 0' }}>Sipariş Edilecek İlaçlar (Canlı Depo Stoklu)</Divider>
-              <Form.List name="items">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map(({ key, name, ...restField }) => (
-                      <Row key={key} gutter={12} align="middle" style={{ marginBottom: 8 }}>
-                        <Col span={15}>
-                          <Form.Item
-                            {...restField}
-                            name={[name, 'drugId']}
-                            rules={[{ required: true, message: 'İlaç seçin' }]}
-                            style={{ marginBottom: 0 }}
-                          >
-                            <Select
-                              placeholder="İlaç Seçin (Anlık Stok Gösterimli)"
-                              showSearch
-                              optionFilterProp="label"
-                            >
-                              {renderDrugOptions()}
-                            </Select>
-                          </Form.Item>
-                        </Col>
-                        <Col span={7}>
-                          <Form.Item
-                            {...restField}
-                            name={[name, 'requestedQuantity']}
-                            rules={[{ required: true, message: 'Miktar girin' }]}
-                            style={{ marginBottom: 0 }}
-                          >
-                            <InputNumber placeholder="Kutu Adedi" min={1} style={{ width: '100%' }} suffix="Kutu" />
-                          </Form.Item>
-                        </Col>
-                        <Col span={2} style={{ textAlign: 'center' }}>
-                          {fields.length > 1 && (
-                            <MinusCircleOutlined
-                              onClick={() => remove(name)}
-                              style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }}
-                            />
-                          )}
-                        </Col>
-                      </Row>
-                    ))}
-                    <Form.Item style={{ marginTop: 12 }}>
-                      <Button type="dashed" onClick={() => add({ requestedQuantity: 10 })} block icon={<PlusOutlined />}>
-                        Başka İlaç Satırı Ekle
-                      </Button>
+              <Row gutter={16}>
+                {editingOrderId && (
+                  <Col span={8}>
+                    <Form.Item name="status" label="Sipariş Durumu">
+                      <Select>
+                        <Select.Option value={0}>Bekliyor</Select.Option>
+                        <Select.Option value={1}>Onaylandı</Select.Option>
+                        <Select.Option value={2}>Tamamlandı/Sevk Edildi</Select.Option>
+                        <Select.Option value={3}>İptal Edildi</Select.Option>
+                        <Select.Option value={4}>Kısmi Onaylandı</Select.Option>
+                      </Select>
                     </Form.Item>
-                  </>
+                  </Col>
                 )}
-              </Form.List>
-            </>
-          )}
+                <Col span={editingOrderId ? 16 : 24}>
+                  <Form.Item name="notes" label="Sipariş Notu">
+                    <Input placeholder="Örn: Acil sevkiyat, soğuk zincir dikkat vb." />
+                  </Form.Item>
+                </Col>
+              </Row>
 
-          <Form.Item style={{ textAlign: 'right', margin: '16px 0 0 0' }}>
-            <Button onClick={() => setIsOrderModalVisible(false)} style={{ marginRight: '8px' }}>İptal</Button>
-            <Button type="primary" htmlType="submit" loading={submitting}>
-              {editingOrderId ? 'Güncelle' : 'Siparişi ve Kalemleri Oluştur'}
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+              {!editingOrderId && (
+                <>
+                  <Divider style={{ margin: '12px 0' }}>Sipariş Edilecek İlaçlar (Canlı Depo Stoklu)</Divider>
+                  <Form.List name="items">
+                    {(fields, { add, remove }) => (
+                      <>
+                        {fields.map(({ key, name, ...restField }) => (
+                          <Row key={key} gutter={12} align="middle" style={{ marginBottom: 8 }}>
+                            <Col span={15}>
+                              <Form.Item
+                                {...restField}
+                                name={[name, 'drugId']}
+                                rules={[{ required: true, message: 'İlaç seçin' }]}
+                                style={{ marginBottom: 0 }}
+                              >
+                                <Select
+                                  placeholder="İlaç Seçin (Anlık Stok Gösterimli)"
+                                  showSearch
+                                  optionFilterProp="label"
+                                >
+                                  {renderDrugOptions()}
+                                </Select>
+                              </Form.Item>
+                            </Col>
+                            <Col span={7}>
+                              <Form.Item
+                                {...restField}
+                                name={[name, 'requestedQuantity']}
+                                rules={[{ required: true, message: 'Miktar girin' }]}
+                                style={{ marginBottom: 0 }}
+                              >
+                                <InputNumber placeholder="Kutu Adedi" min={1} style={{ width: '100%' }} suffix="Kutu" />
+                              </Form.Item>
+                            </Col>
+                            <Col span={2} style={{ textAlign: 'center' }}>
+                              {fields.length > 1 && (
+                                <MinusCircleOutlined
+                                  onClick={() => remove(name)}
+                                  style={{ color: '#ff4d4f', fontSize: 18, cursor: 'pointer' }}
+                                />
+                              )}
+                            </Col>
+                          </Row>
+                        ))}
+                        <Form.Item style={{ marginTop: 12 }}>
+                          <Button type="dashed" onClick={() => add({ requestedQuantity: 10 })} block icon={<PlusOutlined />}>
+                            Başka İlaç Satırı Ekle
+                          </Button>
+                        </Form.Item>
+                      </>
+                    )}
+                  </Form.List>
+                </>
+              )}
 
-      {/* DETAY DRAWER */}
-      <Drawer
-        title={selectedOrder ? `${selectedOrder.orderNumber} - Sipariş ve Stok Onay Yönetimi` : 'Sipariş Detayları'}
-        open={isDetailDrawerVisible}
-        onClose={() => setIsDetailDrawerVisible(false)}
-        width={880}
-        extra={
-          orderItems.length > 0 && (
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              loading={loadingItems}
-              disabled={loadingItems}
-              onClick={handleApproveAllItems}
-              style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderColor: 'transparent', borderRadius: 10 }}
-            >
-              Stok Dahilinde Tümünü Onayla
-            </Button>
-          )
-        }
-      >
-        {selectedOrder && (
-          <>
-            <Descriptions bordered size="small" column={2} style={{ marginBottom: 20 }}>
-              <Descriptions.Item label="Eczane">
-                <Text strong>{pharmacies.find(p => p.id === selectedOrder.pharmacyId)?.name || '-'}</Text>
-              </Descriptions.Item>
-              <Descriptions.Item label="Sipariş Durumu">
-                {getStatusTag(selectedOrder.status)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Sipariş Tarihi">
-                {selectedOrder.orderDate ? new Date(selectedOrder.orderDate).toLocaleDateString('tr-TR') : '-'}
-              </Descriptions.Item>
-              <Descriptions.Item label="Notlar">
-                {selectedOrder.notes || '-'}
-              </Descriptions.Item>
-            </Descriptions>
+              <Form.Item style={{ textAlign: 'right', margin: '16px 0 0 0' }}>
+                <Button onClick={() => setIsOrderModalVisible(false)} style={{ marginRight: '8px' }}>İptal</Button>
+                <Button type="primary" htmlType="submit" loading={submitting}>
+                  {editingOrderId ? 'Güncelle' : 'Siparişi ve Kalemleri Oluştur'}
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
 
-            <Card size="small" title="Siparişe Yeni İlaç Ekle" style={{ marginBottom: 16, background: '#fafafa' }}>
-              <Form form={itemForm} layout="inline" onFinish={handleAddItem}>
-                <Form.Item name="drugId" rules={[{ required: true, message: 'İlaç Seçin' }]} style={{ flex: 1 }}>
-                  <Select placeholder="İlaç Seçin (Canlı Stok)" style={{ width: '100%' }} showSearch optionFilterProp="label">
-                    {renderDrugOptions()}
-                  </Select>
-                </Form.Item>
-                <Form.Item name="requestedQuantity" rules={[{ required: true, message: 'Miktar' }]}>
-                  <InputNumber placeholder="Miktar" min={1} style={{ width: 140 }} suffix="Kutu" />
-                </Form.Item>
-                <Form.Item style={{ marginRight: 0 }}>
-                  <Button type="primary" htmlType="submit" icon={<PlusOutlined />} disabled={loadingItems}>Ekle</Button>
-                </Form.Item>
-              </Form>
-            </Card>
+          {/* DETAY DRAWER */}
+          <Drawer
+            title={selectedOrder ? `${selectedOrder.orderNumber} - Sipariş ve Stok Onay Yönetimi` : 'Sipariş Detayları'}
+            open={isDetailDrawerVisible}
+            onClose={() => setIsDetailDrawerVisible(false)}
+            width={880}
+            extra={
+              orderItems.length > 0 && (
+                <Button
+                  type="primary"
+                  icon={<CheckOutlined />}
+                  loading={loadingItems}
+                  disabled={loadingItems}
+                  onClick={handleApproveAllItems}
+                  style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderColor: 'transparent', borderRadius: 10 }}
+                >
+                  Stok Dahilinde Tümünü Onayla
+                </Button>
+              )
+            }
+          >
+            {selectedOrder && (
+              <>
+                <Descriptions bordered size="small" column={2} style={{ marginBottom: 20 }}>
+                  <Descriptions.Item label={isSupplier() ? 'Sipariş Veren Depo' : 'Eczane'}>
+                    <Text strong>{getCounterpartyName(selectedOrder)}</Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Sipariş Durumu">
+                    {getStatusTag(selectedOrder.status)}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Sipariş Tarihi">
+                    {selectedOrder.orderDate ? new Date(selectedOrder.orderDate).toLocaleDateString('tr-TR') : '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Notlar">
+                    {selectedOrder.notes || '-'}
+                  </Descriptions.Item>
+                </Descriptions>
 
-            <Table
-              dataSource={orderItems}
-              columns={itemColumns}
-              rowKey="id"
-              pagination={false}
-              size="middle"
-              loading={loadingItems}
-              bordered
-              locale={{ emptyText: <Empty description="Bu siparişte henüz ilaç kalemi bulunmuyor." /> }}
-            />
-          </>
-        )}
-      </Drawer>
+                <Card size="small" title="Siparişe Yeni İlaç Ekle" style={{ marginBottom: 16, background: '#fafafa' }}>
+                  <Form form={itemForm} layout="inline" onFinish={handleAddItem}>
+                    <Form.Item name="drugId" rules={[{ required: true, message: 'İlaç Seçin' }]} style={{ flex: 1 }}>
+                      <Select placeholder="İlaç Seçin (Canlı Stok)" style={{ width: '100%' }} showSearch optionFilterProp="label">
+                        {renderDrugOptions()}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item name="requestedQuantity" rules={[{ required: true, message: 'Miktar' }]}>
+                      <InputNumber placeholder="Miktar" min={1} style={{ width: 140 }} suffix="Kutu" />
+                    </Form.Item>
+                    <Form.Item style={{ marginRight: 0 }}>
+                      <Button type="primary" htmlType="submit" icon={<PlusOutlined />} disabled={loadingItems}>Ekle</Button>
+                    </Form.Item>
+                  </Form>
+                </Card>
+
+                <Table
+                  dataSource={orderItems}
+                  columns={itemColumns}
+                  rowKey="id"
+                  pagination={false}
+                  size="middle"
+                  loading={loadingItems}
+                  bordered
+                  locale={{ emptyText: <Empty description="Bu siparişte henüz ilaç kalemi bulunmuyor." /> }}
+                />
+              </>
+            )}
+          </Drawer>
+        </>
+      )}
     </div>
   );
 }

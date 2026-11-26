@@ -11,6 +11,7 @@ using MediFlow.Orders;
 using MediFlow.Pricing;
 using MediFlow.Inventories;
 using MediFlow.Services;
+using MediFlow.Warehouses;
 
 namespace MediFlow.Invoices;
 
@@ -25,6 +26,7 @@ public class InvoiceAppService : CrudAppService<
     private readonly IRepository<OrderItem, Guid> _orderItemRepository;
     private readonly IRepository<DrugPriceHistory, Guid> _drugPriceHistoryRepository;
     private readonly IRepository<StockMovementLog, Guid> _stockMovementLogRepository;
+    private readonly IRepository<Warehouse, Guid> _warehouseRepository;
     private readonly PriceValidationService _priceValidationService;
 
     public InvoiceAppService(
@@ -33,12 +35,14 @@ public class InvoiceAppService : CrudAppService<
         IRepository<OrderItem, Guid> orderItemRepository,
         IRepository<DrugPriceHistory, Guid> drugPriceHistoryRepository,
         IRepository<StockMovementLog, Guid> stockMovementLogRepository,
+        IRepository<Warehouse, Guid> warehouseRepository,
         PriceValidationService priceValidationService) : base(repository)
     {
         _shipmentRepository = shipmentRepository;
         _orderItemRepository = orderItemRepository;
         _drugPriceHistoryRepository = drugPriceHistoryRepository;
         _stockMovementLogRepository = stockMovementLogRepository;
+        _warehouseRepository = warehouseRepository;
         _priceValidationService = priceValidationService;
     }
 
@@ -51,7 +55,8 @@ public class InvoiceAppService : CrudAppService<
     {
         var queryable = await Repository.WithDetailsAsync(x => x.Items);
         var entity = await AsyncExecuter.FirstOrDefaultAsync(queryable, x => x.Id == id);
-        return ObjectMapper.Map<Invoice, InvoiceDto>(entity);
+        var dto = ObjectMapper.Map<Invoice, InvoiceDto>(entity);
+        return await populateWarehouseName(dto);
     }
 
     [UnitOfWork]
@@ -60,6 +65,7 @@ public class InvoiceAppService : CrudAppService<
         var invoice = new Invoice
         {
             PharmacyId = input.PharmacyId,
+            WarehouseId = input.WarehouseId,
             ShipmentId = input.ShipmentId,
             InvoiceNumber = input.InvoiceNumber,
             IssueDate = input.IssuedDate,
@@ -124,7 +130,8 @@ public class InvoiceAppService : CrudAppService<
         }
 
         await Repository.InsertAsync(invoice, autoSave: true);
-        return ObjectMapper.Map<Invoice, InvoiceDto>(invoice);
+        var dto = ObjectMapper.Map<Invoice, InvoiceDto>(invoice);
+        return await populateWarehouseName(dto);
     }
 
     public override async Task<InvoiceDto> UpdateAsync(Guid id, CreateUpdateInvoiceDto input)
@@ -158,7 +165,8 @@ public class InvoiceAppService : CrudAppService<
         existingInvoice.GrandTotal = existingInvoice.SubTotal + existingInvoice.TaxTotal;
 
         await Repository.UpdateAsync(existingInvoice, autoSave: true);
-        return ObjectMapper.Map<Invoice, InvoiceDto>(existingInvoice);
+        var dto = ObjectMapper.Map<Invoice, InvoiceDto>(existingInvoice);
+        return await populateWarehouseName(dto);
     }
 
     public override async Task DeleteAsync(Guid id)
@@ -201,5 +209,16 @@ public class InvoiceAppService : CrudAppService<
 
         invoice.Status = InvoiceStatus.Cancelled;
         await Repository.UpdateAsync(invoice);
+    }
+
+    // Depo adını DTO'ya doldurur (N+1 önleme)
+    private async Task<InvoiceDto> populateWarehouseName(InvoiceDto dto)
+    {
+        if (dto != null && dto.WarehouseId.HasValue)
+        {
+            var warehouse = await _warehouseRepository.FirstOrDefaultAsync(w => w.Id == dto.WarehouseId.Value);
+            dto.WarehouseName = warehouse?.Name;
+        }
+        return dto;
     }
 }

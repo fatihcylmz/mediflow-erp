@@ -10,6 +10,7 @@ using Volo.Abp.Uow;
 using MediFlow.Inventories;
 using MediFlow.Pharmacies;
 using MediFlow.Orders;
+using MediFlow.Warehouses;
 
 namespace MediFlow.Shipments
 {
@@ -26,6 +27,7 @@ namespace MediFlow.Shipments
         private readonly IRepository<StockMovementLog, Guid> _stockMovementLogRepository;
         private readonly IRepository<PharmacyStock, Guid> _pharmacyStockRepository;
         private readonly IRepository<ShipmentItem, Guid> _shipmentItemRepository;
+        private readonly IRepository<Warehouse, Guid> _warehouseRepository;
 
         public ShipmentAppService(
             IRepository<Shipment, Guid> repository,
@@ -33,13 +35,15 @@ namespace MediFlow.Shipments
             IRepository<StockBatch, Guid> stockBatchRepository,
             IRepository<StockMovementLog, Guid> stockMovementLogRepository,
             IRepository<PharmacyStock, Guid> pharmacyStockRepository,
-            IRepository<ShipmentItem, Guid> shipmentItemRepository) : base(repository)
+            IRepository<ShipmentItem, Guid> shipmentItemRepository,
+            IRepository<Warehouse, Guid> warehouseRepository) : base(repository)
         {
             _orderItemRepository = orderItemRepository;
             _stockBatchRepository = stockBatchRepository;
             _stockMovementLogRepository = stockMovementLogRepository;
             _pharmacyStockRepository = pharmacyStockRepository;
             _shipmentItemRepository = shipmentItemRepository;
+            _warehouseRepository = warehouseRepository;
         }
 
         // İŞ KURALI: Teslim edilmiş sevkiyatın silinmesini engelle
@@ -70,7 +74,8 @@ namespace MediFlow.Shipments
                 await TransferStockToPharmacyAsync(shipment);
             }
 
-            return result;
+            // Depo adını doldur (N+1 önleme)
+            return await populateWarehouseName(result);
         }
 
         [UnitOfWork]
@@ -90,7 +95,18 @@ namespace MediFlow.Shipments
                 await TransferStockToPharmacyAsync(shipment);
             }
 
-            return result;
+            return await populateWarehouseName(result);
+        }
+
+        // Depo adını DTO'ya doldurur (N+1 önleme)
+        private async Task<ShipmentDto> populateWarehouseName(ShipmentDto dto)
+        {
+            if (dto != null && dto.WarehouseId.HasValue)
+            {
+                var warehouse = await _warehouseRepository.FirstOrDefaultAsync(w => w.Id == dto.WarehouseId.Value);
+                dto.WarehouseName = warehouse?.Name;
+            }
+            return dto;
         }
 
         /// <summary>

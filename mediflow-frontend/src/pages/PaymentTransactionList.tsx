@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Table, Typography, message, Card, Button, Modal, Form, Input, InputNumber, Select, Space, Popconfirm, Tag, Descriptions, Row, Col } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, DollarOutlined, CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, PieChartOutlined, LineChartOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, DollarOutlined, CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined, PieChartOutlined, LineChartOutlined, StopOutlined, ExclamationCircleOutlined, InboxOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
 import { DonutChart, KPICard } from '../components/charts/DashboardCharts';
@@ -34,12 +34,23 @@ interface Invoice {
   invoiceNumber: string;
   grandTotal: number;
   status: number;
+  warehouseId?: string;
+  warehouseName?: string;
 }
+
+interface Warehouse {
+  id: string;
+  name: string;
+  locationAddress?: string;
+}
+
+const isSupplier = () => localStorage.getItem('role') === 'supplier';
 
 export default function PaymentTransactionList() {
   const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [form] = Form.useForm();
@@ -50,14 +61,16 @@ export default function PaymentTransactionList() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [txRes, methodRes, invoiceRes] = await Promise.all([
+      const [txRes, methodRes, invoiceRes, warehouseRes] = await Promise.all([
         api.get('/api/app/payment-transaction'),
         api.get('/api/app/payment-method').catch(() => ({ data: { items: [] } })),
-        api.get('/api/app/invoice').catch(() => ({ data: { items: [] } }))
+        api.get('/api/app/invoice').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/warehouse').catch(() => ({ data: { items: [] } }))
       ]);
       setTransactions(txRes.data.items || []);
       setMethods(methodRes.data.items || []);
       setInvoices(invoiceRes.data.items || []);
+      setWarehouses(warehouseRes.data.items || []);
     } catch (error: any) {
       const errorMsg = error.response?.data?.message || 'Ödeme kayıtları yüklenirken hata oluştu.';
       message.error(errorMsg);
@@ -158,19 +171,58 @@ export default function PaymentTransactionList() {
     return Array.from(map.values());
   }, [transactions]);
 
+  // Warehouse distribution for supplier
+  const warehouseDistribution = useMemo(() => {
+    const map = new Map<string, { name: string; value: number }>();
+    transactions.forEach(t => {
+      const inv = invoices.find(i => i.id === t.invoiceId);
+      const warehouseId = inv?.warehouseId;
+      const warehouseName = inv?.warehouseName || (warehouseId ? warehouses.find(w => w.id === warehouseId)?.name : 'Bilinmeyen');
+      const name = warehouseName || 'Bilinmeyen Depo';
+      const existing = map.get(name);
+      map.set(name, { name, value: (existing?.value || 0) + (t.amount || 0) });
+    });
+    return Array.from(map.values());
+  }, [transactions, invoices, warehouses]);
+
+  const getInvoiceDisplay = (invoiceId: string) => {
+    const inv = invoices.find(i => i.id === invoiceId);
+    if (!inv) return <Text type="secondary">{invoiceId?.slice(0, 8)}...</Text>;
+    return (
+      <div>
+        <Text strong style={{ color: '#1D4ED8' }}>{inv.invoiceNumber}</Text>
+        {isSupplier() && inv.warehouseName && (
+          <div style={{ fontSize: 11, color: '#64748B' }}>
+            <InboxOutlined style={{ marginRight: 4, verticalAlign: 'middle' }} />
+            {inv.warehouseName}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const getCounterpartyName = (invoice: Invoice | undefined) => {
+    if (!invoice) return 'Bilinmeyen';
+    if (isSupplier()) {
+      return invoice.warehouseName || 'Bilinmeyen Depo';
+    }
+    return invoice.invoiceNumber; // fallback for non-supplier
+  };
+
   const columns = [
     {
-      title: 'Fatura No',
+      title: 'Fatura Bilgisi',
       key: 'invoice',
-      render: (_: any, r: PaymentTransaction) => {
-        const inv = invoices.find(i => i.id === r.invoiceId);
-        return inv ? <Text strong style={{ color: '#1D4ED8' }}>{inv.invoiceNumber}</Text> : <Text type="secondary">{r.invoiceId?.slice(0, 8)}...</Text>;
-      }
+      render: (_: any, r: PaymentTransaction) => getInvoiceDisplay(r.invoiceId)
     },
     {
-      title: 'Ödeme Yöntemi',
-      key: 'method',
+      title: isSupplier() ? 'Ödeyen Depo' : 'Ödeme Yöntemi',
+      key: 'counterparty',
       render: (_: any, r: PaymentTransaction) => {
+        const inv = invoices.find(i => i.id === r.invoiceId);
+        if (isSupplier() && inv?.warehouseName) {
+          return <Tag color="geekblue" icon={<InboxOutlined />}>{inv.warehouseName}</Tag>;
+        }
         const m = methods.find(m => m.id === r.paymentMethodId);
         return m ? <Tag color="geekblue">{m.name}</Tag> : <Text type="secondary">-</Text>;
       }
@@ -222,16 +274,105 @@ export default function PaymentTransactionList() {
       key: 'actions',
       render: (_: any, r: PaymentTransaction) => (
         <Space>
-          <Button size="small" icon={<EditOutlined />} onClick={() => showEditModal(r)} />
-          <Popconfirm title="Bu ödeme kaydını silmek istediğinize emin misiniz?" onConfirm={() => handleDelete(r.id)}>
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          {!isSupplier() && (
+            <Button size="small" icon={<EditOutlined />} onClick={() => showEditModal(r)} />
+          )}
+          {!isSupplier() && (
+            <Popconfirm title="Bu ödeme kaydını silmek istediğinize emin misiniz?" onConfirm={() => handleDelete(r.id)}>
+              <Button size="small" danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          )}
         </Space>
       )
     }
   ];
 
   const currencyFormat = (value: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value);
+
+  const supplierKpiCards = (
+    <Row gutter={[16, 16]} className="mb-6">
+      <Col xs={24} sm={12} md={6}>
+        <KPICard
+          title="Toplam İşlem"
+          value={transactions.length}
+          subtitle="Kayıt"
+          color="#FF7A00"
+          icon={<DollarOutlined />}
+        />
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <KPICard
+          title="Toplam Tutar"
+          value={currencyFormat(totalAmount)}
+          subtitle="İşlem hacmi"
+          color="#1D4ED8"
+          icon={<DollarOutlined />}
+        />
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <KPICard
+          title="Tamamlanan"
+          value={completedCount}
+          subtitle="Başarılı tahsilat"
+          color="#059669"
+          icon={<CheckCircleOutlined />}
+        />
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <KPICard
+          title="Depoya Gönderildi"
+          value={transactions.filter(t => {
+            const inv = invoices.find(i => i.id === t.invoiceId);
+            return inv?.warehouseId && t.status === 1;
+          }).length}
+          subtitle="depoya ödendi"
+          color="#7C3AED"
+          icon={<InboxOutlined />}
+        />
+      </Col>
+    </Row>
+  );
+
+  const defaultKpiCards = (
+    <Row gutter={[16, 16]} className="mb-6">
+      <Col xs={24} sm={12} md={6}>
+        <KPICard
+          title="Toplam İşlem"
+          value={transactions.length}
+          subtitle="Kayıt"
+          color="#FF7A00"
+          icon={<DollarOutlined />}
+        />
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <KPICard
+          title="Toplam Tutar"
+          value={currencyFormat(totalAmount)}
+          subtitle="İşlem hacmi"
+          color="#1D4ED8"
+          icon={<DollarOutlined />}
+        />
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <KPICard
+          title="Tamamlanan"
+          value={completedCount}
+          subtitle="Başarılı işlem"
+          color="#059669"
+          icon={<CheckCircleOutlined />}
+        />
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <KPICard
+          title="Bekleyen"
+          value={pendingCount}
+          subtitle="Onay bekliyor"
+          color="#FAAD14"
+          icon={<ClockCircleOutlined />}
+        />
+      </Col>
+    </Row>
+  );
 
   return (
     <div style={{ padding: '24px', height: '100%' }}>
@@ -240,55 +381,22 @@ export default function PaymentTransactionList() {
         <div>
           <h2 style={{ color: '#0F172A', fontWeight: 700, margin: 0, fontSize: 22 }}>
             <DollarOutlined style={{ color: '#FF7A00', marginRight: 10, verticalAlign: 'middle' }} />
-            Ödeme İşlemleri
+            {isSupplier() ? 'B2B Tahsilat İşlemleri' : 'Ödeme İşlemleri'}
           </h2>
-          <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>Tahsilat ve ödeme kayıtlarını görüntüleyin, yönetin ve analiz edin.</p>
+          <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>
+            {isSupplier() ? 'Depo ödemelerini görüntüleyin ve analiz edin.' : 'Tahsilat ve ödeme kayıtlarını görüntüleyin, yönetin ve analiz edin.'}
+          </p>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large"
-          style={{ background: 'linear-gradient(135deg, #FF7A00, #FF9E4D)', borderColor: 'transparent', borderRadius: 10 }}>
-          Yeni Ödeme Kaydı
-        </Button>
+        {!isSupplier() && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={showAddModal} size="large"
+            style={{ background: 'linear-gradient(135deg, #FF7A00, #FF9E4D)', borderColor: 'transparent', borderRadius: 10 }}>
+            Yeni Ödeme Kaydı
+          </Button>
+        )}
       </div>
 
       {/* KPI Cards - Modern White Surface */}
-      <Row gutter={[16, 16]} className="mb-6">
-        <Col xs={24} sm={12} md={6}>
-          <KPICard
-            title="Toplam İşlem"
-            value={transactions.length}
-            subtitle="Kayıt"
-            color="#FF7A00"
-            icon={<DollarOutlined />}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <KPICard
-            title="Toplam Tutar"
-            value={currencyFormat(totalAmount)}
-            subtitle="İşlem hacmi"
-            color="#1D4ED8"
-            icon={<DollarOutlined />}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <KPICard
-            title="Tamamlanan"
-            value={completedCount}
-            subtitle="Başarılı işlem"
-            color="#059669"
-            icon={<CheckCircleOutlined />}
-          />
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <KPICard
-            title="Bekleyen"
-            value={pendingCount}
-            subtitle="Onay bekliyor"
-            color="#FAAD14"
-            icon={<ClockCircleOutlined />}
-          />
-        </Col>
-      </Row>
+      {isSupplier() ? supplierKpiCards : defaultKpiCards}
 
       {/* Charts Row - Donut Charts */}
       <Row gutter={[16, 16]} className="mb-6">
@@ -297,7 +405,7 @@ export default function PaymentTransactionList() {
           <Card
             className="shadow-sm rounded-xl overflow-hidden"
             styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
-            title={<div className="flex items-center gap-2"><PieChartOutlined style={{ color: '#7C3AED' }} /><span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Ödeme Yöntemi Dağılımı</span></div>}
+            title={<div className="flex items-center gap-2"><PieChartOutlined style={{ color: '#7C3AED' }} /><span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>{isSupplier() ? 'Ödeme Yöntemi Dağılımı' : 'Ödeme Yöntemi Dağılımı'}</span></div>}
           >
             <div style={{ height: 280 }}>
               {loading ? (
@@ -316,15 +424,17 @@ export default function PaymentTransactionList() {
           <Card
             className="shadow-sm rounded-xl overflow-hidden"
             styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '12px 20px' }, body: { padding: '16px 20px' } }}
-            title={<div className="flex items-center gap-2"><LineChartOutlined style={{ color: '#059669' }} /><span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>Tahsilat Durumu Dağılımı</span></div>}
+            title={<div className="flex items-center gap-2"><LineChartOutlined style={{ color: '#059669' }} /><span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>{isSupplier() ? 'Depo Tahsilat Dağılımı' : 'Tahsilat Durumu Dağılımı'}</span></div>}
           >
             <div style={{ height: 280 }}>
               {loading ? (
                 <div className="flex h-full items-center justify-center"><div className="text-slate-400">Yükleniyor...</div></div>
+              ) : isSupplier() && warehouseDistribution.length > 0 ? (
+                <DonutChart data={warehouseDistribution} title="TOPLAM" size={160} />
               ) : statusDistribution.length > 0 ? (
                 <DonutChart data={statusDistribution} title="TOPLAM" size={160} />
               ) : (
-                <div className="flex h-full items-center justify-center text-slate-400">Durum verisi yok</div>
+                <div className="flex h-full items-center justify-center text-slate-400">Veri yok</div>
               )}
             </div>
           </Card>
@@ -335,7 +445,7 @@ export default function PaymentTransactionList() {
       <Card
         className="shadow-sm rounded-xl overflow-hidden"
         styles={{ header: { borderBottom: '1px solid #F1F5F9', padding: '16px 20px' }, body: { padding: 0 } }}
-        title={<div style={{ fontSize: 15, fontWeight: 600, color: '#0F172A' }}>Ödeme İşlemleri Listesi</div>}
+        title={<div style={{ fontSize: 15, fontWeight: 600, color: '#0F172A' }}>{isSupplier() ? 'Depo Tahsilat Listesi' : 'Ödeme İşlemleri Listesi'}</div>}
       >
         <Table
           dataSource={transactions}
@@ -345,75 +455,79 @@ export default function PaymentTransactionList() {
           bordered={false}
           size="middle"
           pagination={{ pageSize: 15, showSizeChanger: true }}
-          locale={{ emptyText: <Text type="secondary">Ödeme kaydı bulunmuyor.</Text> }}
+          locale={{ emptyText: <Text type="secondary">{isSupplier() ? 'Depo tahsilat kaydı bulunmuyor.' : 'Ödeme kaydı bulunmuyor.'}</Text> }}
         />
       </Card>
 
-      {/* MODAL */}
-      <Modal
-        title={editingId ? "Ödeme Kaydını Düzenle" : "Yeni Ödeme Kaydı Oluştur"}
-        open={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={null}
-        width={650}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item name="invoiceId" label="Fatura" rules={[{ required: true, message: 'Fatura seçiniz' }]}>
-            <Select placeholder="Fatura Seçin" showSearch optionFilterProp="children">
-              {invoices.filter(i => i.status !== 1).map(inv => (
-                <Select.Option key={inv.id} value={inv.id}>
-                  {inv.invoiceNumber} - {currencyFormat(inv.grandTotal)}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+      {!isSupplier() && (
+        <>
+          {/* MODAL */}
+          <Modal
+            title={editingId ? "Ödeme Kaydını Düzenle" : "Yeni Ödeme Kaydı Oluştur"}
+            open={isModalVisible}
+            onCancel={() => setIsModalVisible(false)}
+            footer={null}
+            width={650}
+          >
+            <Form form={form} layout="vertical" onFinish={handleSubmit}>
+              <Form.Item name="invoiceId" label="Fatura" rules={[{ required: true, message: 'Fatura seçiniz' }]}>
+                <Select placeholder="Fatura Seçin" showSearch optionFilterProp="children">
+                  {invoices.filter(i => i.status !== 1).map(inv => (
+                    <Select.Option key={inv.id} value={inv.id}>
+                      {inv.invoiceNumber} - {currencyFormat(inv.grandTotal)}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
 
-          <Form.Item name="paymentMethodId" label="Ödeme Yöntemi" rules={[{ required: true, message: 'Ödeme yöntemi seçiniz' }]}>
-            <Select placeholder="Ödeme Yöntemi Seçin" showSearch optionFilterProp="children">
-              {methods.filter(m => m.isActive).map(m => (
-                <Select.Option key={m.id} value={m.id}>{m.name} {(m.feePercentage ? `(${m.feePercentage}% ücret)` : '')}</Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
+              <Form.Item name="paymentMethodId" label="Ödeme Yöntemi" rules={[{ required: true, message: 'Ödeme yöntemi seçiniz' }]}>
+                <Select placeholder="Ödeme Yöntemi Seçin" showSearch optionFilterProp="children">
+                  {methods.filter(m => m.isActive).map(m => (
+                    <Select.Option key={m.id} value={m.id}>{m.name} {(m.feePercentage ? `(${m.feePercentage}% ücret)` : '')}</Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
 
-          <Form.Item name="amount" label="Tutar (₺)" rules={[{ required: true, message: 'Tutar giriniz' }]}>
-            <InputNumber precision={2} min={0.01} style={{ width: '100%' }} />
-          </Form.Item>
+              <Form.Item name="amount" label="Tutar (₺)" rules={[{ required: true, message: 'Tutar giriniz' }]}>
+                <InputNumber precision={2} min={0.01} style={{ width: '100%' }} />
+              </Form.Item>
 
-          <Form.Item name="feeAmount" label="İşlem Ücreti (₺)">
-            <InputNumber precision={2} min={0} style={{ width: '100%' }} />
-          </Form.Item>
+              <Form.Item name="feeAmount" label="İşlem Ücreti (₺)">
+                <InputNumber precision={2} min={0} style={{ width: '100%' }} />
+              </Form.Item>
 
-          <Form.Item name="paymentDate" label="Ödeme Tarihi" rules={[{ required: true, message: 'Tarih seçiniz' }]}>
-            <Select.Option key="now" value={dayjs().format('YYYY-MM-DDTHH:mm:ss')}>Şimdi</Select.Option>
-          </Form.Item>
+              <Form.Item name="paymentDate" label="Ödeme Tarihi" rules={[{ required: true, message: 'Tarih seçiniz' }]}>
+                <Select.Option key="now" value={dayjs().format('YYYY-MM-DDTHH:mm:ss')}>Şimdi</Select.Option>
+              </Form.Item>
 
-          <Form.Item name="transactionReference" label="Referans / İşlem No">
-            <Input placeholder="Banka referans numarası vb." style={{ width: '100%' }} />
-          </Form.Item>
+              <Form.Item name="transactionReference" label="Referans / İşlem No">
+                <Input placeholder="Banka referans numarası vb." style={{ width: '100%' }} />
+              </Form.Item>
 
-          <Form.Item name="status" label="Durum" rules={[{ required: true, message: 'Durum seçiniz' }]}>
-            <Select placeholder="Durum Seçin" style={{ width: '100%' }}>
-              <Select.Option value={0}>Beklemede</Select.Option>
-              <Select.Option value={1}>Tamamlandı</Select.Option>
-              <Select.Option value={2}>Başarısız</Select.Option>
-              <Select.Option value={3}>İade Edildi</Select.Option>
-              <Select.Option value={4}>İptal Edildi</Select.Option>
-            </Select>
-          </Form.Item>
+              <Form.Item name="status" label="Durum" rules={[{ required: true, message: 'Durum seçiniz' }]}>
+                <Select placeholder="Durum Seçin" style={{ width: '100%' }}>
+                  <Select.Option value={0}>Beklemede</Select.Option>
+                  <Select.Option value={1}>Tamamlandı</Select.Option>
+                  <Select.Option value={2}>Başarısız</Select.Option>
+                  <Select.Option value={3}>İade Edildi</Select.Option>
+                  <Select.Option value={4}>İptal Edildi</Select.Option>
+                </Select>
+              </Form.Item>
 
-          <Form.Item name="notes" label="Notlar">
-            <Input.TextArea rows={3} placeholder="İsteğe bağlı notlar..." style={{ width: '100%' }} />
-          </Form.Item>
+              <Form.Item name="notes" label="Notlar">
+                <Input.TextArea rows={3} placeholder="İsteğe bağlı notlar..." style={{ width: '100%' }} />
+              </Form.Item>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 16, borderTop: '1px solid #F1F5F9' }}>
-            <Button type="default" onClick={() => setIsModalVisible(false)}>İptal</Button>
-            <Button type="primary" htmlType="submit" loading={loading} style={{ background: '#FF7A00', borderColor: '#FF7A00' }}>
-              {editingId ? 'Güncelle' : 'Oluştur'}
-            </Button>
-          </div>
-        </Form>
-      </Modal>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 16, borderTop: '1px solid #F1F5F9' }}>
+                <Button type="default" onClick={() => setIsModalVisible(false)}>İptal</Button>
+                <Button type="primary" htmlType="submit" loading={loading} style={{ background: '#FF7A00', borderColor: '#FF7A00' }}>
+                  {editingId ? 'Güncelle' : 'Oluştur'}
+                </Button>
+              </div>
+            </Form>
+          </Modal>
+        </>
+      )}
     </div>
   );
 }

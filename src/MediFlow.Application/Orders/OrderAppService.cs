@@ -58,6 +58,7 @@ namespace MediFlow.Orders
             {
                 PharmacyId = input.PharmacyId,
                 CustomerId = input.CustomerId,
+                WarehouseId = input.WarehouseId,
                 OrderNumber = input.OrderNumber,
                 OrderDate = input.OrderDate,
                 Status = input.Status,
@@ -128,13 +129,18 @@ namespace MediFlow.Orders
             await Repository.UpdateAsync(order);
         }
 
-        // [D5] 在返回 DTO 时补齐 PharmacyName / CustomerName，避免前端 N+1 查询
+        // [D5] 在返回 DTO 时补齐 PharmacyName / CustomerName / WarehouseName，避免前端 N+1 查询
         private async Task<OrderDto> populateNames(OrderDto dto)
         {
             if (dto != null)
             {
                 var pharmacy = await _pharmacyRepository.FirstOrDefaultAsync(p => p.Id == dto.PharmacyId);
                 dto.PharmacyName = pharmacy?.Name;
+                if (dto.WarehouseId.HasValue)
+                {
+                    var warehouse = await _warehouseRepository.FirstOrDefaultAsync(w => w.Id == dto.WarehouseId.Value);
+                    dto.WarehouseName = warehouse?.Name;
+                }
             }
             return dto;
         }

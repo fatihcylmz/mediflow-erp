@@ -8,6 +8,7 @@ public class CreateUpdateOrderDto
 {
     public Guid PharmacyId { get; set; }
     public Guid? CustomerId { get; set; }
+    public Guid? WarehouseId { get; set; } // Depo bazlı B2B tedarik zinciri muhatabı
 
     [Required]
     [StringLength(50)]

@@ -7,16 +7,18 @@ namespace MediFlow.Invoices;
 public class Invoice : FullAuditedAggregateRoot<Guid>
 {
     public Guid PharmacyId { get; set; }
+    public Guid? WarehouseId { get; set; } // Depo bazlı B2B tedarik zinciri muhatabı
+    public string? WarehouseName { get; set; } // Depo adı (N+1 önleme)
     public Guid ShipmentId { get; set; } // Hangi teslimatın faturası?
-    
+
     public string InvoiceNumber { get; set; } // Resmi Fatura/e-Arşiv Numarası
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; } // Son ödeme tarihi (Vade)
-    
+
     public decimal SubTotal { get; set; } // Vergisiz Tutar
     public decimal TaxTotal { get; set; } // Toplam KDV
     public decimal GrandTotal { get; set; } // Genel Toplam
-    
+
     public InvoiceStatus Status { get; set; }
 
     // Eklenen kısımlar:

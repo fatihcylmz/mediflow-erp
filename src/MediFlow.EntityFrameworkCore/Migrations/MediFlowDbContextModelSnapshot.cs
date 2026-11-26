@@ -19,7 +19,7 @@ namespace MediFlow.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.PostgreSql)
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -505,7 +505,15 @@ namespace MediFlow.Migrations
                     b.Property<decimal>("TaxTotal")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("WarehouseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("WarehouseName")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("AppInvoices", (string)null);
                 });
@@ -641,11 +649,19 @@ namespace MediFlow.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("WarehouseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("WarehouseName")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderNumber");
 
                     b.HasIndex("PharmacyId");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("AppOrders", (string)null);
                 });
@@ -1447,7 +1463,15 @@ namespace MediFlow.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<Guid?>("WarehouseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("WarehouseName")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("AppShipments", (string)null);
                 });
@@ -3543,6 +3567,14 @@ namespace MediFlow.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MediFlow.Invoices.Invoice", b =>
+                {
+                    b.HasOne("MediFlow.Warehouses.Warehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("MediFlow.Invoices.InvoiceItem", b =>
                 {
                     b.HasOne("MediFlow.Invoices.Invoice", null)
@@ -3550,6 +3582,14 @@ namespace MediFlow.Migrations
                         .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MediFlow.Orders.Order", b =>
+                {
+                    b.HasOne("MediFlow.Warehouses.Warehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("MediFlow.Orders.OrderItem", b =>
@@ -3592,6 +3632,14 @@ namespace MediFlow.Migrations
                     b.HasOne("MediFlow.Invoices.Invoice", null)
                         .WithMany()
                         .HasForeignKey("InvoiceId");
+                });
+
+            modelBuilder.Entity("MediFlow.Shipments.Shipment", b =>
+                {
+                    b.HasOne("MediFlow.Warehouses.Warehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLogAction", b =>

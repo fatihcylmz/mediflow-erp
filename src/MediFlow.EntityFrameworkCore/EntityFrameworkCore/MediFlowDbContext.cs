@@ -223,6 +223,8 @@ using MediFlow.Payment;
                 b.Property(x => x.OrderNumber).IsRequired().HasMaxLength(50);
                 b.HasIndex(x => x.OrderNumber);
                 b.HasIndex(x => x.PharmacyId);
+                b.HasIndex(x => x.WarehouseId);
+                b.HasOne<Warehouse>().WithMany().HasForeignKey(x => x.WarehouseId).OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<OrderItem>(b =>
@@ -247,6 +249,8 @@ using MediFlow.Payment;
                 b.ToTable(MediFlowConsts.DbTablePrefix + "Shipments", MediFlowConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.TrackingNumber).HasMaxLength(100);
+                b.HasIndex(x => x.WarehouseId);
+                b.HasOne<Warehouse>().WithMany().HasForeignKey(x => x.WarehouseId).OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<ShipmentItem>(b =>
@@ -300,6 +304,8 @@ using MediFlow.Payment;
                 b.Property(x => x.SubTotal).HasColumnType("decimal(18,2)");
                 b.Property(x => x.TaxTotal).HasColumnType("decimal(18,2)");
                 b.Property(x => x.GrandTotal).HasColumnType("decimal(18,2)");
+                b.HasIndex(x => x.WarehouseId);
+                b.HasOne<Warehouse>().WithMany().HasForeignKey(x => x.WarehouseId).OnDelete(DeleteBehavior.Restrict);
             });
             builder.Entity<InvoiceItem>(b =>
             {
