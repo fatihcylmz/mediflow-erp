@@ -344,7 +344,7 @@ export default function DrugList() {
       {/* Header Section - Modern Cards */}
       <Card
         className="rounded-xl shadow-sm border-0 bg-white"
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: { padding: 0 } }}
       >
         <div style={{ padding: 24, borderBottom: '1px solid #f1f5f9' }}>
           <Row justify="space-between" align="middle">
@@ -522,7 +522,7 @@ export default function DrugList() {
           <Row gutter={20}>
             <Col span={6}>
               <Form.Item name="dosage" label={<span style={{ fontWeight: 600 }}>Dozaj</span>}>
-                <InputNumber style={{ width: '100%', borderRadius: 10 }} step={0.01} min={0} size="large" addonAfter="mg" />
+                <InputNumber style={{ width: '100%', borderRadius: 10 }} step={0.01} min={0} size="large" suffix="mg" />
               </Form.Item>
             </Col>
             <Col span={6}>
@@ -544,7 +544,7 @@ export default function DrugList() {
             </Col>
             <Col span={6}>
               <Form.Item name="minimumStockLevel" label={<span style={{ fontWeight: 600 }}>Min. Stok</span>}>
-                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={0} size="large" addonAfter="adet" />
+                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={0} size="large" suffix="adet" />
               </Form.Item>
             </Col>
           </Row>
@@ -552,7 +552,7 @@ export default function DrugList() {
           <Row gutter={20}>
             <Col span={12}>
               <Form.Item name="shelfLifeInMonths" label={<span style={{ fontWeight: 600 }}>Raf Ömrü (Ay)</span>}>
-                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={1} size="large" addonAfter="ay" />
+                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={1} size="large" suffix="ay" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -599,7 +599,7 @@ export default function DrugList() {
               <Select placeholder="Etken Madde Seç" style={{ width: 220 }} showSearch optionFilterProp="children" size="large" options={ingredients.map(i => ({ value: i.id, label: i.name }))} />
             </Form.Item>
             <Form.Item name="amount" rules={[{ required: true, message: 'Miktar' }]}>
-              <InputNumber placeholder="Miktar" min={0} step={0.01} style={{ width: 120 }} size="large" addonAfter="mg" />
+              <InputNumber placeholder="Miktar" min={0} step={0.01} style={{ width: 120 }} size="large" suffix="mg" />
             </Form.Item>
             <Form.Item name="unit" rules={[{ required: true, message: 'Birim' }]}>
               <Select placeholder="Birim" style={{ width: 100 }} size="large" options={[

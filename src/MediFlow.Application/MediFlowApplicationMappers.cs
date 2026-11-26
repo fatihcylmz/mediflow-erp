@@ -644,3 +644,43 @@ public partial class CreateUpdatePaymentMethodDtoToPaymentMethodMapper : MapperB
     public override partial void Map(CreateUpdatePaymentMethodDto source, PaymentMethod destination);
 }
 
+// PaymentTransaction Mappers — 500 kök nedeni: List<PaymentTransaction> -> List<PaymentTransactionDto>
+// eşlemesi Mapperly'de tanımsızdı ("No object mapping was found" → /api/app/payment-transaction 500).
+[Mapper]
+public partial class PaymentTransactionToPaymentTransactionDtoMapper : MapperBase<PaymentTransaction, PaymentTransactionDto>
+{
+    [MapperIgnoreSource(nameof(PaymentTransaction.ExtraProperties))]
+    [MapperIgnoreSource(nameof(PaymentTransaction.ConcurrencyStamp))]
+    [MapperIgnoreSource(nameof(PaymentTransaction.Invoice))]
+    [MapperIgnoreSource(nameof(PaymentTransaction.PaymentMethod))]
+    public override partial PaymentTransactionDto Map(PaymentTransaction source);
+
+    [MapperIgnoreSource(nameof(PaymentTransaction.ExtraProperties))]
+    [MapperIgnoreSource(nameof(PaymentTransaction.ConcurrencyStamp))]
+    [MapperIgnoreSource(nameof(PaymentTransaction.Invoice))]
+    [MapperIgnoreSource(nameof(PaymentTransaction.PaymentMethod))]
+    public override partial void Map(PaymentTransaction source, PaymentTransactionDto destination);
+}
+
+[Mapper]
+public partial class CreateUpdatePaymentTransactionDtoToPaymentTransactionMapper : MapperBase<CreateUpdatePaymentTransactionDto, PaymentTransaction>
+{
+    [MapperIgnoreTarget(nameof(PaymentTransaction.Id))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.ExtraProperties))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.ConcurrencyStamp))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.FeeAmount))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.NetAmount))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.Invoice))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.PaymentMethod))]
+    public override partial PaymentTransaction Map(CreateUpdatePaymentTransactionDto source);
+
+    [MapperIgnoreTarget(nameof(PaymentTransaction.Id))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.ExtraProperties))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.ConcurrencyStamp))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.FeeAmount))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.NetAmount))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.Invoice))]
+    [MapperIgnoreTarget(nameof(PaymentTransaction.PaymentMethod))]
+    public override partial void Map(CreateUpdatePaymentTransactionDto source, PaymentTransaction destination);
+}
+

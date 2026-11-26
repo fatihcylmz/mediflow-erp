@@ -65,10 +65,10 @@ export default function ShipmentList() {
       setLoading(true);
       const [shipRes, pharmRes, orderRes, drugRes, itemRes] = await Promise.all([
         api.get('/api/app/shipment'),
-        api.get('/api/app/pharmacy'),
-        api.get('/api/app/order'),
-        api.get('/api/app/drug'),
-        api.get('/api/app/order-item')
+        api.get('/api/app/pharmacy').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/order').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/drug').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/order-item').catch(() => ({ data: { items: [] } }))
       ]);
       setShipments(shipRes.data.items || []);
       setPharmacies(pharmRes.data.items || []);

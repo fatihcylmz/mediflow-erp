@@ -168,7 +168,7 @@ export default function IngredientList() {
   return (
     <div className="space-y-4">
       {/* Header Section */}
-      <Card className="rounded-xl shadow-sm border-0 bg-white" bodyStyle={{ padding: 0 }}>
+      <Card className="rounded-xl shadow-sm border-0 bg-white" styles={{ body: { padding: 0 } }}>
         <div style={{ padding: 24, borderBottom: '1px solid #f1f5f9' }}>
           <Row justify="space-between" align="middle">
             <Col>

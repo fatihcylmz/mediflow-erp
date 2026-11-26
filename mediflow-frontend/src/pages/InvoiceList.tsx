@@ -57,9 +57,9 @@ export default function InvoiceList() {
       setLoading(true);
       const [invoiceRes, pharmacyRes, shipmentRes, drugRes] = await Promise.all([
         api.get('/api/app/invoice'),
-        api.get('/api/app/pharmacy'),
-        api.get('/api/app/shipment'),
-        api.get('/api/app/drug')
+        api.get('/api/app/pharmacy').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/shipment').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/drug').catch(() => ({ data: { items: [] } }))
       ]);
       setInvoices(invoiceRes.data.items || []);
       setPharmacies(pharmacyRes.data.items || []);
@@ -291,7 +291,7 @@ export default function InvoiceList() {
       {/* Header Section - Modern Cards */}
       <Card
         className="rounded-xl shadow-sm border-0 bg-white"
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: { padding: 0 } }}
       >
         <div style={{ padding: 24, borderBottom: '1px solid #f1f5f9' }}>
           <Row justify="space-between" align="middle">
@@ -469,17 +469,17 @@ export default function InvoiceList() {
           <Row gutter={20}>
             <Col span={8}>
               <Form.Item name="subTotal" label={<span style={{ fontWeight: 600 }}>Ara Toplam</span>} rules={[{ required: true, message: 'Ara toplam zorunludur!' }]}>
-                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={0} step={0.01} size="large" addonAfter="₺" />
+                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={0} step={0.01} size="large" suffix="₺" />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item name="taxTotal" label={<span style={{ fontWeight: 600 }}>KDV</span>} rules={[{ required: true, message: 'KDV zorunludur!' }]}>
-                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={0} step={0.01} size="large" addonAfter="₊" />
+                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={0} step={0.01} size="large" suffix="₊" />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item name="grandTotal" label={<span style={{ fontWeight: 600 }}>Genel Toplam</span>} rules={[{ required: true, message: 'Genel toplam zorunludur!' }]}>
-                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={0} step={0.01} size="large" addonAfter="₺" />
+                <InputNumber style={{ width: '100%', borderRadius: 10 }} min={0} step={0.01} size="large" suffix="₺" />
               </Form.Item>
             </Col>
           </Row>

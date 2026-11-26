@@ -80,10 +80,10 @@ export default function OrderList() {
       setLoading(true);
       const [orderRes, pharmRes, drugRes, itemsRes, stockRes] = await Promise.all([
         api.get('/api/app/order'),
-        api.get('/api/app/pharmacy'),
-        api.get('/api/app/drug'),
-        api.get('/api/app/order-item'),
-        api.get('/api/app/stock-batch')
+        api.get('/api/app/pharmacy').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/drug').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/order-item').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/stock-batch').catch(() => ({ data: { items: [] } }))
       ]);
       setOrders(orderRes.data.items || []);
       setPharmacies(pharmRes.data.items || []);
@@ -522,7 +522,7 @@ export default function OrderList() {
                             rules={[{ required: true, message: 'Miktar girin' }]}
                             style={{ marginBottom: 0 }}
                           >
-                            <InputNumber placeholder="Kutu Adedi" min={1} style={{ width: '100%' }} addonAfter="Kutu" />
+                            <InputNumber placeholder="Kutu Adedi" min={1} style={{ width: '100%' }} suffix="Kutu" />
                           </Form.Item>
                         </Col>
                         <Col span={2} style={{ textAlign: 'center' }}>
@@ -601,7 +601,7 @@ export default function OrderList() {
                   </Select>
                 </Form.Item>
                 <Form.Item name="requestedQuantity" rules={[{ required: true, message: 'Miktar' }]}>
-                  <InputNumber placeholder="Miktar" min={1} style={{ width: 140 }} addonAfter="Kutu" />
+                  <InputNumber placeholder="Miktar" min={1} style={{ width: 140 }} suffix="Kutu" />
                 </Form.Item>
                 <Form.Item style={{ marginRight: 0 }}>
                   <Button type="primary" htmlType="submit" icon={<PlusOutlined />} disabled={loadingItems}>Ekle</Button>

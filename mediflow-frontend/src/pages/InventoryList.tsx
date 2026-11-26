@@ -80,9 +80,9 @@ export default function InventoryList() {
       setLoading(true);
       const [stockRes, drugRes, warehouseRes, supRes] = await Promise.all([
         api.get('/api/app/stock-batch'),
-        api.get('/api/app/drug'),
-        api.get('/api/app/warehouse'),
-        api.get('/api/app/supplier')
+        api.get('/api/app/drug').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/warehouse').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/supplier').catch(() => ({ data: { items: [] } }))
       ]);
       setStockBatches(stockRes.data.items || []);
       setDrugs(drugRes.data.items || []);

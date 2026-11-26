@@ -670,10 +670,10 @@ export default function ReturnList() {
               <Form.Item name="quantity" rules={[{ required: true, message: 'Miktar' }]} style={{ flex: 1, minWidth: '110px' }}>
                 <InputNumber 
                   placeholder="Adet" 
-                  min={1} 
-                  max={selectedInvoiceItem ? selectedInvoiceItem.quantity : 1000} 
-                  style={{ width: '100%' }} 
-                  addonAfter="Kutu" 
+                  min={1}
+                  max={selectedInvoiceItem ? selectedInvoiceItem.quantity : 1000}
+                  style={{ width: '100%' }}
+                  suffix="Kutu"
                 />
               </Form.Item>
 

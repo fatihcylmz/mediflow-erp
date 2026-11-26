@@ -47,6 +47,12 @@ public class PermissionDataSeedContributor : IDataSeedContributor, ITransientDep
         await _roleManager.CreateAsync(new IdentityRole(Guid.NewGuid(), roleName, _currentTenant.Id));
     }
 
+    private static readonly string[] PermissionClaimTypes =
+    {
+        "permission",
+        "http://www.aspnetboilerplate.com/claims/permission"
+    };
+
     private async Task GrantPermissionsToRoleAsync(string roleName, List<string> permissions)
     {
         var role = await _roleManager.FindByNameAsync(roleName);
@@ -58,17 +64,29 @@ public class PermissionDataSeedContributor : IDataSeedContributor, ITransientDep
             if (role == null) return;
         }
 
+        var allowed = permissions.Distinct().ToHashSet();
         var existingClaims = await _roleManager.GetClaimsAsync(role);
-        var existingPerms = existingClaims.Where(c => c.Type == "permission").Select(c => c.Value).ToHashSet();
 
-        foreach (var perm in permissions.Distinct())
+        // Yetkili seed: bu rollerin eski seed'lardan kalan, yeni setin dışındaki
+        // permission claim'lerini (Create/Edit/Delete vb.) kaldır — fail-closed kuralı.
+        var staleClaims = existingClaims
+            .Where(c => PermissionClaimTypes.Contains(c.Type) && !allowed.Contains(c.Value))
+            .ToList();
+        foreach (var stale in staleClaims)
         {
-            if (!existingPerms.Contains(perm))
-            {
-                await _roleManager.AddClaimAsync(role, new Claim("permission", perm));
-                // Add long URI format for compatibility if needed
-                await _roleManager.AddClaimAsync(role, new Claim("http://www.aspnetboilerplate.com/claims/permission", perm));
-            }
+            await _roleManager.RemoveClaimAsync(role, stale);
+        }
+
+        var grantedPerms = existingClaims
+            .Where(c => c.Type == "permission" && allowed.Contains(c.Value))
+            .Select(c => c.Value)
+            .ToHashSet();
+
+        foreach (var perm in allowed.Where(p => !grantedPerms.Contains(p)))
+        {
+            await _roleManager.AddClaimAsync(role, new Claim("permission", perm));
+            // Add long URI format for compatibility if needed
+            await _roleManager.AddClaimAsync(role, new Claim("http://www.aspnetboilerplate.com/claims/permission", perm));
         }
     }
 
@@ -76,38 +94,50 @@ public class PermissionDataSeedContributor : IDataSeedContributor, ITransientDep
     {
         return new List<string>
         {
+            // Role dashboard'u (App.tsx PharmacyDashboard): /api/app/dashboard/trend -> DashboardTrend
             MediFlowPermissions.Dashboard,
             MediFlowPermissions.DashboardStats,
+            MediFlowPermissions.DashboardTrend,
+
+            // SALT OKUNUR (parent + View; Create/Edit/Delete KESİNLİKLE kapalı)
             MediFlowPermissions.Drugs,
             MediFlowPermissions.DrugsView,
-            // Spec: etken madde yalnızca okuma (Create/Edit/Delete KESİNLİKLE kapalı)
             MediFlowPermissions.Ingredients,
             MediFlowPermissions.IngredientsView,
-            MediFlowPermissions.Orders,
-            MediFlowPermissions.OrdersView,
-            MediFlowPermissions.OrdersCreate,
-            MediFlowPermissions.OrdersEdit,
-            MediFlowPermissions.OrdersDelete,
+            MediFlowPermissions.Pharmacies,
+            MediFlowPermissions.PharmaciesView,
+            MediFlowPermissions.Suppliers,
+            MediFlowPermissions.SuppliersView,
+            MediFlowPermissions.Warehouses,
+            MediFlowPermissions.WarehousesView,
+            MediFlowPermissions.Invoices,
+            MediFlowPermissions.InvoicesView,
+
+            // TAM YETKİ (kendi eczanesi kapsamında) — Default(parent), Create, Edit
+            // Inventories/StockBatches: GET -> InventoryView, POST/PUT/DELETE -> InventoryManage
+            MediFlowPermissions.Inventory,
+            MediFlowPermissions.InventoryView,
+            MediFlowPermissions.InventoryManage,
             MediFlowPermissions.Prescriptions,
             MediFlowPermissions.PrescriptionsView,
             MediFlowPermissions.PrescriptionsCreate,
             MediFlowPermissions.PrescriptionsEdit,
+            MediFlowPermissions.Orders,
+            MediFlowPermissions.OrdersView,
+            MediFlowPermissions.OrdersCreate,
+            MediFlowPermissions.OrdersEdit,
             MediFlowPermissions.Sales,
             MediFlowPermissions.SalesView,
             MediFlowPermissions.SalesCreate,
             MediFlowPermissions.SalesEdit,
-            MediFlowPermissions.SalesCancel,
-            MediFlowPermissions.Payments,
-            MediFlowPermissions.PaymentsView,
-            MediFlowPermissions.PaymentsCreate,
-            MediFlowPermissions.Inventory,
-            MediFlowPermissions.InventoryView,
             MediFlowPermissions.Returns,
             MediFlowPermissions.ReturnsView,
             MediFlowPermissions.ReturnsCreate,
-            MediFlowPermissions.Customers,
-            MediFlowPermissions.CustomersView,
-            MediFlowPermissions.CustomersCreate
+            MediFlowPermissions.ReturnsEdit,
+            MediFlowPermissions.Payments,
+            MediFlowPermissions.PaymentsView,
+            MediFlowPermissions.PaymentsCreate,
+            MediFlowPermissions.PaymentsEdit
         };
     }
 
@@ -117,21 +147,42 @@ public class PermissionDataSeedContributor : IDataSeedContributor, ITransientDep
         {
             MediFlowPermissions.Dashboard,
             MediFlowPermissions.DashboardStats,
+            MediFlowPermissions.DashboardTrend,
+
+            // SALT OKUNUR (parent + View)
+            MediFlowPermissions.Drugs,
+            MediFlowPermissions.DrugsView,
+            MediFlowPermissions.Ingredients,
+            MediFlowPermissions.IngredientsView,
+            MediFlowPermissions.Pharmacies,
+            MediFlowPermissions.PharmaciesView,
+            MediFlowPermissions.Warehouses,
+            MediFlowPermissions.WarehousesView,
+            // Inventories/StockBatches salt okunur: GET -> InventoryView
+            MediFlowPermissions.Inventory,
+            MediFlowPermissions.InventoryView,
+            MediFlowPermissions.Returns,
+            MediFlowPermissions.ReturnsView,
+
+            // TAM YETKİ — Orders (Default, Edit/Onay)
             MediFlowPermissions.Orders,
             MediFlowPermissions.OrdersView,
+            MediFlowPermissions.OrdersEdit,
             MediFlowPermissions.OrdersApprove,
+            // Shipments (Default, Create, Edit)
             MediFlowPermissions.Shipments,
             MediFlowPermissions.ShipmentsView,
             MediFlowPermissions.ShipmentsCreate,
             MediFlowPermissions.ShipmentsEdit,
-            MediFlowPermissions.ShipmentsDispatch,
+            // Invoices (Default, Create, Edit)
             MediFlowPermissions.Invoices,
             MediFlowPermissions.InvoicesView,
             MediFlowPermissions.InvoicesCreate,
             MediFlowPermissions.InvoicesEdit,
+            // Payments (Default, Create)
             MediFlowPermissions.Payments,
             MediFlowPermissions.PaymentsView,
-            MediFlowPermissions.DrugsView
+            MediFlowPermissions.PaymentsCreate
         };
     }
 
@@ -141,19 +192,39 @@ public class PermissionDataSeedContributor : IDataSeedContributor, ITransientDep
         {
             MediFlowPermissions.Dashboard,
             MediFlowPermissions.DashboardStats,
+            MediFlowPermissions.DashboardTrend,
+
+            // SALT OKUNUR (parent + View)
+            MediFlowPermissions.Drugs,
+            MediFlowPermissions.DrugsView,
+            MediFlowPermissions.Ingredients,
+            MediFlowPermissions.IngredientsView,
+            MediFlowPermissions.Pharmacies,
+            MediFlowPermissions.PharmaciesView,
+            MediFlowPermissions.Suppliers,
+            MediFlowPermissions.SuppliersView,
+            MediFlowPermissions.Returns,
+            MediFlowPermissions.ReturnsView,
+
+            // TAM YETKİ
+            // Warehouses.Default: class -> Warehouses, GET -> WarehousesView
+            MediFlowPermissions.Warehouses,
+            MediFlowPermissions.WarehousesView,
+            // Inventories/StockBatches (Default, Create, Edit): GET -> InventoryView, POST/PUT/DELETE -> InventoryManage
             MediFlowPermissions.Inventory,
             MediFlowPermissions.InventoryView,
             MediFlowPermissions.InventoryManage,
-            // Warehouse ayrıca siparişlerini görüp onaylayabilsin (spec: Orders açık)
+            // Orders.Default: class -> Orders, GET -> OrdersView
             MediFlowPermissions.Orders,
             MediFlowPermissions.OrdersView,
-            MediFlowPermissions.Warehouses,
-            MediFlowPermissions.WarehousesView,
+            // Shipments (Default, Create, Edit, Approve/Deliver):
+            // GET -> ShipmentsView, POST -> ShipmentsCreate,
+            // PUT(status->Delivered/Dispatch) -> ShipmentsEdit (Dispatch claim'i de tutarlılık için ekli)
             MediFlowPermissions.Shipments,
             MediFlowPermissions.ShipmentsView,
+            MediFlowPermissions.ShipmentsCreate,
             MediFlowPermissions.ShipmentsEdit,
-            MediFlowPermissions.Drugs,
-            MediFlowPermissions.DrugsView
+            MediFlowPermissions.ShipmentsDispatch
         };
     }
 
@@ -163,6 +234,7 @@ public class PermissionDataSeedContributor : IDataSeedContributor, ITransientDep
         {
             MediFlowPermissions.Dashboard,
             MediFlowPermissions.DashboardStats,
+            MediFlowPermissions.DashboardTrend,
             MediFlowPermissions.Sales,
             MediFlowPermissions.SalesView,
             MediFlowPermissions.SalesCreate,

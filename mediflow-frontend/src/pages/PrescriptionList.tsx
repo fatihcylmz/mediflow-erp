@@ -50,7 +50,7 @@ export default function PrescriptionList() {
       setLoading(true);
       const [presRes, custRes] = await Promise.all([
         api.get('/api/app/prescription'),
-        api.get('/api/app/customer')
+        api.get('/api/app/customer').catch(() => ({ data: { items: [] } }))
       ]);
       setPrescriptions(presRes.data.items || []);
       setCustomers(custRes.data.items || []);
@@ -221,7 +221,7 @@ export default function PrescriptionList() {
   return (
     <div className="space-y-4">
       {/* Header Section */}
-      <Card className="rounded-xl shadow-sm border-0 bg-white" bodyStyle={{ padding: 0 }}>
+      <Card className="rounded-xl shadow-sm border-0 bg-white" styles={{ body: { padding: 0 } }}>
         <div style={{ padding: 24, borderBottom: '1px solid #f1f5f9' }}>
           <Row justify="space-between" align="middle">
             <Col>

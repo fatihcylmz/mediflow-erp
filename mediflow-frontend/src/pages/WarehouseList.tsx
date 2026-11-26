@@ -109,7 +109,7 @@ export default function WarehouseList() {
       {/* Header Section */}
       <Card
         className="rounded-xl shadow-sm border-0 bg-white"
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: { padding: 0 } }}
       >
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9' }}>
           <Row align="middle" gutter={16}>

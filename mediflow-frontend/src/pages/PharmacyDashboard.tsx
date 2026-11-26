@@ -303,7 +303,6 @@ export default function PharmacyDashboard() {
               <Card
                 className="shadow-sm rounded-xl cursor-pointer hover:shadow-md transition-shadow"
                 styles={{ body: { padding: 0, borderRadius: 12 } }}
-                bodyStyle={{ padding: 0, borderRadius: 12 }}
                 onClick={() => navigate('/pharmacy/orders')}
               >
                 <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)' }}>
@@ -317,7 +316,6 @@ export default function PharmacyDashboard() {
               <Card
                 className="shadow-sm rounded-xl cursor-pointer hover:shadow-md transition-shadow"
                 styles={{ body: { padding: 0, borderRadius: 12 } }}
-                bodyStyle={{ padding: 0, borderRadius: 12 }}
                 onClick={() => navigate('/pharmacy/prescriptions')}
               >
                 <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #fdf4ff, #fae8ff)' }}>
@@ -331,7 +329,6 @@ export default function PharmacyDashboard() {
               <Card
                 className="shadow-sm rounded-xl cursor-pointer hover:shadow-md transition-shadow"
                 styles={{ body: { padding: 0, borderRadius: 12 } }}
-                bodyStyle={{ padding: 0, borderRadius: 12 }}
                 onClick={() => navigate('/admin/dashboard')}
               >
                 <div style={{ padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, #fef3c7, #fde68a)' }}>

@@ -74,11 +74,11 @@ export default function SaleList() {
       setLoading(true);
       const [saleRes, pharmRes, custRes, presRes, batchRes, drugRes] = await Promise.all([
         api.get('/api/app/sale'),
-        api.get('/api/app/pharmacy'),
-        api.get('/api/app/customer'),
-        api.get('/api/app/prescription'),
-        api.get('/api/app/stock-batch'), // İzlenebilirlik için Lot eşleştirmesi
-        api.get('/api/app/drug') // Lotların içindeki ilaç isimleri
+        api.get('/api/app/pharmacy').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/customer').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/prescription').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/stock-batch').catch(() => ({ data: { items: [] } })), // İzlenebilirlik için Lot eşleştirmesi
+        api.get('/api/app/drug').catch(() => ({ data: { items: [] } })) // Lotların içindeki ilaç isimleri
       ]);
       setSales(saleRes.data.items || []);
       setPharmacies(pharmRes.data.items || []);
@@ -425,7 +425,7 @@ export default function SaleList() {
           <div style={{ background: '#f5f5f5', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
              {/* DbContext kısıtlaması: decimal(18,2) -> step 0.01 */}
              <Form.Item name="totalAmount" label="Toplam Tutar" rules={[{ required: true }]} style={{ marginBottom: 0 }}>
-               <InputNumber style={{ width: '100%', fontWeight: 'bold' }} min={0} step={0.01} addonAfter="₺" />
+               <InputNumber style={{ width: '100%', fontWeight: 'bold' }} min={0} step={0.01} suffix="₺" />
              </Form.Item>
           </div>
 
@@ -460,7 +460,7 @@ export default function SaleList() {
             </Form.Item>
             {/* DbContext kısıtlaması: decimal(18,2) -> step 0.01 */}
             <Form.Item name="unitPrice" rules={[{ required: true, message: 'Birim Fiyat' }]}>
-              <InputNumber placeholder="Birim Fiyat" min={0} step={0.01} style={{ width: 150 }} addonAfter="₺" />
+              <InputNumber placeholder="Birim Fiyat" min={0} step={0.01} style={{ width: 150 }} suffix="₺" />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" icon={<PlusOutlined />}>Ekle</Button>

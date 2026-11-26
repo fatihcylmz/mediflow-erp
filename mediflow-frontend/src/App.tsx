@@ -19,6 +19,9 @@ import DrugPriceHistoryList from './pages/DrugPriceHistoryList';
 import ReturnList from './pages/ReturnList';
 import SaleList from './pages/SaleList';
 import PaymentTransactionList from './pages/PaymentTransactionList';
+import PharmacyDashboard from './pages/PharmacyDashboard';
+import SupplierDashboard from './pages/SupplierDashboard';
+import WarehouseDashboard from './pages/WarehouseDashboard';
 import UserManagementPage from './components/UserManagement/UserManagementPage';
 import AdminLayout from './layouts/AdminLayout';
 import PharmacyLayout from './layouts/PharmacyLayout';
@@ -632,8 +635,9 @@ function PharmacyPages({ page }: PageProps) {
     case 'drugs': return <DrugList />;
     case 'prescriptions': return <PrescriptionList />;
     case 'sales': return <SaleList />;
+    case 'returns': return <ReturnList />;
     case 'payments': return <PaymentTransactionList />;
-    default: return <Dashboard />;
+    default: return <PharmacyDashboard />;
   }
 }
 
@@ -642,7 +646,8 @@ function SupplierPages({ page }: PageProps) {
     case 'orders': return <OrderList />;
     case 'shipments': return <ShipmentList />;
     case 'invoices': return <InvoiceList />;
-    default: return <Dashboard />;
+    case 'payments': return <PaymentTransactionList />;
+    default: return <SupplierDashboard />;
   }
 }
 
@@ -651,7 +656,8 @@ function WarehousePages({ page }: PageProps) {
     case 'warehouses': return <WarehouseList />;
     case 'inventories': return <InventoryList />;
     case 'shipments': return <ShipmentList />;
-    default: return <Dashboard />;
+    case 'drugs': return <DrugList />;
+    default: return <WarehouseDashboard />;
   }
 }
 

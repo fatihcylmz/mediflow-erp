@@ -52,8 +52,8 @@ export default function PaymentTransactionList() {
       setLoading(true);
       const [txRes, methodRes, invoiceRes] = await Promise.all([
         api.get('/api/app/payment-transaction'),
-        api.get('/api/app/payment-method'),
-        api.get('/api/app/invoice')
+        api.get('/api/app/payment-method').catch(() => ({ data: { items: [] } })),
+        api.get('/api/app/invoice').catch(() => ({ data: { items: [] } }))
       ]);
       setTransactions(txRes.data.items || []);
       setMethods(methodRes.data.items || []);

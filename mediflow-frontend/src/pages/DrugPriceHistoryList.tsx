@@ -227,12 +227,12 @@ export default function DrugPriceHistoryList() {
           <Space style={{ display: 'flex', width: '100%', gap: '16px' }}>
             <Form.Item name="price" label="Fiyat (KDV Hariç)" rules={[{ required: true }]} style={{ flex: 1 }}>
                {/* DbContext kısıtlaması: decimal(18,2) -> step 0.01 */}
-              <InputNumber style={{ width: '100%' }} min={0} step={0.01} addonAfter="₺" />
+              <InputNumber style={{ width: '100%' }} min={0} step={0.01} suffix="₺" />
             </Form.Item>
             
             <Form.Item name="taxRate" label="KDV Oranı (%)" rules={[{ required: true }]} style={{ flex: 1 }}>
                {/* DbContext kısıtlaması: decimal(5,2) -> step 0.01 */}
-              <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.01} addonAfter="%" />
+              <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.01} suffix="%" />
             </Form.Item>
           </Space>
 
@@ -256,7 +256,7 @@ export default function DrugPriceHistoryList() {
                 {isCovered && (
                   <Form.Item name="stateCoveragePercentage" label="SGK Karşılama Oranı (%)" rules={[{ required: true }]} style={{ marginBottom: 0, flex: 1 }}>
                     {/* DbContext kısıtlaması: decimal(5,2) -> step 0.01 */}
-                    <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.01} addonAfter="%" />
+                    <InputNumber style={{ width: '100%' }} min={0} max={100} step={0.01} suffix="%" />
                   </Form.Item>
                 )}
              </Space>
