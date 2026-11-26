@@ -5,6 +5,7 @@ namespace MediFlow.Prescriptions;
 
 public class Prescription : FullAuditedAggregateRoot<Guid>
 {
+    public Guid? PharmacyId { get; set; } // Reçeteyi işleyen eczane (eczane kapsamı için); bağımsız reçetede null
     public Guid CustomerId { get; set; } // Hangi Hasta? (Daha önce açtığımız Customer tablosuna FK)
     
     public string EPrescriptionNumber { get; set; } // Örn: "RX-99887766" (Devletin verdiği e-reçete no)

@@ -71,6 +71,7 @@ using MediFlow.Payment;
         //Identity
         public DbSet<IdentityUser> Users { get; set; }
         public DbSet<IdentityRole> Roles { get; set; }
+        public DbSet<IdentityRoleClaim> RoleClaims { get; set; }
         public DbSet<IdentityClaimType> ClaimTypes { get; set; }
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
         public DbSet<IdentitySecurityLog> SecurityLogs { get; set; }

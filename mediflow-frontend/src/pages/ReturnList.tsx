@@ -198,7 +198,7 @@ export default function ReturnList() {
       };
 
       if (editingReturnId) {
-        await api.put(`/return/${editingReturnId}`, payload);
+        await api.put(`/api/app/return/${editingReturnId}`, payload);
         message.success('İade kaydı güncellendi.');
       } else {
         await api.post('/api/app/return', payload);
@@ -213,7 +213,7 @@ export default function ReturnList() {
 
   const handleReturnDelete = async (id: string) => {
     try {
-      await api.delete(`/return/${id}`);
+      await api.delete(`/api/app/return/${id}`);
       message.success('İade kaydı silindi.');
       fetchData();
     } catch (error) {
@@ -323,7 +323,7 @@ export default function ReturnList() {
 
   const handleRemoveItem = async (id: string) => {
     try {
-      await api.delete(`/return-item/${id}`);
+      await api.delete(`/api/app/return-item/${id}`);
       message.success('Kalem silindi.');
       if (selectedReturn) showReturnDetails(selectedReturn);
       fetchData();
@@ -343,7 +343,7 @@ export default function ReturnList() {
         status: newStatus,
         isApproved: newStatus === 1
       };
-      await api.put(`/return/${selectedReturn.id}`, payload);
+      await api.put(`/api/app/return/${selectedReturn.id}`, payload);
       message.success(statusText);
       setSelectedReturn({ ...selectedReturn, status: newStatus, isApproved: newStatus === 1 });
       fetchData();

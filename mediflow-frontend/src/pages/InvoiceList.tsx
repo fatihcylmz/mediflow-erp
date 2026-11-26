@@ -104,7 +104,7 @@ export default function InvoiceList() {
         dueDate: values.dueDate.toISOString()
       };
       if (editingId) {
-        await api.put(`/invoice/${editingId}`, payload);
+        await api.put(`/api/app/invoice/${editingId}`, payload);
         message.success('Fatura başarıyla güncellendi.');
       } else {
         await api.post('/api/app/invoice', payload);
@@ -119,7 +119,7 @@ export default function InvoiceList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/invoice/${id}`);
+      await api.delete(`/api/app/invoice/${id}`);
       message.success('Fatura silindi.');
       fetchInitialData();
     } catch (error) {

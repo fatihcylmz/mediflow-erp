@@ -48,6 +48,10 @@ export default function DrugList() {
   const [loadingFormula, setLoadingFormula] = useState<boolean>(false);
   const [formulaForm] = Form.useForm();
 
+  const role = localStorage.getItem('role') || '';
+  const canManage = role === 'admin';
+  const canViewIngredients = role === 'admin' || role === 'pharmacy' || role === 'warehouse';
+
   useEffect(() => {
     fetchInitialData();
   }, []);
@@ -91,7 +95,7 @@ export default function DrugList() {
   const handleDrugSave = async (values: any) => {
     try {
       if (editingDrugId) {
-        await api.put(`/drug/${editingDrugId}`, values);
+        await api.put(`/api/app/drug/${editingDrugId}`, values);
         message.success('İlaç başarıyla güncellendi.');
       } else {
         await api.post('/api/app/drug', values);
@@ -106,7 +110,7 @@ export default function DrugList() {
 
   const handleDrugDelete = async (id: string) => {
     try {
-      await api.delete(`/drug/${id}`);
+      await api.delete(`/api/app/drug/${id}`);
       message.success('İlaç silindi.');
       fetchInitialData();
     } catch (error) {
@@ -151,7 +155,7 @@ export default function DrugList() {
 
   const handleRemoveFormula = async (id: string) => {
     try {
-      await api.delete(`/drug-ingredient/${id}`);
+      await api.delete(`/api/app/drug-ingredient/${id}`);
       message.success('Etken madde formülden çıkarıldı.');
       if (selectedDrug) showFormulaDetails(selectedDrug);
     } catch (error) {
@@ -254,31 +258,35 @@ export default function DrugList() {
       width: 180,
       render: (_: any, record: Drug) => (
         <Space direction="vertical" size={4}>
-          <Tooltip title="Formül Detayları">
-            <Button
-              type="primary"
-              size="small"
-              icon={<ExperimentOutlined />}
-              onClick={() => showFormulaDetails(record)}
-              style={{ width: '100%', background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', border: 'none' }}
-            >
-              Formül
-            </Button>
-          </Tooltip>
-          <Space size={4} style={{ width: '100%' }}>
-            <Tooltip title="Düzenle">
+          {canViewIngredients && (
+            <Tooltip title="Formül Detayları">
               <Button
-                icon={<EditOutlined />}
-                onClick={() => showEditDrugModal(record)}
-                style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 6 }}
-              />
+                type="primary"
+                size="small"
+                icon={<ExperimentOutlined />}
+                onClick={() => showFormulaDetails(record)}
+                style={{ width: '100%', background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', border: 'none' }}
+              >
+                Formül
+              </Button>
             </Tooltip>
-            <Tooltip title="Sil">
-              <Popconfirm title="Bu ilacı silmek istediğinize emin misiniz?" onConfirm={() => handleDrugDelete(record.id)}>
-                <Button danger icon={<DeleteOutlined />} style={{ flex: 1, border: '1px solid #fecaca', borderRadius: 6 }} />
-              </Popconfirm>
-            </Tooltip>
-          </Space>
+          )}
+          {canManage && (
+            <Space size={4} style={{ width: '100%' }}>
+              <Tooltip title="Düzenle">
+                <Button
+                  icon={<EditOutlined />}
+                  onClick={() => showEditDrugModal(record)}
+                  style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 6 }}
+                />
+              </Tooltip>
+              <Tooltip title="Sil">
+                <Popconfirm title="Bu ilacı silmek istediğinize emin misiniz?" onConfirm={() => handleDrugDelete(record.id)}>
+                  <Button danger icon={<DeleteOutlined />} style={{ flex: 1, border: '1px solid #fecaca', borderRadius: 6 }} />
+                </Popconfirm>
+              </Tooltip>
+            </Space>
+          )}
         </Space>
       ),
     }
@@ -319,7 +327,7 @@ export default function DrugList() {
       key: 'action',
       width: 50,
       align: 'center' as const,
-      render: (_: any, record: DrugIngredient) => (
+      render: (_: any, record: DrugIngredient) => canManage ? (
         <Button
           danger
           type="text"
@@ -327,7 +335,7 @@ export default function DrugList() {
           onClick={() => handleRemoveFormula(record.id)}
           size="small"
         />
-      )
+      ) : null
     }
   ];
 
@@ -364,19 +372,21 @@ export default function DrugList() {
                   loading={loading}
                   style={{ borderRadius: 10, border: '1px solid #e2e8f0' }}
                 />
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={showAddDrugModal}
-                  style={{
-                    background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)',
-                    borderColor: 'transparent',
-                    borderRadius: 10,
-                    boxShadow: '0 4px 15px rgba(255, 122, 0, 0.3)'
-                  }}
-                >
-                  Yeni İlaç Ekle
-                </Button>
+                {canManage && (
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={showAddDrugModal}
+                    style={{
+                      background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)',
+                      borderColor: 'transparent',
+                      borderRadius: 10,
+                      boxShadow: '0 4px 15px rgba(255, 122, 0, 0.3)'
+                    }}
+                  >
+                    Yeni İlaç Ekle
+                  </Button>
+                )}
               </Space>
             </Col>
           </Row>
@@ -582,8 +592,9 @@ export default function DrugList() {
         footer={[<Button key="close" onClick={() => setIsFormulaModalVisible(false)} style={{ borderRadius: 10 }}>Kapat</Button>]}
         width={800}
       >
-        <Card size="small" style={{ marginBottom: 16, background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <Form form={formulaForm} layout="inline" onFinish={handleAddFormula} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        {canManage && (
+          <Card size="small" style={{ marginBottom: 16, background: '#f8fafc', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+            <Form form={formulaForm} layout="inline" onFinish={handleAddFormula} style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <Form.Item name="ingredientId" rules={[{ required: true, message: 'Seçiniz' }]}>
               <Select placeholder="Etken Madde Seç" style={{ width: 220 }} showSearch optionFilterProp="children" size="large" options={ingredients.map(i => ({ value: i.id, label: i.name }))} />
             </Form.Item>
@@ -603,7 +614,8 @@ export default function DrugList() {
               <Button type="primary" htmlType="submit" icon={<PlusOutlined />} size="large" style={{ background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)', borderRadius: 10, border: 'none' }}>Ekle</Button>
             </Form.Item>
           </Form>
-        </Card>
+          </Card>
+        )}
 
         <Table
           dataSource={drugIngredients}

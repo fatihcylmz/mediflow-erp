@@ -25,6 +25,9 @@ export default function IngredientList() {
   const [form] = Form.useForm();
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  const role = localStorage.getItem('role') || '';
+  const canManage = role === 'admin';
+
   useEffect(() => {
     fetchIngredients();
   }, []);
@@ -58,7 +61,7 @@ export default function IngredientList() {
   const handleSave = async (values: any) => {
     try {
       if (editingId) {
-        await api.put(`/ingredient/${editingId}`, values);
+        await api.put(`/api/app/ingredient/${editingId}`, values);
         message.success('Etken madde başarıyla güncellendi.');
       } else {
         await api.post('/api/app/ingredient', values);
@@ -74,7 +77,7 @@ export default function IngredientList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/ingredient/${id}`);
+      await api.delete(`/api/app/ingredient/${id}`);
       message.success('Etken madde silindi.');
       fetchIngredients();
     } catch (error: any) {
@@ -138,7 +141,7 @@ export default function IngredientList() {
       key: 'actions',
       fixed: 'right' as const,
       width: 120,
-      render: (_: any, record: Ingredient) => (
+      render: (_: any, record: Ingredient) => canManage ? (
         <Space size={4}>
           <Tooltip title="Düzenle">
             <Button
@@ -158,7 +161,7 @@ export default function IngredientList() {
             </Popconfirm>
           </Tooltip>
         </Space>
-      ),
+      ) : null,
     }
   ];
 
@@ -195,19 +198,21 @@ export default function IngredientList() {
                     style={{ borderRadius: 10, border: '1px solid #e2e8f0' }}
                   />
                 </Tooltip>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={showAddModal}
-                  style={{
-                    background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)',
-                    borderColor: 'transparent',
-                    borderRadius: 10,
-                    boxShadow: '0 4px 15px rgba(255, 122, 0, 0.3)'
-                  }}
-                >
-                  Yeni Madde Ekle
-                </Button>
+                {canManage && (
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={showAddModal}
+                    style={{
+                      background: 'linear-gradient(135deg, #ff7a00, #ff9e4d)',
+                      borderColor: 'transparent',
+                      borderRadius: 10,
+                      boxShadow: '0 4px 15px rgba(255, 122, 0, 0.3)'
+                    }}
+                  >
+                    Yeni Madde Ekle
+                  </Button>
+                )}
               </Space>
             </Col>
           </Row>

@@ -38,6 +38,9 @@ export default function PrescriptionList() {
   const [form] = Form.useForm();
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  const role = localStorage.getItem('role') || '';
+  const isOwnPharmacyScope = role === 'pharmacy' || role === 'sales';
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -83,7 +86,7 @@ export default function PrescriptionList() {
       };
 
       if (editingId) {
-        await api.put(`/prescription/${editingId}`, payload);
+        await api.put(`/api/app/prescription/${editingId}`, payload);
         message.success('Reçete güncellendi.');
       } else {
         await api.post('/api/app/prescription', payload);
@@ -99,7 +102,7 @@ export default function PrescriptionList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/prescription/${id}`);
+      await api.delete(`/api/app/prescription/${id}`);
       message.success('Reçete silindi.');
       fetchData();
     } catch (error: any) {
@@ -229,6 +232,13 @@ export default function PrescriptionList() {
               <Text type="secondary" style={{ marginLeft: 8 }}>
                 Toplam {prescriptions.length} reçete kaydı
               </Text>
+              {isOwnPharmacyScope && (
+                <div style={{ marginTop: 4, marginLeft: 8 }}>
+                  <Tag color="orange" style={{ borderRadius: 6 }}>
+                    Sadece kendi eczanenizin reçetelerini görüntülüyorsunuz
+                  </Tag>
+                </div>
+              )}
             </Col>
             <Col>
               <Space size={12}>

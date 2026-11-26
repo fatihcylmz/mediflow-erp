@@ -141,7 +141,7 @@ export default function OrderList() {
 
     if (newStatus !== order.status) {
       const orderPayload = { ...order, status: newStatus };
-      await api.put(`/order/${order.id}`, orderPayload);
+      await api.put(`/api/app/order/${order.id}`, orderPayload);
       setSelectedOrder(orderPayload);
       fetchData();
     }
@@ -191,7 +191,7 @@ export default function OrderList() {
       };
 
       if (editingOrderId) {
-        await api.put(`/order/${editingOrderId}`, orderPayload);
+        await api.put(`/api/app/order/${editingOrderId}`, orderPayload);
         message.success('Sipariş bilgileri güncellendi.');
       } else {
         const orderRes = await api.post('/api/app/order', orderPayload);
@@ -211,9 +211,9 @@ export default function OrderList() {
     try {
       const relatedItems = allOrderItems.filter(i => i.orderId === id);
       for (const item of relatedItems) {
-        await api.delete(`/order-item/${item.id}`);
+        await api.delete(`/api/app/order-item/${item.id}`);
       }
-      await api.delete(`/order/${id}`);
+      await api.delete(`/api/app/order/${id}`);
       message.success('Sipariş silindi.');
       if (selectedOrder?.id === id) setIsDetailDrawerVisible(false);
       fetchData();
@@ -278,7 +278,7 @@ export default function OrderList() {
   const handleRemoveItem = async (id: string) => {
     if (!selectedOrder) return;
     try {
-      await api.delete(`/order-item/${id}`);
+      await api.delete(`/api/app/order-item/${id}`);
       await refreshOrderItems(selectedOrder);
       message.success('Kalem silindi.');
     } catch (error: any) {
@@ -305,7 +305,7 @@ export default function OrderList() {
     }
     try {
       setLoadingItems(true);
-      await api.put(`/order-item/${record.id}`, {
+      await api.put(`/api/app/order-item/${record.id}`, {
         orderId: record.orderId,
         drugId: record.drugId,
         requestedQuantity: record.requestedQuantity,
@@ -331,7 +331,7 @@ export default function OrderList() {
         const safeApproveQty = Math.min(item.requestedQuantity, availableStock);
         if (safeApproveQty < item.requestedQuantity) stockShortageCount++;
         if (safeApproveQty === item.approvedQuantity) continue;
-        await api.put(`/order-item/${item.id}`, {
+        await api.put(`/api/app/order-item/${item.id}`, {
           orderId: item.orderId,
           drugId: item.drugId,
           requestedQuantity: item.requestedQuantity,

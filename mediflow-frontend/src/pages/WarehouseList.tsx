@@ -53,7 +53,7 @@ export default function WarehouseList() {
   const handleSave = async (values: any) => {
     try {
       if (editingId) {
-        await api.put(`/warehouse/${editingId}`, values);
+        await api.put(`/api/app/warehouse/${editingId}`, values);
         message.success('Depo güncellendi.');
       } else {
         await api.post('/api/app/warehouse', values);
@@ -68,7 +68,7 @@ export default function WarehouseList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/warehouse/${id}`);
+      await api.delete(`/api/app/warehouse/${id}`);
       message.success('Depo silindi.');
       fetchWarehouses();
     } catch (error) {

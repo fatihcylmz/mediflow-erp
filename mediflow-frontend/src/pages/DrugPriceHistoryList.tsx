@@ -90,7 +90,7 @@ export default function DrugPriceHistoryList() {
       };
 
       if (editingId) {
-        await api.put(`/drug-price-history/${editingId}`, payload);
+        await api.put(`/api/app/drug-price-history/${editingId}`, payload);
         message.success('Fiyat kaydı güncellendi.');
       } else {
         await api.post('/api/app/drug-price-history', payload);
@@ -106,7 +106,7 @@ export default function DrugPriceHistoryList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/drug-price-history/${id}`);
+      await api.delete(`/api/app/drug-price-history/${id}`);
       message.success('Fiyat kaydı silindi.');
       fetchData();
     } catch (error) {

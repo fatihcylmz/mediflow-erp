@@ -55,7 +55,7 @@ export default function SupplierList() {
   const handleSave = async (values: any) => {
     try {
       if (editingId) {
-        await api.put(`/supplier/${editingId}`, values);
+        await api.put(`/api/app/supplier/${editingId}`, values);
         message.success('Tedarikçi başarıyla güncellendi.');
       } else {
         await api.post('/api/app/supplier', values);
@@ -71,7 +71,7 @@ export default function SupplierList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/supplier/${id}`);
+      await api.delete(`/api/app/supplier/${id}`);
       message.success('Tedarikçi silindi.');
       fetchSuppliers();
     } catch (error) {

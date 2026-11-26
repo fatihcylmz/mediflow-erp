@@ -131,7 +131,7 @@ export default function ShipmentList() {
       };
 
       if (editingId) {
-        await api.put(`/shipment/${editingId}`, payload);
+        await api.put(`/api/app/shipment/${editingId}`, payload);
         message.success('Sevkiyat güncellendi.');
       } else {
         // 1. Ana Sevkiyat Kaydını Oluştur
@@ -172,7 +172,7 @@ export default function ShipmentList() {
         status: newStatus,
         deliveryDate: newStatus === 2 ? new Date().toISOString() : record.deliveryDate
       };
-      await api.put(`/shipment/${record.id}`, payload);
+      await api.put(`/api/app/shipment/${record.id}`, payload);
       message.success(`Sevkiyat durumu güncellendi: ${getStatusText(newStatus)}`);
       
       // Stoktan düştüğünü görmek için verileri yenile
@@ -195,7 +195,7 @@ export default function ShipmentList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/shipment/${id}`);
+      await api.delete(`/api/app/shipment/${id}`);
       message.success('Sevkiyat silindi.');
       fetchData();
     } catch (error: any) {

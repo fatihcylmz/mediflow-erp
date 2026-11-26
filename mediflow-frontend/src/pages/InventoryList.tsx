@@ -51,6 +51,9 @@ export default function InventoryList() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const role = localStorage.getItem('role') || '';
+  const isPharmacyOrSales = role === 'pharmacy' || role === 'sales';
+
   // Depo Filtresi (Tümü veya seçilen depo ID)
   const [selectedWarehouseFilter, setSelectedWarehouseFilter] = useState<string | null>(null);
 
@@ -116,7 +119,7 @@ export default function InventoryList() {
       };
 
       if (editingId) {
-        await api.put(`/stock-batch/${editingId}`, payload);
+        await api.put(`/api/app/stock-batch/${editingId}`, payload);
         message.success('Lot bilgisi güncellendi.');
       } else {
         await api.post('/api/app/stock-batch', payload);
@@ -131,7 +134,7 @@ export default function InventoryList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/stock-batch/${id}`);
+      await api.delete(`/api/app/stock-batch/${id}`);
       message.success('Lot silindi.');
       fetchInitialData();
     } catch (error) {
@@ -273,6 +276,12 @@ export default function InventoryList() {
             <KPICard title="Karantinada" value={stockBatches.filter(b => b.isQuarantined).length} subtitle="lot" color="#DC2626" icon={<ReloadOutlined />} />
           </Col>
         </Row>
+
+        {isPharmacyOrSales && (
+          <Tag color="orange" style={{ borderRadius: 6, marginBottom: 12 }}>
+            Sadece kendi eczanenizin stoklarını görüntülüyorsunuz
+          </Tag>
+        )}
 
         <Table
           dataSource={summaryData}

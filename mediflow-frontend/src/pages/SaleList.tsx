@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Typography, message, Card, Button, Modal, Form, Select, DatePicker, Space, Popconfirm, InputNumber, Row, Col } from 'antd';
+import { Table, Typography, message, Card, Button, Modal, Form, Select, DatePicker, Space, Popconfirm, InputNumber, Row, Col, Tag } from 'antd';
 import { ShoppingCartOutlined, PlusOutlined, EditOutlined, DeleteOutlined, UnorderedListOutlined, WarningOutlined, CheckCircleOutlined, ClockCircleOutlined, DollarOutlined, FileProtectOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import api from '../services/api';
@@ -49,6 +49,9 @@ export default function SaleList() {
   const [stockBatches, setStockBatches] = useState<StockBatch[]>([]);
   const [drugs, setDrugs] = useState<Drug[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const role = localStorage.getItem('role') || '';
+  const isOwnPharmacyScope = role === 'pharmacy' || role === 'sales';
 
   // Ana Satış Modal State'leri
   const [isSaleModalVisible, setIsSaleModalVisible] = useState<boolean>(false);
@@ -121,7 +124,7 @@ export default function SaleList() {
       };
 
       if (editingSaleId) {
-        await api.put(`/sale/${editingSaleId}`, payload);
+        await api.put(`/api/app/sale/${editingSaleId}`, payload);
         message.success('Satış kaydı güncellendi.');
       } else {
         await api.post('/api/app/sale', payload);
@@ -136,7 +139,7 @@ export default function SaleList() {
 
   const handleSaleDelete = async (id: string) => {
     try {
-      await api.delete(`/sale/${id}`);
+      await api.delete(`/api/app/sale/${id}`);
       message.success('Satış kaydı silindi.');
       fetchData();
     } catch (error) {
@@ -185,7 +188,7 @@ export default function SaleList() {
 
   const handleRemoveItem = async (id: string) => {
     try {
-      await api.delete(`/sale-item/${id}`);
+      await api.delete(`/api/app/sale-item/${id}`);
       message.success('Kalem silindi.');
       if (selectedSale) showSaleDetails(selectedSale);
     } catch (error) {
@@ -338,6 +341,13 @@ export default function SaleList() {
             Satış ve Reçete İşlemleri
           </h2>
           <p style={{ color: '#64748B', margin: '4px 0 0', fontSize: 14 }}>Tüm satış kayıtlarını görüntüleyin, analiz edin ve yönetin.</p>
+          {isOwnPharmacyScope && (
+            <div style={{ marginTop: 6 }}>
+              <Tag color="orange" style={{ borderRadius: 6 }}>
+                Sadece kendi eczanenizin satışlarını görüntülüyorsunuz
+              </Tag>
+            </div>
+          )}
         </div>
         <Button type="primary" icon={<PlusOutlined />} onClick={showAddSaleModal} size="large"
           style={{ background: '#FF7A00', borderColor: '#FF7A00', borderRadius: 10 }}>

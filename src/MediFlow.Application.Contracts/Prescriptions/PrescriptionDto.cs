@@ -5,6 +5,8 @@ namespace MediFlow.Prescriptions;
 
 public class PrescriptionDto : FullAuditedEntityDto<Guid>
 {
+    public Guid? PharmacyId { get; set; }
+    public string? PharmacyName { get; set; } // [D5] N+1 önleme
     public Guid CustomerId { get; set; }
     public string EPrescriptionNumber { get; set; }
     public string DoctorName { get; set; }

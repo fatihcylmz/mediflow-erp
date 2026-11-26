@@ -45,7 +45,15 @@ export default function LoginPage() {
                               (payload['role'] ? [payload['role']] :
                               (Array.isArray(payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']) ? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] :
                               (payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ? [payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']] : [])));
-      const assignedRole = roles.find(r => ['admin','pharmacy','warehouse','supplier','sales'].includes(r.toLowerCase())) ?? 'admin';
+      const assignedRoleMap: Record<string, string> = {
+        admin: 'admin',
+        pharmacyadmin: 'pharmacy',
+        warehouseadmin: 'warehouse',
+        supplier: 'supplier',
+        sales: 'sales',
+      };
+      const matchedRole = roles.find(r => Object.keys(assignedRoleMap).includes(r.toLowerCase()));
+      const assignedRole = matchedRole ? assignedRoleMap[matchedRole.toLowerCase()] : 'admin';
 
       localStorage.setItem('role', assignedRole);
       localStorage.setItem('username', values.username);

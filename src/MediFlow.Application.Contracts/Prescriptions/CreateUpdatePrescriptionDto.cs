@@ -5,6 +5,9 @@ namespace MediFlow.Prescriptions;
 
 public class CreateUpdatePrescriptionDto
 {
+    // Reçeteyi işleyen eczane (PharmacyAdmin/Sales otomatik kendi eczanesi; Admin null bırakabilir)
+    public Guid? PharmacyId { get; set; }
+
     public Guid CustomerId { get; set; }
 
     [Required]

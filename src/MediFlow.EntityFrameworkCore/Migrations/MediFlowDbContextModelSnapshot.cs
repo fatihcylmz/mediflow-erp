@@ -19,7 +19,7 @@ namespace MediFlow.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("_Abp_DatabaseProvider", EfCoreDatabaseProvider.PostgreSql)
-                .HasAnnotation("ProductVersion", "10.0.14")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -801,7 +801,7 @@ namespace MediFlow.Migrations
                     b.Property<decimal>("FeeAmount")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("InvoiceId")
+                    b.Property<Guid?>("InvoiceId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsDeleted")
@@ -829,6 +829,9 @@ namespace MediFlow.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("PaymentMethodId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("SaleId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Status")
@@ -1074,6 +1077,9 @@ namespace MediFlow.Migrations
                     b.Property<Guid?>("LastModifierId")
                         .HasColumnType("uuid")
                         .HasColumnName("LastModifierId");
+
+                    b.Property<Guid?>("PharmacyId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -3568,9 +3574,7 @@ namespace MediFlow.Migrations
                 {
                     b.HasOne("MediFlow.Invoices.Invoice", "Invoice")
                         .WithMany()
-                        .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InvoiceId");
 
                     b.HasOne("MediFlow.Payment.PaymentMethod", "PaymentMethod")
                         .WithMany()

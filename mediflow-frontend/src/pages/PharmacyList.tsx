@@ -82,7 +82,7 @@ export default function PharmacyList() {
   const handleSave = async (values: any) => {
     try {
       if (editingId) {
-        await api.put(`/pharmacy/${editingId}`, values);
+        await api.put(`/api/app/pharmacy/${editingId}`, values);
         message.success('Eczane bilgileri güncellendi.');
       } else {
         await api.post('/api/app/pharmacy', values);
@@ -97,7 +97,7 @@ export default function PharmacyList() {
 
   const handleDelete = async (id: string) => {
     try {
-      await api.delete(`/pharmacy/${id}`);
+      await api.delete(`/api/app/pharmacy/${id}`);
       message.success('Eczane silindi.');
       fetchInitialData();
     } catch (error) {

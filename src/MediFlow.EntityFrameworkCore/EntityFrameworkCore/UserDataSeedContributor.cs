@@ -49,11 +49,11 @@ public class UserDataSeedContributor : IDataSeedContributor, ITransientDependenc
     {
         var users = new[]
         {
-            new { UserName = "admin_mehmet", Email = "admin@mediflow.local", Password = "Admin123!", Role = "Admin", Name = "Mehmet", Surname = "Zortmaz" },
-            new { UserName = "eczane_ahmet", Email = "eczane@mediflow.local", Password = "Pharmacy123!", Role = "PharmacyAdmin", Name = "Ahmet", Surname = "Eczacı" },
-            new { UserName = "depo_ayse", Email = "depo@mediflow.local", Password = "Warehouse123!", Role = "WarehouseAdmin", Name = "Ayşe", Surname = "Depocu" },
-            new { UserName = "tedarikci_mustafa", Email = "tedarikci@mediflow.local", Password = "Supplier123!", Role = "Supplier", Name = "Mustafa", Surname = "Tedarikçi" },
-            new { UserName = "sales_cemal", Email = "sales@mediflow.local", Password = "Sales123!", Role = "Sales", Name = "Cemal", Surname = "Satış" },
+            new { UserName = "admin_mehmet", Email = "admin@mediflow.local", Password = "Admin123!", Role = "Admin", Name = "Mehmet", Surname = "Zortmaz", PharmacyName = (string)null, WarehouseName = (string)null },
+            new { UserName = "eczane_ahmet", Email = "eczane@mediflow.local", Password = "Pharmacy123!", Role = "PharmacyAdmin", Name = "Ahmet", Surname = "Eczacı", PharmacyName = "Şifa Eczanesi", WarehouseName = (string)null },
+            new { UserName = "depo_ayse", Email = "depo@mediflow.local", Password = "Warehouse123!", Role = "WarehouseAdmin", Name = "Ayşe", Surname = "Depocu", PharmacyName = (string)null, WarehouseName = "Merkez Depo - İstanbul Anadolu" },
+            new { UserName = "tedarikci_mustafa", Email = "tedarikci@mediflow.local", Password = "Supplier123!", Role = "Supplier", Name = "Mustafa", Surname = "Tedarikçi", PharmacyName = (string)null, WarehouseName = (string)null },
+            new { UserName = "sales_cemal", Email = "sales@mediflow.local", Password = "Sales123!", Role = "Sales", Name = "Cemal", Surname = "Satış", PharmacyName = "Şifa Eczanesi", WarehouseName = (string)null },
         };
 
         foreach (var u in users)
@@ -66,6 +66,18 @@ public class UserDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 existing.Name = u.Name;
                 existing.Surname = u.Surname;
                 existing.SetEmailConfirmed(true);
+
+                // Rol bazlı veri kapsamı eşlemesi: kullanıcı hangi eczaneye/depoya bağlıysa
+                // bu kayıt Sale/Inventory/Prescription sorgularında kapsam filtresi olarak kullanılır.
+                if (!string.IsNullOrEmpty(u.PharmacyName))
+                {
+                    existing.ExtraProperties["PharmacyName"] = u.PharmacyName;
+                }
+                if (!string.IsNullOrEmpty(u.WarehouseName))
+                {
+                    existing.ExtraProperties["WarehouseName"] = u.WarehouseName;
+                }
+
                 await _userManager.UpdateAsync(existing);
 
                 // Şifre güncelle
@@ -92,6 +104,16 @@ public class UserDataSeedContributor : IDataSeedContributor, ITransientDependenc
                 Surname = u.Surname,
             };
             user.SetEmailConfirmed(true);
+
+            // Rol bazlı veri kapsamı eşlemesi (yeni kullanıcı)
+            if (!string.IsNullOrEmpty(u.PharmacyName))
+            {
+                user.ExtraProperties["PharmacyName"] = u.PharmacyName;
+            }
+            if (!string.IsNullOrEmpty(u.WarehouseName))
+            {
+                user.ExtraProperties["WarehouseName"] = u.WarehouseName;
+            }
 
             var result = await _userManager.CreateAsync(user, u.Password);
             if (!result.Succeeded)

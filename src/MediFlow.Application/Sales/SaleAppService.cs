@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,8 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp;
 using Volo.Abp.Uow;
+using Volo.Abp.Identity;
+using Volo.Abp.Users;
 using MediFlow.Pharmacies;
 using MediFlow.Inventories;
 using MediFlow.Customers;
@@ -36,6 +39,7 @@ public class SaleAppService : CrudAppService<
     private readonly IRepository<Shipment, Guid> _shipmentRepository;
     private readonly IRepository<Order, Guid> _orderRepository;
     private readonly IRepository<Invoice, Guid> _invoiceRepository;
+    private readonly UserScopeService _userScopeService;
 
     public SaleAppService(
         IRepository<Sale, Guid> repository,
@@ -48,7 +52,8 @@ public class SaleAppService : CrudAppService<
         PriceValidationService priceValidationService,
         IRepository<Shipment, Guid> shipmentRepository,
         IRepository<Order, Guid> orderRepository,
-        IRepository<Invoice, Guid> invoiceRepository) : base(repository)
+        IRepository<Invoice, Guid> invoiceRepository,
+        UserScopeService userScopeService) : base(repository)
     {
         _saleItemRepository = saleItemRepository;
         _pharmacyStockRepository = pharmacyStockRepository;
@@ -60,11 +65,60 @@ public class SaleAppService : CrudAppService<
         _shipmentRepository = shipmentRepository;
         _orderRepository = orderRepository;
         _invoiceRepository = invoiceRepository;
+        _userScopeService = userScopeService;
     }
 
-    // [B4] Satış oluşturulduğunda kalemler de oluşturulur ve PharmacyStock'tan düşüm yapılır.
+    // Eczane kapsamı: PharmacyAdmin/Sales yalnızca kendi eczanesinin satışlarını görür.
+    public override async Task<SaleDto> GetAsync(Guid id)
+    {
+        var dto = await base.GetAsync(id);
+
+        var pharmacyScope = await _userScopeService.GetPharmacyScopeAsync();
+        if (pharmacyScope.HasValue && dto.PharmacyId != pharmacyScope.Value)
+        {
+            throw new UserFriendlyException("Bu satışa erişme yetkiniz bulunmuyor.");
+        }
+
+        return dto;
+    }
+
+    public override async Task<PagedResultDto<SaleDto>> GetListAsync(PagedAndSortedResultRequestDto input)
+    {
+        var pharmacyScope = await _userScopeService.GetPharmacyScopeAsync();
+
+        if (!pharmacyScope.HasValue)
+        {
+            return await base.GetListAsync(input);
+        }
+
+        // Eczane rolleri: yalnızca kendi eczanesinin satışlarını görür (fail-closed: Guid.Empty = sonuç yok)
+        var allSales = await Repository.GetListAsync(s => s.PharmacyId == pharmacyScope.Value);
+
+        var pagedSales = allSales
+            .OrderByDescending(s => s.CreationTime)
+            .Skip(input.SkipCount)
+            .Take(input.MaxResultCount)
+            .ToList();
+
+        var dtos = new List<SaleDto>();
+        foreach (var sale in pagedSales)
+        {
+            var dto = ObjectMapper.Map<Sale, SaleDto>(sale);
+            dtos.Add(await populateNames(dto));
+        }
+
+        return new PagedResultDto<SaleDto>(allSales.Count, dtos);
+    }
+
     public override async Task<SaleDto> CreateAsync(CreateUpdateSaleDto input)
     {
+        // Eczane rolleri yalnızca kendi eczanesine satış yapabilir
+        var pharmacyScope = await _userScopeService.GetPharmacyScopeAsync();
+        if (pharmacyScope.HasValue)
+        {
+            input.PharmacyId = pharmacyScope.Value;
+        }
+
         var sale = new Sale
         {
             PharmacyId = input.PharmacyId,

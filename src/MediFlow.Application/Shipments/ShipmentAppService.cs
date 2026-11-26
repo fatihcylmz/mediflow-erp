@@ -56,6 +56,23 @@ namespace MediFlow.Shipments
             await base.DeleteAsync(id);
         }
 
+        // ÖNEMLİ: Sevkiyat doğrudan "Teslim Alındı" olarak oluşturulursa da otomatik
+        // stok transferi yapılır (depo -> eczane). Idempotency guard'ı çift işlemi önler.
+        [UnitOfWork]
+        public override async Task<ShipmentDto> CreateAsync(CreateUpdateShipmentDto input)
+        {
+            var result = await base.CreateAsync(input);
+
+            var deliveredStatus = (ShipmentStatus)2;
+            if (input.Status == deliveredStatus)
+            {
+                var shipment = await Repository.GetAsync(result.Id);
+                await TransferStockToPharmacyAsync(shipment);
+            }
+
+            return result;
+        }
+
         [UnitOfWork]
         public override async Task<ShipmentDto> UpdateAsync(Guid id, CreateUpdateShipmentDto input)
         {
@@ -69,54 +86,74 @@ namespace MediFlow.Shipments
             // EĞER SEVKİYAT "TESLİM ALINDI" Olarak ONAYLANDIYSA:
             if (input.Status == deliveredStatus && oldStatus != deliveredStatus)
             {
-                if (existingShipment.OrderId.HasValue)
-                {
-                    // Siparişteki ilaçları çekiyoruz
-                    var orderItems = await _orderItemRepository.GetListAsync(x => x.OrderId == existingShipment.OrderId.Value);
-
-                    foreach (var item in orderItems)
-                    {
-                        var quantityToDeduct = item.ApprovedQuantity > 0 ? item.ApprovedQuantity : item.RequestedQuantity;
-                        if (quantityToDeduct <= 0) continue;
-
-                        int remainingQuantity = quantityToDeduct;
-
-                        // --- FIFO HATASI DÜZELTMESİ ---
-                        // Eğer OrderItem'da StockBatchId varsa (rezervasyon sırasında atandıysa) ÖNCE ONU KULLAN
-                        if (item.StockBatchId.HasValue)
-                        {
-                            var reservedBatch = await _stockBatchRepository.GetAsync(item.StockBatchId.Value);
-                            remainingQuantity = await ProcessBatchDeductionAsync(reservedBatch, remainingQuantity, existingShipment, item.DrugId);
-                        }
-
-                        // Hala kalan miktar varsa (veya rezervasyon yoksa) FIFO ile tamamla
-                        if (remainingQuantity > 0)
-                        {
-                            var availableBatchesQuery = await _stockBatchRepository.GetQueryableAsync();
-                            var availableBatches = availableBatchesQuery
-                                .Where(x => x.DrugId == item.DrugId && x.Quantity > 0)
-                                .OrderBy(x => x.ExpirationDate)
-                                .ToList();
-
-                            foreach (var batch in availableBatches)
-                            {
-                                if (remainingQuantity <= 0) break;
-                                // Zaten işlenmiş batch'i atla (StockBatchId ile gelen)
-                                if (item.StockBatchId.HasValue && batch.Id == item.StockBatchId.Value) continue;
-
-                                remainingQuantity = await ProcessBatchDeductionAsync(batch, remainingQuantity, existingShipment, item.DrugId);
-                            }
-                        }
-
-                        if (remainingQuantity > 0)
-                        {
-                            throw new UserFriendlyException($"Stok miktarı yetersiz! {remainingQuantity} kutu eksik kalacak. (İlaç: {item.DrugId})");
-                        }
-                    }
-                }
+                var shipment = await Repository.GetAsync(id);
+                await TransferStockToPharmacyAsync(shipment);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Sevkiyat onaylandığında (Eczane Teslim Aldı) depo stokundan düşer, hedef eczanenin
+        /// raf stokuna (PharmacyStock) eklenir. Idempotency guard'ı sayesinde aynı sevkiyat
+        /// birden fazla kez onaylansa bile stok yalnızca 1 kez transfer edilir.
+        /// </summary>
+        private async Task TransferStockToPharmacyAsync(Shipment shipment)
+        {
+            // IDEMPOTENCY GUARD: bu sevkiyatın kalemi zaten yazılmışsa transfer tamamlanmış demektir.
+            var alreadyTransferred = await _shipmentItemRepository.AnyAsync(x => x.ShipmentId == shipment.Id);
+            if (alreadyTransferred)
+            {
+                return; // Çift onay durumunda stok ikinci kez düşmemesin diye
+            }
+
+            if (!shipment.OrderId.HasValue)
+            {
+                return; // Sipariş bağlantısı olmayan sevkiyat stoğu otomatik transfer etmez
+            }
+
+            // Siparişteki ilaçları çekiyoruz
+            var orderItems = await _orderItemRepository.GetListAsync(x => x.OrderId == shipment.OrderId.Value);
+
+            foreach (var item in orderItems)
+            {
+                var quantityToDeduct = item.ApprovedQuantity > 0 ? item.ApprovedQuantity : item.RequestedQuantity;
+                if (quantityToDeduct <= 0) continue;
+
+                int remainingQuantity = quantityToDeduct;
+
+                // --- FIFO HATASI DÜZELTMESİ ---
+                // Eğer OrderItem'da StockBatchId varsa (rezervasyon sırasında atandıysa) ÖNCE ONU KULLAN
+                if (item.StockBatchId.HasValue)
+                {
+                    var reservedBatch = await _stockBatchRepository.GetAsync(item.StockBatchId.Value);
+                    remainingQuantity = await ProcessBatchDeductionAsync(reservedBatch, remainingQuantity, shipment, item.DrugId);
+                }
+
+                // Hala kalan miktar varsa (veya rezervasyon yoksa) FIFO ile tamamla
+                if (remainingQuantity > 0)
+                {
+                    var availableBatchesQuery = await _stockBatchRepository.GetQueryableAsync();
+                    var availableBatches = availableBatchesQuery
+                        .Where(x => x.DrugId == item.DrugId && x.Quantity > 0)
+                        .OrderBy(x => x.ExpirationDate)
+                        .ToList();
+
+                    foreach (var batch in availableBatches)
+                    {
+                        if (remainingQuantity <= 0) break;
+                        // Zaten işlenmiş batch'i atla (StockBatchId ile gelen)
+                        if (item.StockBatchId.HasValue && batch.Id == item.StockBatchId.Value) continue;
+
+                        remainingQuantity = await ProcessBatchDeductionAsync(batch, remainingQuantity, shipment, item.DrugId);
+                    }
+                }
+
+                if (remainingQuantity > 0)
+                {
+                    throw new UserFriendlyException($"Stok miktarı yetersiz! {remainingQuantity} kutu eksik kalacak, sevkiyat teslim alamaz. (İlaç: {item.DrugId})");
+                }
+            }
         }
 
         private async Task<int> ProcessBatchDeductionAsync(StockBatch batch, int remainingQuantity, Shipment existingShipment, Guid drugId)
